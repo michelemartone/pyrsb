@@ -33,7 +33,8 @@ The following functionality is implemented:
  If the file is in place, it won't download it a second time.
  After that, `make local-librsb-pyrsb` (or `make lp`) will build pyrsb
  using local librsb, then run it.
-- `make test` will test and run the `test.py` benchmark (*so you can see speed compared to SciPy*)
+- `make test` will test benchmark code using `test.py` (*to compare speed to SciPy*)
+- `make b` will also produce graphs (requires `gnuplot`)
 
 ## Example Usage
 		import numpy
