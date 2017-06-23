@@ -211,11 +211,18 @@ cdef class rsb_matrix:
         """Destructor."""
         self._mtx_free()
 
-    def shape(self):
+    def getshape(self):
         """
         Shape of the matrix.
         """
         return (self.nrA,self.ncA)
+
+    @property
+    def shape(self):
+        """
+        Shape of the matrix.
+        """
+        return self.getshape()
 
     def __richcmp__(self,f,b):
         """Unfinished."""
@@ -280,7 +287,7 @@ cdef class rsb_matrix:
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
-            y = np.zeros([self.shape()[0],nrhs],dtype=np.double,order='F')
+            y = np.zeros([self.shape[0],nrhs],dtype=np.double,order='F')
             self._spmm(x,y)
         return y
 

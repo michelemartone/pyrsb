@@ -52,8 +52,8 @@ def bench_both(a,c,psf,nrhs=1):
         print "a's triu"
         print a.triu()
         print " "
-    x=np.ones([a.shape()[1],nrhs],dtype=sp.double)
-    y=np.ones([a.shape()[0],nrhs],dtype=sp.double)
+    x=np.ones([a.shape[1],nrhs],dtype=sp.double)
+    y=np.ones([a.shape[0],nrhs],dtype=sp.double)
     nnz=a.nnz()
     if want_verbose:
         a.do_print()
@@ -71,8 +71,8 @@ def bench_both(a,c,psf,nrhs=1):
     su=psf_dt/rsb_dt
     if want_verbose:
     	print("Speedup of RSB over ",psf," is ",su,"x")
-    #print("PYRSB:"," nr: ",a.shape()[0]," nc: ",a.shape()[1]," nnz: ",nnz," speedup: ",su," nrhs: ",nrhs," psf_mflops: ",psf_mflops," rsb_mflops: ",rsb_mflops,"")
-    printf("PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  psf_mflops: %.2e  rsb_mflops: %.2e\n",a.shape()[0],a.shape()[1],nnz,su,nrhs,psf_mflops,rsb_mflops)
+    #print("PYRSB:"," nr: ",a.shape[0]," nc: ",a.shape[1]," nnz: ",nnz," speedup: ",su," nrhs: ",nrhs," psf_mflops: ",psf_mflops," rsb_mflops: ",rsb_mflops,"")
+    printf("PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  psf_mflops: %.2e  rsb_mflops: %.2e\n",a.shape[0],a.shape[1],nnz,su,nrhs,psf_mflops,rsb_mflops)
     if want_verbose:
         print("y=",y)
 
