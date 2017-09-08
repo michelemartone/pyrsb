@@ -186,7 +186,7 @@ cdef class rsb_matrix:
         self.errval = lr.rsb_mtx_get_info_str(self.mtxAp, "RSB_MIF_MATRIX_INFO__TO__CHAR_P", buf, buflen)
         self._err_check()
         # self.do_print()
-        return "["+buf+"]"
+        return "["+buf.decode("utf-8")+"]"
 
     def do_print(self, brief=False):
         """
