@@ -19,6 +19,8 @@ import scipy as sp
 import cython
 cimport cython
 
+import sys
+
 verbose=0
 
 cpdef rsb_lib_init():
@@ -186,7 +188,12 @@ cdef class rsb_matrix:
         self.errval = lr.rsb_mtx_get_info_str(self.mtxAp, "RSB_MIF_MATRIX_INFO__TO__CHAR_P", buf, buflen)
         self._err_check()
         # self.do_print()
-        return "["+buf+"]"
+        if sys.version_info[0] < 3:
+            # Python2
+            return "["+buf+"]"
+        else:
+            # Python3
+            return "["+buf.decode("utf-8")+"]"
 
     def do_print(self, brief=False):
         """
