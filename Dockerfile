@@ -1,5 +1,5 @@
 # Start with a configurable base image
-ARG IMG="debian"
+ARG IMG="debian:latest"
 FROM "${IMG}"
 
 # Declare the arguments
@@ -12,8 +12,6 @@ RUN apt-get update
 
 # Install the packages needed for the build
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
-    "clang" \
-    "clang-tidy" \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
     "libhwloc-dev" "libgfortran-6-dev" "libz-dev" \
