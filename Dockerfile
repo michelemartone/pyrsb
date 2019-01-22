@@ -17,7 +17,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
     "make" \
-    "cython python3-scipy python3-numpy" \
+    "cython" "python-scipy" "python-numpy" \
     "pkg-config" \
     ${PKG}
 
