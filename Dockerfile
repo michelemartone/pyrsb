@@ -16,6 +16,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "clang-tidy" \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
+    "libhwloc-dev" "libgfortran-6-dev" "libz-dev" \
     "make" \
     "cython" "python-scipy" "python-numpy" \
     "pkg-config" \
