@@ -17,6 +17,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
     "make" \
+    "cython python3-scipy python3-numpy" \
     "pkg-config" \
     ${PKG}
 
@@ -31,3 +32,4 @@ USER "user"
 
 # Build and test (TODO)
 RUN rsbench -Q0.11
+RUN make
