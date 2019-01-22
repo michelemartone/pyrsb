@@ -30,4 +30,4 @@ RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test (TODO)
-RUN rsbench -Q1
+RUN rsbench -Q0.11
