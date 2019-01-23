@@ -16,6 +16,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "man" "librsb-dev" "librsb-doc" \
     "libhwloc-dev" "libgfortran-6-dev" "libz-dev" \
     "make" \
+    "octave" "octave-sparsersb" \
     "cython" "python-scipy" "python-numpy" \
     "pkg-config" \
     ${PKG}
@@ -29,6 +30,7 @@ RUN useradd "user"
 RUN chown --recursive "user:user" "."
 USER "user"
 
-# Build and test (TODO)
+# Build and test
 RUN rsbench -Q0.11
+RUN octave /usr/share/doc/octave-sparsersb/examples/sparsersbbench.m
 RUN make
