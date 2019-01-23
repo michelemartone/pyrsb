@@ -1,5 +1,5 @@
 # Start with a configurable base image
-ARG IMG="debian:latest"
+ARG IMG="debian:testing"
 FROM "${IMG}"
 
 # Declare the arguments
