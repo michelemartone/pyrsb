@@ -14,8 +14,8 @@ RUN apt-get update
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
-    "libhwloc-dev" "libgfortran-8-dev" "libz-dev" \
-    "make" \
+    "libhwloc-dev" "libz-dev" \
+    "make" "gfortran" "libgfortran-8-dev" \
     "octave" "octave-sparsersb" \
     "cython" "python-scipy" "python-numpy" \
     "pkg-config" \
