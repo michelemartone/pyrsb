@@ -7,4 +7,5 @@ env:
  - OMP_NUM_THREADS=2
 
 script:
-- docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" "."
+- docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" "IMG=ubuntu:18.04" "."
+- docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" "IMG=debian:unstable" "."
