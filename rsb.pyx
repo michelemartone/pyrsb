@@ -183,10 +183,13 @@ cdef class rsb_matrix:
         """Return a brief matrix description string."""
         cdef size_t buflen = 256
         cdef char buf[256]
+        cdef bytes info = b"["
         self.errval = lr.rsb_mtx_get_info_str(self.mtxAp, "RSB_MIF_MATRIX_INFO__TO__CHAR_P", buf, buflen)
         self._err_check()
         # self.do_print()
-        return "["+buf+"]"
+        info += buf
+        info += b"]"
+        return str(info)
 
     def do_print(self, brief=False):
         """
