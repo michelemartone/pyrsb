@@ -38,20 +38,20 @@ def bench_both(a,c,psf,nrhs=1):
     if want_autotune:
         a.autotune(verbose=want_verbose_tuning)
     if want_verbose:
-    	print "Benchmarking SPMV on matrix ",a
+    	print ("Benchmarking SPMV on matrix ",a)
     if want_verbose:
-        print "*"
-        print a
-        print "*"
-        print "a:"
-        print a.find()
-        print "a's (1,1):"
-        print a.find_block(1,1,1,1)
-        print "a's tril"
-        print a.tril()
-        print "a's triu"
-        print a.triu()
-        print " "
+        print ("*")
+        print (a)
+        print ("*")
+        print ("a:")
+        print (a.find())
+        print ("a's (1,1):")
+        print (a.find_block(1,1,1,1))
+        print ("a's tril")
+        print (a.tril())
+        print ("a's triu")
+        print (a.triu())
+        print (" ")
     x=np.ones([a.shape[1],nrhs],dtype=sp.double)
     y=np.ones([a.shape[0],nrhs],dtype=sp.double)
     nnz=a.nnz()
