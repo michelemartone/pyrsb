@@ -10,11 +10,11 @@ ifeq "$(HOSTNAME)" "your_host"
 export LIBRSB_CONFIG_PATH=
 else
 endif
-#export CXXLAGS=$(shell $(RSBPATH)/bin/librsb-config  --cflags ; python-config  --cflags) 
+#export CXXLAGS=$(shell $(RSBPATH)/bin/librsb-config  --cflags ; python3-config  --cflags) 
 #export LDFLAGS=$(shell $(LIBRSB_CONFIG) --ldflags ) -fopenmp 
 #export LIBS=$(shell /opt/librsb-debug/bin/librsb-config   --ldflags ) 
 export LIBRSB_CONFIG=$(LIBRSB_CONFIG_PATH)librsb-config
-export CFLAGS=$(shell $(LIBRSB_CONFIG)  --cflags ; python-config  --cflags ) $(EXTRA_CFLAGS)
+export CFLAGS=$(shell $(LIBRSB_CONFIG)  --cflags ; python3-config  --cflags ) $(EXTRA_CFLAGS)
 export LDFLAGS=$(shell $(LIBRSB_CONFIG) --ldflags --extra_libs )
 export RSB_INCDIR=$(shell $(LIBRSB_CONFIG) --prefix )/include
 
@@ -49,11 +49,11 @@ all-local: local-librsb local-librsb-pyrsb
 # python -c 'import rsb; import numpy; rsb.rsb_lib_init();a=rsb.rsb_matrix([11.0,22.0],[1,2],[1,2]);b=rsb.rsb_matrix([110.,220.],[1,2],[1,2]);x=numpy.array([110.,220,330]);y=numpy.array([0.,0.,0.]);b.spmv(x,y);print x,y;print(a>=b);print(a);print(a*b);del a; del b;rsb.rsb_lib_exit()'
 test: rsb.so
 	export PYTHONPATH=.
-	python demo.py
-	python test.py
+	python3 demo.py
+	python3 test.py
 
 rsb.so: rsb.o setup.py
-	python setup.py build_ext -i
+	python3 setup.py build_ext -i
 
 rsb.o: rsb.c
 
@@ -69,7 +69,7 @@ RSB2PY=./rsb_h_to_rsb_py.sh
 # 	$(RSB2PY) $(SRCDIR) | grep -v RSB_WANT_LONG_IDX_TYPE > $@
 	
 rsb.c: rsb.pyx librsb.pxd
-	cython    -I$(RSB_INCDIR)  rsb.pyx
+	cython3    -I$(RSB_INCDIR)  rsb.pyx
 	#cython -3 -I$(RSB_INCDIR)  rsb.pyx
 
 clean:
@@ -94,5 +94,5 @@ dist:
 signed-dist: dist
 	gpg -sbv -u 1DBB555AEA359B8AAF0C6B88E0E669C8EF1258B8 -a pyrsb.tar.gz
 
-# cython python-dev
+# cython3 python3-dev
 

@@ -17,7 +17,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "libhwloc-dev" "libz-dev" \
     "make" "gfortran" "libgfortran-8-dev" \
     "octave" "octave-sparsersb" \
-    "cython" "python-scipy" "python-numpy" "python-configobj" \
+    "cython3" "python3-scipy" "python3-numpy" "python3-configobj" \
     "pkg-config" \
     ${PKG}
 
