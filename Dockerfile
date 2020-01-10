@@ -31,7 +31,7 @@ RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test
-RUN rsbench -Q0.11
+# RUN rsbench -Q0.11
 #RUN octave /usr/share/doc/octave-sparsersb/examples/sparsersbbench.m # too much
 RUN octave /usr/share/doc/octave-sparsersb/examples/demo_sparsersb.m
 RUN make
