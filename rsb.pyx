@@ -111,11 +111,21 @@ cdef class rsb_matrix:
         self._err_check()
         return self.errval
 
+    def _spmv(self,np.ndarray[np.float_t, ndim=1] x, np.ndarray[np.float_t, ndim=1] y, transA='N', double alpha = 1.0, double beta = 1.0, order='F'):
+        """
+        Sparse Matrix by vector product based on rsb_spmv().
+        """
+        cdef lr.rsb_coo_idx_t incX = 1, incY = 1
+        cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
+        self.errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
+        self._err_check()
+        return self.errval
+
     def _spmv(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0, order='F'):
         """
         Sparse Matrix by vector product based on rsb_spmv().
         """
-        cdef lr.rsb_coo_idx_t incX = 1, incY = 1 
+        cdef lr.rsb_coo_idx_t incX = 1, incY = 1
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         self.errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
         self._err_check()
@@ -286,7 +296,7 @@ cdef class rsb_matrix:
         if type(x) is type(self):
             return self._spmul(x)
         if x.ndim is 1:
-            y = np.empty([self.nrA            ],dtype=np.double,order='F')
+            y = np.empty([self.nr()            ],dtype=np.double,order='F')
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
@@ -396,6 +406,20 @@ cdef class rsb_matrix:
         (specific to rsb).
         """
         return self.nnzA
+
+    def nr(self):
+        """
+        Number of rows.
+        (specific to rsb).
+        """
+        return self.nrA
+
+    def nc(self):
+        """
+        Number of columns.
+        (specific to rsb).
+        """
+        return self.ncA
 
     def _refresh(self):
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.nrA)
