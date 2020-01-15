@@ -4,11 +4,11 @@
 [librsb](http://librsb.sourceforge.net/) is a **high performance sparse matrix
 library** implementing the Recursive Sparse Blocks format,
 which is especially well suited for
-multiplications in **iterative methods** on **huge sparse matrices**.
+multiplications in **iterative methods** on **huge symmetric sparse matrices**.
 
 **PyRSB is a Cython-based Python interface to librsb.**
 
-So far, PyRSB is a working prototype, so **prospective users and collaborators feedback is sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
+So far, PyRSB is a working prototype: **prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
 
 ## Features
 
@@ -17,7 +17,7 @@ The following functionality is implemented:
   * Initialization with `rsb.rsb_matrix()` styled as [`scipy.sparse.csr_matrix()`](https://docs.scipy.org/doc/scipy/reference/sparse.html).
   * Conversion from `scipy.sparse.csr_matrix()`.
   * Multiplication by vector/multivector.
-  * Rows/columns through `nr=a.shape()[0]`/`nr=a.shape()[1]`.
+  * Rows/columns through `nr=a.shape()[0]`/`nr=a.shape()[1]`, or `nr()`/`nc()`.
   * `find()`, `find_block()`, `tril()`, `triu()`, `shape()`, `nnz()`.
   * `print`'able.
   * PyRSB-Specific: `autotune()`, `do_print()`.
@@ -25,7 +25,7 @@ The following functionality is implemented:
 ## Build and Use
 
 - If you have librsb installed:
- `make` will attempt building and testing.
+ `make` shall build and test.
   Make sure you have `cython`, `scipy`, `numpy`. installed.
 - If you want the `Makefile` to build librsb (in this directory):
  `make all-local` will attempt downloading librsb-1.2.0-rc7 from the 
