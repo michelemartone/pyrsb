@@ -296,7 +296,7 @@ cdef class rsb_matrix:
         if type(x) is type(self):
             return self._spmul(x)
         if x.ndim is 1:
-            y = np.empty([self.nr()            ],dtype=np.double,order='F')
+            y = np.zeros([self.nr()         ],dtype=np.double)
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
