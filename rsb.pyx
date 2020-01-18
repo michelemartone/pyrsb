@@ -285,7 +285,7 @@ cdef class rsb_matrix:
         """
            Multiply by a scalar, dense vector, dense matrix (multivector) or another sparse matrix.
            In the case of a scalar, will return a scaled copy of this matrix.
-           In the case of a vector or multivector, this will be assumed stored in Fortran (column first) order.
+           In the case of a vector or multivector, order is taken from the operand array; Fortran (column-first) order is recommended.
            In the case of another sparse matrix, this must be conformant in size.
         """
         cdef np.ndarray y
@@ -300,7 +300,11 @@ cdef class rsb_matrix:
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
-            y = np.zeros([self.shape[0],nrhs],dtype=np.double,order='F')
+            if x.itemsize == x.strides[0]:
+                order='F'
+            else:
+                order='C'
+            y = np.zeros([self.shape[0],nrhs],dtype=np.double,order=order)
             self._spmm(x,y)
         return y
 
