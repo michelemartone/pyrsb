@@ -18,8 +18,9 @@ a=rsb_matrix(c)
 nrhs=1 # set to nrhs>1 to multiply by multiple vectors at once
 nr=a.shape[0]
 nc=a.shape[1]
-x=numpy.empty([nc,nrhs],dtype=scipy.double)
-y=numpy.empty([nr,nrhs],dtype=scipy.double)
+order='F'
+x=numpy.empty([nc,nrhs],dtype=scipy.double,order=order)
+y=numpy.empty([nr,nrhs],dtype=scipy.double,order=order)
 x[:,:]=1.0
 y[:,:]=0.0
 print(a)
