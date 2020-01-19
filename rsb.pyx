@@ -97,18 +97,11 @@ cdef class rsb_matrix:
         cdef lr.rsb_coo_idx_t nrhs = x.shape[1]
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        if order == b'F':
-            ldB=self.ncA
-            ldC=self.nrA
-            order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-        else:
-            ldB=nrhs
-            ldC=nrhs
-            order=lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
+        (lr_order,ldB,ldC)=self._otn2obc(order,transA,nrhs)
         if x.shape[1] is not y.shape[1]:
            self.errval = lr.RSB_ERR_BADARGS
         else:
-           self.errval = lr.rsb_spmm(transA_, &alpha, self.mtxAp, nrhs, order, <lr.cvoid_ptr>x.data, ldB, &beta, <lr.void_ptr>y.data, ldC);
+           self.errval = lr.rsb_spmm(transA_, &alpha, self.mtxAp, nrhs, lr_order, <lr.cvoid_ptr>x.data, ldB, &beta, <lr.void_ptr>y.data, ldC);
         self._err_check()
         return self.errval
 
@@ -349,8 +342,23 @@ cdef class rsb_matrix:
         (specific to rsb).
         """
         self.errval = lr.rsb_lib_set_opt_str(opnp,opvp)
-        self._err_check()
+        self._err_check(want_strict=True)
         return True
+
+    def _otn2obc(self,order,transA,nrhs):
+        if order == b'F':
+            lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
+            if transA == b'N':
+                ldB=self.ncA
+                ldC=self.nrA
+            else:
+                ldB=self.nrA
+                ldC=self.ncA
+        else:
+            lr_order=lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
+            ldB=nrhs
+            ldC=nrhs
+        return (lr_order,ldB,ldC)
 
     def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', double alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', double beta=1.0, verbose = False):
         """
@@ -359,23 +367,16 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        if order == b'F':
-            ldB=self.ncA
-            ldC=self.nrA
-            order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-        else:
-            ldB=nrhs
-            ldC=nrhs
-            order=lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
+        (lr_order,ldB,ldC)=self._otn2obc(order,transA,nrhs)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
-        self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,order,NULL,ldB,&beta,NULL,ldC);
+        self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
+        self._err_check(want_strict=True)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
-        self._err_check()
         return True
 
-    def _err_check(self):
+    def _err_check(self,want_strict=False):
         """
         Basic error checking.
         (specific to rsb).
@@ -385,7 +386,9 @@ cdef class rsb_matrix:
         if ( self.errval ):
             lr.rsb_strerror_r(self.errval,buf,buflen)
             self.errval = lr.RSB_ERR_NO_ERROR
-            print("Error reported by librsb: ", buf)
+            print "Error reported by librsb: ", str(buf,'ascii')
+            if want_strict:
+                assert False
             return False
         return True
 
