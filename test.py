@@ -46,7 +46,7 @@ def bench_both(a,c,psf,nrhs=1):
         print ("a:")
         print (a.find())
         print ("a's (1,1):")
-        print (a.find_block(1,1,1,1))
+        print (a._find_block(1,1,1,1))
         print ("a's tril")
         print (a.tril())
         print ("a's triu")
