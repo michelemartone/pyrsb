@@ -180,7 +180,7 @@ cdef class rsb_matrix:
         cdef np.ndarray IAa = np.array(I,dtype=np.int32)
         cdef np.ndarray JAa = np.array(J,dtype=np.int32)
         self.nnzA=len(VAa)
-        VA=<lr.cvoid_ptr> VAa.data
+        VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*>IAa.data
         JA=<lr.rsb_coo_idx_t*>JAa.data
         self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&self.errval)
@@ -403,9 +403,9 @@ cdef class rsb_matrix:
         cdef np.ndarray VAa = np.arange(rnz,dtype=np.double)
         cdef np.ndarray JAa = np.arange(rnz,dtype=np.int32)
         cdef np.ndarray IAa = np.arange(rnz,dtype=np.int32)
-        cdef lr.cvoid_ptr VA = NULL
+        cdef lr.void_ptr VA = NULL
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
-        VA=<lr.cvoid_ptr> VAa.data
+        VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*> IAa.data
         JA=<lr.rsb_coo_idx_t*> JAa.data
         self.errval = lr.rsb_mtx_get_coo_block(self.mtxAp,VA,IA,JA,frA,lrA,fcA,lcA,NULL,NULL,NULL,lr.RSB_FLAG_NOFLAGS)
@@ -452,12 +452,12 @@ cdef class rsb_matrix:
         More or less as scipy.sparse.find(): returns (ia,ja,va).
         (specific to rsb).
         """
-        cdef lr.cvoid_ptr VA = NULL
+        cdef lr.void_ptr VA = NULL
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
         cdef np.ndarray VAa = np.arange(self.nnzA,dtype=np.double)
         cdef np.ndarray IAa = np.arange(self.nnzA,dtype=np.int32)
         cdef np.ndarray JAa = np.arange(self.nnzA,dtype=np.int32)
-        VA=<lr.cvoid_ptr> VAa.data
+        VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*> IAa.data
         JA=<lr.rsb_coo_idx_t*> JAa.data
         self.errval = lr.rsb_mtx_get_coo(self.mtxAp,VA,IA,JA,lr.RSB_FLAG_NOFLAGS)
@@ -562,7 +562,7 @@ cdef class rsb_matrix:
         if order is 'C':
             rowmajorB = lr.RSB_BOOL_TRUE
             ldB=self.ncA; nrB=self.nrA; ncB=self.ncA
-        if order is 'F':
+        else:
             rowmajorB = lr.RSB_BOOL_FALSE
             ldB=self.nrA; nrB=self.nrA; ncB=self.ncA
         self.errval = lr.rsb_mtx_add_to_dense(&alpha,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
