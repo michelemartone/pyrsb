@@ -360,14 +360,24 @@ cdef class rsb_matrix:
             ldC=nrhs
         return (lr_order,ldB,ldC)
 
+    def _o2o(self, lr.rsb_flags_t order):
+        if order == b'F':
+            lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
+        else:
+            if order == b'C':
+                lr_order=lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
+            else:
+                assert False
+        return lr_order
+
     def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', double alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', double beta=1.0, verbose = False):
         """
         An auto-tuner based on rsb_tune_spmm(): optimizes either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
         """
-        cdef lr.rsb_nnz_idx_t ldB, ldC
+        cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        (lr_order,ldB,ldC)=self._otn2obc(order,transA,nrhs)
+        lr_order=self._o2o(order)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
         self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
