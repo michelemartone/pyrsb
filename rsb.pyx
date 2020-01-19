@@ -98,7 +98,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         if order == b'F':
-            ldB=self.nrA
+            ldB=self.ncA
             ldC=self.nrA
             order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
         else:
@@ -360,7 +360,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         if order == b'F':
-            ldB=self.nrA
+            ldB=self.ncA
             ldC=self.nrA
             order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
         else:
