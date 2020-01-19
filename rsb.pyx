@@ -63,6 +63,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_coo_idx_t ncA
     cdef lr.rsb_coo_idx_t nrA
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
+    cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
 
     def _psf2lsf(self, sym):
@@ -187,6 +188,7 @@ cdef class rsb_matrix:
         IA=<lr.rsb_coo_idx_t*>IAa.data
         JA=<lr.rsb_coo_idx_t*>JAa.data
         self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&self.errval)
+        self._refresh()
         return
     
     def __str__(self):
@@ -411,6 +413,13 @@ cdef class rsb_matrix:
         """
         return self.nnzA
 
+    def nsubm(self):
+        """
+        Number of sparse blocks.
+        (specific to rsb).
+        """
+        return self.nsubmA
+
     def nr(self):
         """
         Number of rows.
@@ -430,6 +439,7 @@ cdef class rsb_matrix:
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.ncA)
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
+        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
 
     def find(self):
         """

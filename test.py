@@ -72,7 +72,7 @@ def bench_both(a,c,psf,nrhs=1):
     if want_verbose:
     	print("Speedup of RSB over ",psf," is ",su,"x")
     #print("PYRSB:"," nr: ",a.shape[0]," nc: ",a.shape[1]," nnz: ",nnz," speedup: ",su," nrhs: ",nrhs," psf_mflops: ",psf_mflops," rsb_mflops: ",rsb_mflops,"")
-    printf("PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  psf_mflops: %.2e  rsb_mflops: %.2e\n",a.shape[0],a.shape[1],nnz,su,nrhs,psf_mflops,rsb_mflops)
+    printf("PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  psf_mflops: %.2e  rsb_mflops: %.2e  rsb_nsubm: %d\n",a.shape[0],a.shape[1],nnz,su,nrhs,psf_mflops,rsb_mflops,a.nsubm())
     if want_verbose:
         print("y=",y)
 
