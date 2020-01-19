@@ -36,6 +36,7 @@ cpdef rsb_lib_exit():
 cpdef rsb_file_mtx_load(const char * filename):
     """Load an rsb_matrix matrix from a Matrix Market file."""
     rm = rsb_matrix()
+    lr.rsb_mtx_free(rm.mtxAp) # workaround: shall maybe pass string to rsb_matrix ?
     rm.mtxAp = lr.rsb_file_mtx_load(filename,rm.flagsA,rm.typecode,&rm.errval)
     rm._err_check()
     rm._refresh()
