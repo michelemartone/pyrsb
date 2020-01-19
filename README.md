@@ -8,7 +8,7 @@ multiplications in **iterative methods** on **huge symmetric sparse matrices**.
 
 **PyRSB is a Cython-based Python interface to librsb.**
 
-So far, PyRSB is a working prototype: **prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
+So far, PyRSB is only a prototype: **prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
 
 ## Features
 
@@ -21,6 +21,7 @@ The following functionality is implemented:
   * `find()`, `find_block()`, `tril()`, `triu()`, `shape()`, `nnz()`.
   * `print`'able.
   * PyRSB-Specific: `autotune()`, `do_print()`.
+  * load from a Matrix Market file, e.g. `rsb.rsb_file_mtx_load(bytes(filename,encoding='utf-8'))`
 
 ## Build and Use
 

@@ -10,7 +10,6 @@ import numpy as np
 import scipy as sp
 import sys
 
-import sys
 def printf(format, *args):
     sys.stdout.write(format % args)
 
@@ -97,13 +96,17 @@ def bench_random_files():
 
 def bench_file(filename):
     print("# loading from file ",filename)
-    a=rsb.rsb_file_mtx_load(filename)
+    a=rsb.rsb_file_mtx_load(bytes(filename,encoding='utf-8'))
     if a is not None:
         (I,J,V)=a.find()
         c=sp.sparse.csr_matrix((V,(I,J)))
         bench_matrix(a,c)
 
-#bench_file("venkat50.mtx.gz")
-bench_random_files()
-# a.save("file.mtx")
+if len(sys.argv) > 1 :
+    for filename in sys.argv[1:]:
+        bench_file(filename)
+else:
+    #bench_file("venkat50.mtx.gz")
+    bench_random_files()
+    # a.save("file.mtx")
 rsb.rsb_lib_exit()

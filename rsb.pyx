@@ -33,7 +33,7 @@ cpdef rsb_lib_exit():
         print("Finalizing librsb")
     return lr.rsb_lib_exit(NULL)
 
-cpdef rsb_file_mtx_load(char * filename):
+cpdef rsb_file_mtx_load(const char * filename):
     """Load an rsb_matrix matrix from a Matrix Market file."""
     rm = rsb_matrix()
     rm.mtxAp = lr.rsb_file_mtx_load(filename,rm.flagsA,rm.typecode,&rm.errval)
@@ -173,9 +173,12 @@ cdef class rsb_matrix:
             V = []
             I = []
             J = []
-        else:
-            if shape is None:
-                shape=[max(I)+1,max(J)+1]
+
+        if shape is None:
+            shape=[0,0]
+        if len(I):
+            shape=[max(I)+1,max(J)+1]
+
         self.nrA=shape[0]
         self.ncA=shape[1]
         self.flagsA = self.flagsA + self._psf2lsf(sym)
