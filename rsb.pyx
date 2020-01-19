@@ -98,7 +98,9 @@ cdef class rsb_matrix:
         cdef lr.rsb_coo_idx_t nrhs = x.shape[1]
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
+        cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
         (lr_order,ldB,ldC)=self._otn2obc(order,transA,nrhs)
+        assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
            self.errval = lr.RSB_ERR_BADARGS
         else:
@@ -347,6 +349,7 @@ cdef class rsb_matrix:
         return True
 
     def _otn2obc(self,order,transA,nrhs):
+        cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
         if order == b'F':
             lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
             if transA == b'N':
@@ -362,6 +365,7 @@ cdef class rsb_matrix:
         return (lr_order,ldB,ldC)
 
     def _o2o(self, lr.rsb_flags_t order):
+        cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
         if order == b'F':
             lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
         else:
@@ -378,10 +382,11 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        lr_order=self._o2o(order)
+        cdef lr.rsb_flags_t lr_order = self._o2o(order)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
         self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
+        assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         self._err_check(want_strict=True)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
