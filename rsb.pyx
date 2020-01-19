@@ -363,10 +363,10 @@ cdef class rsb_matrix:
             ldC=nrhs
             order=lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if (verbose == True):
-            self.opt_set("RSB_IO_WANT_VERBOSE_TUNING","1")
+            self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
         self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,order,NULL,ldB,&beta,NULL,ldC);
         if (verbose == True):
-            self.opt_set("RSB_IO_WANT_VERBOSE_TUNING","0")
+            self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
         self._err_check()
         return True
 
