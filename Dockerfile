@@ -19,6 +19,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     "octave" "octave-sparsersb" \
     "cython3" "python3-scipy" "python3-numpy" "python3-configobj" \
     "pkg-config" \
+    "python3-setuptools" \
     ${PKG}
 
 # Copy the current directory to the container and continue inside it
