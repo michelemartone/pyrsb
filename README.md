@@ -2,7 +2,7 @@
 # PyRSB
 
 [![GPL enforced badge](https://img.shields.io/badge/GPL-enforced-blue.svg "This project enforces the GPL.")](https://gplenforced.org)
-[![Build Status](https://travis-ci.com/michelemartone/pyrsb.svg?branch=master)](https://travis-ci.com/michelemartone/pyrsb)
+[![Build Status](https://travis-ci.org/michelemartone/pyrsb.svg?branch=master)](https://travis-ci.org/michelemartone/pyrsb)
 
 [librsb](http://librsb.sourceforge.net/) is a **high performance sparse matrix
 library** implementing the Recursive Sparse Blocks format,
