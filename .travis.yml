@@ -8,4 +8,8 @@ env:
 
 script:
   - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:18.04" "."
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:19.04" "."
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:19.10" "."
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:20.04" "."
   - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=debian:unstable" "."
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=debian:testing" "."
