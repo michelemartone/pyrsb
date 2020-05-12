@@ -34,5 +34,5 @@ USER "user"
 # Build and test librsb a bit
 # RUN rsbench -Q0.11
 #RUN octave /usr/share/doc/octave-sparsersb/examples/sparsersbbench.m # too much
-RUN octave -q --no-gui --no-window-system /usr/share/doc/octave-sparsersb/examples/demo_sparsersb.m
+#RUN octave -q --no-gui --no-window-system /usr/share/doc/octave-sparsersb/examples/demo_sparsersb.m
 RUN make
