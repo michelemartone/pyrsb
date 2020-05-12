@@ -14,5 +14,9 @@ env:
     - IMG=debian:unstable
     - IMG=debian:testing
 
+jobs:
+  allow_failures:
+    - env: IMG=ubuntu:19.04
+
 script:
   - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "${IMG}" "."
