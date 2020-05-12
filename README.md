@@ -31,6 +31,10 @@ The following functionality is implemented:
 - If you have librsb installed:
  `make` shall build and test.
   Make sure you have `cython`, `scipy`, `numpy`. installed.
+- If you want to install librsb on Ubuntu or Debian:
+ `sudo apt-get install librsb-dev` shall suffice.
+  Other operating systems have librsb, too.
+  Check yours.
 - If you want the `Makefile` to build librsb (in this directory):
  `make all-local` will attempt downloading librsb-1.2.0-rc7 from the 
  web and building it here before building pyrsb.
