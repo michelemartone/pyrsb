@@ -52,6 +52,17 @@ test: rsb.so
 	python3 demo.py
 	python3 test.py
 
+itest:
+	rm -fR build/ rsb.egg-info/ dist/
+	python3 setup.py sdist bdist_wheel
+	ls dist
+	pip3 install --user $(shell ls dist/*.whl)
+	python3 demo.py
+	yes | pip3 uninstall rsb
+	pip3 install --user $(shell ls dist/*.tar.gz)
+	python3 demo.py
+	yes | pip3 uninstall rsb
+
 rsb.so: rsb.o setup.py
 	python3 setup.py build_ext -i
 
