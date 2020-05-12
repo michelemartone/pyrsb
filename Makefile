@@ -31,7 +31,7 @@ local-librsb-get:
 	tar xvzf librsb-1.2.0-rc7.tar.gz
 
 md5check:
-	echo "20feede92ba83f7b7376c0d89d564f84  librsb-1.2.0-rc7.tar.gz" > librsb-1.2.0-rc7.tar.gz.md5
+	echo "d98a7f86cbf17a7cb4b6493d50659e4d  librsb-1.2.0-rc7.tar.gz" > librsb-1.2.0-rc7.tar.gz.md5
 	md5sum -c librsb-1.2.0-rc7.tar.gz.md5 || false
 
 local-librsb: local-librsb-get
