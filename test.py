@@ -29,7 +29,7 @@ want_autotune=0
 want_verbose_tuning=False
 want_psf='csr'
 want_nrhs = [ 1, 2, 3, 4, 5, 6, 7, 8 ]
-want_nrA = [ 10, 30, 100, 300, 1000, 3000, 10000, 30000 ] 
+want_nrA = [ 10, 30, 100, 300, 1000, 3000, 10000 ]
 
 def bench_both(a,c,psf,nrhs=1):
     timeout=0.2
