@@ -4,12 +4,15 @@ services:
  - docker
 
 env:
- - OMP_NUM_THREADS=2
+  global:
+    - OMP_NUM_THREADS=2
+  matrix:
+    - IMG=ubuntu:18.04
+    - IMG=ubuntu:19.04
+    - IMG=ubuntu:19.10
+    - IMG=ubuntu:20.04
+    - IMG=debian:unstable
+    - IMG=debian:testing
 
 script:
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:18.04" "."
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:19.04" "."
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:19.10" "."
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=ubuntu:20.04" "."
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=debian:unstable" "."
-  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "IMG=debian:testing" "."
+  - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "${IMG}" "."
