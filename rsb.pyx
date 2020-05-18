@@ -410,6 +410,7 @@ cdef class rsb_matrix:
 
     def _find_block(self,frA,lrA,fcA,lcA):
         """
+        Extract sparse block as COO.
         Unfinished.
         """
         cdef lr.rsb_nnz_idx_t rnz = 0
@@ -584,6 +585,21 @@ cdef class rsb_matrix:
         self.errval = lr.rsb_mtx_add_to_dense(&alpha,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
         self._err_check()
         return b
+
+    def mini_self_print_test(self):
+        """Unfinished."""
+        print("*")
+        print(self)
+        print("*")
+        print("a:")
+        print(self.find())
+        print("a's (1,1):")
+        print(self._find_block(1, 1, 1, 1))
+        print("a's tril")
+        print(self.tril())
+        print("a's triu")
+        print(self.triu())
+        print(" ")
 
 import rsb
 rsb.rsb_lib_init()

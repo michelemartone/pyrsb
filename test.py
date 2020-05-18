@@ -61,18 +61,7 @@ def bench_both(a, c, psf, nrhs=1):
     if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
     if WANT_VERBOSE:
-        print("*")
-        print(a)
-        print("*")
-        print("a:")
-        print(a.find())
-        print("a's (1,1):")
-        print(a._find_block(1, 1, 1, 1))
-        print("a's tril")
-        print(a.tril())
-        print("a's triu")
-        print(a.triu())
-        print(" ")
+        a.mini_self_print_test()
     x = np.ones([a.shape[1], nrhs], dtype=sp.double)
     y = np.ones([a.shape[0], nrhs], dtype=sp.double)
     nnz = a.nnz()
@@ -171,8 +160,8 @@ def bench_file(filename):
 
 
 if len(sys.argv) > 1:
-    for filename in sys.argv[1:]:
-        bench_file(filename)
+    for arg in sys.argv[1:]:
+        bench_file(arg)
 else:
     # bench_file("venkat50.mtx.gz")
     bench_random_files()
