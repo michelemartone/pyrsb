@@ -4,11 +4,11 @@ Proof of concept, very limited interface code.
 Author: Michele Martone
 License: GPLv3+
 """
-import rsb
 import math
+import sys
 import numpy as np
 import scipy as sp
-import sys
+import rsb
 
 
 def printf(format, *args):
@@ -27,22 +27,22 @@ def bench(timeout, a, x, y):
     return (op_dt, dt, iterations)
 
 
-want_verbose = 0
-want_autotune = 0
-want_verbose_tuning = False
-want_psf = "csr"
-want_nrhs = [1, 2, 3, 4, 5, 6, 7, 8]
-want_nrA = [10, 30, 100, 300, 1000, 3000, 10000]
+WANT_VERBOSE = 0
+WANT_AUTOTUNE = 0
+WANT_VERBOSE_TUNING = False
+WANT_PSF = "csr"
+WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
+WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
 def bench_both(a, c, psf, nrhs=1):
     timeout = 0.2
     # timeout=2.0
-    if want_autotune:
-        a.autotune(verbose=want_verbose_tuning)
-    if want_verbose:
+    if WANT_AUTOTUNE:
+        a.autotune(verbose=WANT_VERBOSE_TUNING)
+    if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
-    if want_verbose:
+    if WANT_VERBOSE:
         print("*")
         print(a)
         print("*")
@@ -58,14 +58,14 @@ def bench_both(a, c, psf, nrhs=1):
     x = np.ones([a.shape[1], nrhs], dtype=sp.double)
     y = np.ones([a.shape[0], nrhs], dtype=sp.double)
     nnz = a.nnz()
-    if want_verbose:
+    if WANT_VERBOSE:
         a.do_print()
         print("x=", x)
         print("y=", y)
         print("Benchmarking y<-A*x+y ... ")
     (psf_dt, dt, iterations) = bench(timeout, c, x, y)
     psf_mflops = (2 * nrhs * nnz) / (psf_dt * 1e6)
-    if want_verbose:
+    if WANT_VERBOSE:
         print(
             "Done ",
             iterations,
@@ -81,7 +81,7 @@ def bench_both(a, c, psf, nrhs=1):
         )
     (rsb_dt, dt, iterations) = bench(timeout, a, x, y)
     rsb_mflops = (2 * nrhs * nnz) / (rsb_dt * 1e6)
-    if want_verbose:
+    if WANT_VERBOSE:
         print(
             "Done ",
             iterations,
@@ -94,7 +94,7 @@ def bench_both(a, c, psf, nrhs=1):
             " MFLOPS",
         )
     su = psf_dt / rsb_dt
-    if want_verbose:
+    if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
     # print("PYRSB:"," nr: ",a.shape[0]," nc: ",a.shape[1]," nnz: ",nnz," speedup: ",su," nrhs: ",nrhs," psf_mflops: ",psf_mflops," rsb_mflops: ",rsb_mflops,"")
     printf(
@@ -108,7 +108,7 @@ def bench_both(a, c, psf, nrhs=1):
         rsb_mflops,
         a.nsubm(),
     )
-    if want_verbose:
+    if WANT_VERBOSE:
         print("y=", y)
 
 
@@ -116,19 +116,19 @@ def bench_both(a, c, psf, nrhs=1):
 
 
 def bench_matrix(a, c):
-    for nrhs in want_nrhs:
-        bench_both(a, c, want_psf, nrhs)
+    for nrhs in WANT_NRHS:
+        bench_both(a, c, WANT_PSF, nrhs)
     del a
     del c
 
 
 def bench_random_files():
-    for nrA in want_nrA:
+    for nrA in WANT_NRA:
         ncA = nrA
         dnst = (math.sqrt(1.0 * nrA)) / nrA
         # print("# generating ",nrA,"x",ncA," with density ",dnst)
         printf("# generating %d x %d with with density %.1e\n", nrA, ncA, dnst)
-        c = sp.sparse.rand(nrA, ncA, density=dnst, format=want_psf, dtype=sp.double)
+        c = sp.sparse.rand(nrA, ncA, density=dnst, format=WANT_PSF, dtype=sp.double)
         (I, J, V) = sp.sparse.find(c)
         a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
         bench_matrix(a, c)

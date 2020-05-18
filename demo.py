@@ -1,3 +1,7 @@
+"""
+pyrsb demo
+"""
+
 import numpy
 import scipy
 from scipy.sparse import csr_matrix

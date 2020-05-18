@@ -1,14 +1,14 @@
+"""setuptools installer script for PyRSB."""
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-from Cython.Build import cythonize
 
 with open("README.md", "r") as fh:
-    long_description = fh.read()
+    LONG_DESCRIPTION = fh.read()
 
 from numpy import get_include
 
-include_dirs = [get_include()]
+INCLUDE_DIRS = [get_include()]
 
 setup(
     # name="rsb-michele.martone", version = '0.2.202005072047',
@@ -18,7 +18,7 @@ setup(
     author="Michele Martone",
     author_email="michelemartone@users.sourceforge.net",
     description="PyRSB: a Cython-based Python interface to librsb",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/michelemartone/pyrsb",
     packages=setuptools.find_packages(),  # rsb
@@ -32,7 +32,7 @@ setup(
             "rsb",
             ["rsb.pyx", "librsb.pxd"],
             libraries=["rsb", "z", "hwloc", "gfortran"],
-            include_dirs=include_dirs,
+            include_dirs=INCLUDE_DIRS,
         )
     ],
     setup_requires=["numpy", "scipy"],
