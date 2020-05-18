@@ -31,7 +31,7 @@ def bench(timeout, a, x, y):
     dt = -rsb.rsb_time()
     while dt + rsb.rsb_time() < timeout:
         iterations = iterations + 1
-        y = a * x  # See __mul__
+        y += a * x  # See __mul__
         # a.spmm(x,y) # This form avoids the copy of y.
     dt = dt + rsb.rsb_time()
     op_dt = dt / iterations
@@ -128,9 +128,6 @@ def bench_both(a, c, psf, nrhs=1):
     )
     if WANT_VERBOSE:
         print("y=", y)
-
-
-# def bench_file(filename):
 
 
 def bench_matrix(a, c):
