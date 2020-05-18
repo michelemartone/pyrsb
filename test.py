@@ -12,10 +12,21 @@ import rsb
 
 
 def printf(format, *args):
+    """
+    Printf-like shorthand.
+    """
     sys.stdout.write(format % args)
 
 
 def bench(timeout, a, x, y):
+    """
+    Benchmark multiplication operation.
+    :param timeout: benchmark time
+    :param a: matrix
+    :param x: right hand side vector
+    :param y: result vector
+    :return: a tuple with operation time, benchmark time, performed iterations
+    """
     iterations = 0
     dt = -rsb.rsb_time()
     while dt + rsb.rsb_time() < timeout:
@@ -36,6 +47,13 @@ WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
 def bench_both(a, c, psf, nrhs=1):
+    """
+    Perform comparative benchmark: rsb vs csr.
+    :param a: rsb matrix
+    :param c: csr matrix
+    :param psf: format string for matrix c
+    :param nrhs: number of right-hand-side vectors
+    """
     timeout = 0.2
     # timeout=2.0
     if WANT_AUTOTUNE:
@@ -96,9 +114,9 @@ def bench_both(a, c, psf, nrhs=1):
     su = psf_dt / rsb_dt
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
-    # print("PYRSB:"," nr: ",a.shape[0]," nc: ",a.shape[1]," nnz: ",nnz," speedup: ",su," nrhs: ",nrhs," psf_mflops: ",psf_mflops," rsb_mflops: ",rsb_mflops,"")
     printf(
-        "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  psf_mflops: %.2e  rsb_mflops: %.2e  rsb_nsubm: %d\n",
+        "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d"
+        "  psf_mflops: %.2e  rsb_mflops: %.2e  rsb_nsubm: %d\n",
         a.shape[0],
         a.shape[1],
         nnz,
@@ -116,6 +134,11 @@ def bench_both(a, c, psf, nrhs=1):
 
 
 def bench_matrix(a, c):
+    """
+    Perform comparative benchmark: rsb vs csr.
+    :param a: rsb matrix
+    :param c: csr matrix
+    """
     for nrhs in WANT_NRHS:
         bench_both(a, c, WANT_PSF, nrhs)
     del a
@@ -123,6 +146,9 @@ def bench_matrix(a, c):
 
 
 def bench_random_files():
+    """
+    Perform comparative benchmark on randomly generated matrices.
+    """
     for nrA in WANT_NRA:
         ncA = nrA
         dnst = (math.sqrt(1.0 * nrA)) / nrA
@@ -135,6 +161,10 @@ def bench_random_files():
 
 
 def bench_file(filename):
+    """
+    Perform comparative benchmark on matrices loaded from Matrix Market files.
+    :param filename: a Matrix Market file
+    """
     print("# loading from file ", filename)
     a = rsb.rsb_file_mtx_load(bytes(filename, encoding="utf-8"))
     if a is not None:
