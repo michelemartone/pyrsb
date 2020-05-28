@@ -2,6 +2,10 @@
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+from time import gmtime, strftime
+
+#VERSION = '0.2.202005072047'
+VERSION = strftime("0.2.%Y%m%d%H%M%S", gmtime())
 
 with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
@@ -13,8 +17,8 @@ INCLUDE_DIRS = [get_include()]
 setup(
     # name="rsb-michele.martone", version = '0.2.202005072047',
     name="rsb",
-    version="0.2.202005072047",
-    # name="rsb", version = '0.2',
+    version=VERSION,
+    # name="rsb",
     author="Michele Martone",
     author_email="michelemartone@users.sourceforge.net",
     description="PyRSB: a Cython-based Python interface to librsb",
