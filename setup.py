@@ -1,11 +1,14 @@
 """setuptools installer script for PyRSB."""
+import os
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from time import gmtime, strftime
 
-#VERSION = '0.2.202005072047'
-VERSION = strftime("0.2.%Y%m%d%H%M%S", gmtime())
+if os.environ.get('PYRSB_VERSION'):
+    VERSION = os.environ.get('PYRSB_VERSION')
+else:
+    VERSION = strftime("0.2.%Y%m%d%H%M%S", gmtime())
 
 with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
