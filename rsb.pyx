@@ -172,8 +172,8 @@ cdef class rsb_matrix:
 
         if shape is None:
             shape=[0,0]
-        if len(I):
-            shape=[max(I)+1,max(J)+1]
+            if len(I):
+                shape=[max(I)+1,max(J)+1]
 
         self.nrA=shape[0]
         self.ncA=shape[1]
