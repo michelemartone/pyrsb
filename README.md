@@ -30,7 +30,7 @@ The following functionality is implemented:
 
 - If you have librsb installed:
  `make` shall build and test.
-  Make sure you have `cython`, `scipy`, `numpy`. installed.
+- Make sure you have `cython`, `scipy`, `numpy`. installed.
 - If you want to install librsb on Ubuntu or Debian:
  `sudo apt-get install librsb-dev` shall suffice.
   Other operating systems have librsb, too.

@@ -29,10 +29,15 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/michelemartone/pyrsb",
     packages=setuptools.find_packages(),  # rsb
+        project_urls={
+        "Bug Tracker": "https://github.com/michelemartone/pyrsb/issues",
+        "Source Code": "https://github.com/michelemartone/pyrsb",
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
+        #"Operating System :: POSIX :: Linux",
     ],
     ext_modules=[
         Extension(
