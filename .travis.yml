@@ -1,22 +1,36 @@
-sudo: required
+language: python
+os: linux
+dist: xenial
+python: 3.7
 
 services:
  - docker
 
+stages:
+    - test
+    - post
 env:
   global:
     - OMP_NUM_THREADS=2
-  matrix:
+  jobs:
     - IMG=ubuntu:18.04
     - IMG=ubuntu:19.04
     - IMG=ubuntu:19.10
     - IMG=ubuntu:20.04
-    - IMG=debian:unstable
     - IMG=debian:testing
+    - IMG=debian:unstable
 
 jobs:
   allow_failures:
     - env: IMG=ubuntu:19.04
+    - env: IMG=debian:unstable
+  include:
+    - env: IMG=""
+      stage: post
+      dist: bionic
+      python: 3.8
+      script:
+      -  true
 
 script:
   - docker build --build-arg "OMP_NUM_THREADS=${OMP_NUM_THREADS}" --build-arg "${IMG}" "."
