@@ -23,22 +23,22 @@ all: test
 rsb: local-librsb
 
 local-librsb-dl:
-	wget 'https://sourceforge.net/projects/librsb/files/librsb-1.2.0-rc7.tar.gz/download' -O librsb-1.2.0-rc7.tar.gz
+	wget 'https://sourceforge.net/projects/librsb/files/librsb-1.2.0.9.tar.gz/download' -O librsb-1.2.0.9.tar.gz
 
 local-librsb-get:
-	test -f librsb-1.2.0-rc7.tar.gz || make local-librsb-dl
+	test -f librsb-1.2.0.9.tar.gz || make local-librsb-dl
 	make md5check
-	tar xvzf librsb-1.2.0-rc7.tar.gz
+	tar xvzf librsb-1.2.0.9.tar.gz
 
 md5check:
-	echo "d98a7f86cbf17a7cb4b6493d50659e4d  librsb-1.2.0-rc7.tar.gz" > librsb-1.2.0-rc7.tar.gz.md5
-	md5sum -c librsb-1.2.0-rc7.tar.gz.md5 || false
+	echo "f34b2968f354f7c33e1fbcffd3955ed7  librsb-1.2.0.9.tar.gz" > librsb-1.2.0.9.tar.gz.md5
+	md5sum -c librsb-1.2.0.9.tar.gz.md5 || false
 
 local-librsb: local-librsb-get
-	cd librsb-1.2.0-rc7 && ./configure CFLAGS=-O3\ -fPIC        --prefix=`pwd`/../local --enable-shared && make -j4 && make install
+	cd librsb-1.2.0.9 && ./configure CFLAGS=-O3\ -fPIC        --prefix=`pwd`/../local --enable-shared && make -j4 && make install
 
 local-librsb-debug: local-librsb-get
-	cd librsb-1.2.0-rc7 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb --prefix=`pwd`/../local --enable-shared && make -j4 && make install
+	cd librsb-1.2.0.9 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb --prefix=`pwd`/../local --enable-shared && make -j4 && make install
 
 lp: local-librsb-pyrsb
 local-librsb-pyrsb:
