@@ -105,14 +105,16 @@ def bench_both(a, c, psf, nrhs=1):
         print("Speedup of RSB over ", psf, " is ", su, "x")
     printf(
         "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d"
-        "  psf_mflops: %.2e  rsb_mflops: %.2e  rsb_nsubm: %d\n",
+        "  psf_mflops: %.2e  psf_dt: %.2e  rsb_mflops: %.2e  rsb_dt: %.2e  rsb_nsubm: %d\n",
         a.shape[0],
         a.shape[1],
         nnz,
         su,
         nrhs,
         psf_mflops,
+        psf_dt,
         rsb_mflops,
+        rsb_dt,
         a.nsubm(),
     )
     if WANT_VERBOSE:
