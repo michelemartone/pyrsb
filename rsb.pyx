@@ -457,6 +457,18 @@ cdef class rsb_matrix:
         """
         return self.ncA
 
+    def _is_unsymmetric(self):
+        """
+        RSB matrix symmetry.
+        (specific to rsb).
+        """
+        cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
+        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
+        if ( ( flagsA & (lr.RSB_FLAG_HERMITIAN | lr.RSB_FLAG_SYMMETRIC ) ) == lr.RSB_FLAG_NOFLAGS ):
+            return True
+        else:
+            return False
+
     def _refresh(self):
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
         self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)

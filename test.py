@@ -105,14 +105,16 @@ def bench_both(a, c, psf, nrhs=1):
         print("Speedup of RSB over ", psf, " is ", su, "x")
     printf(
         "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d"
-        "  psf_mflops: %.2e  rsb_mflops: %.2e  rsb_nsubm: %d\n",
+        "  psf_mflops: %.2e  psf_dt: %.2e  rsb_mflops: %.2e  rsb_dt: %.2e  rsb_nsubm: %d\n",
         a.shape[0],
         a.shape[1],
         nnz,
         su,
         nrhs,
         psf_mflops,
+        psf_dt,
         rsb_mflops,
+        rsb_dt,
         a.nsubm(),
     )
     if WANT_VERBOSE:
@@ -140,9 +142,14 @@ def bench_random_files():
         dnst = (math.sqrt(1.0 * nrA)) / nrA
         # print("# generating ",nrA,"x",ncA," with density ",dnst)
         printf("# generating %d x %d with with density %.1e\n", nrA, ncA, dnst)
+        gt = -rsb.rsb_time()
         c = sp.sparse.rand(nrA, ncA, density=dnst, format=WANT_PSF, dtype=sp.double)
+        gt = gt + rsb.rsb_time()
         (I, J, V) = sp.sparse.find(c)
+        ct = -rsb.rsb_time()
         a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
+        ct = ct + rsb.rsb_time()
+        printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz(),gt,a.nnz()/gt,ct)
         bench_matrix(a, c)
 
 
@@ -152,7 +159,12 @@ def bench_file(filename):
     :param filename: a Matrix Market file
     """
     print("# loading from file ", filename)
+    lt = - rsb.rsb_time()
     a = rsb.rsb_file_mtx_load(bytes(filename, encoding="utf-8"))
+    lt = lt + rsb.rsb_time()
+    printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz(),lt,a.nnz()/lt)
+    if not a._is_unsymmetric():
+        print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     if a is not None:
         (I, J, V) = a.find()
         c = sp.sparse.csr_matrix((V, (I, J)))
