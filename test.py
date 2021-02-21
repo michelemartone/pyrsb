@@ -27,12 +27,24 @@ def bench(timeout, a, x, y):
     :param y: result vector
     :return: a tuple with operation time, benchmark time, performed iterations
     """
+    zero_alloc = True
     iterations = 0
     dt = -rsb.rsb_time()
-    while dt + rsb.rsb_time() < timeout:
-        iterations = iterations + 1
-        y += a * x  # See __mul__
-        # a.spmm(x,y) # This form avoids the copy of y.
+
+    if zero_alloc:
+        if (isinstance(a,rsb.rsb_matrix)):
+            while dt + rsb.rsb_time() < timeout:
+                iterations = iterations + 1
+                a._spmm(x,y) # This form avoids the copy of y
+        else:
+            while dt + rsb.rsb_time() < timeout:
+                iterations = iterations + 1
+                # y += a._mul_multivector(x) # inefficient
+                sp.sparse._sparsetools.csr_matvecs(a.shape[0], a.shape[1], x.shape[1], a.indptr, a.indices, a.data, x.ravel(), y.ravel())
+    else:
+        while dt + rsb.rsb_time() < timeout:
+            iterations = iterations + 1
+            y += a * x  # Inefficient (result created repeatedly) see __mul__
     dt = dt + rsb.rsb_time()
     op_dt = dt / iterations
     return (op_dt, dt, iterations)
