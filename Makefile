@@ -50,6 +50,7 @@ all-local: local-librsb local-librsb-pyrsb
 test: rsb.so
 	export PYTHONPATH=.
 	python3 demo.py
+	python3 demo2.py
 	python3 test.py
 
 itest:
@@ -107,8 +108,9 @@ signed-dist: dist
 
 cleanall:
 	rm -f demo.py
+	rm -f demo2.py
 
-demo.py: README.md
+demo.py demo2.py: README.md
 	LSSNIPS= awk -f md2sh.awk < $<
 
 # cython3 python3-dev
