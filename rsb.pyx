@@ -71,23 +71,23 @@ cdef class rsb_matrix:
         """
         Python Symmetry Flag to librsb Symmetry Flag.
         """
-        if sym == 'U':
-                return lr.RSB_FLAG_NOFLAGS 
-        if sym == 'S':
+        if sym == 'U' or sym == ord('U') or sym == b'U':
+                return lr.RSB_FLAG_NOFLAGS
+        if sym == 'S' or sym == ord('S') or sym == b'S':
                 return lr.RSB_FLAG_LOWER_SYMMETRIC
-        if sym == 'H':
+        if sym == 'H' or sym == ord('H') or sym == b'H':
                 return lr.RSB_FLAG_LOWER_HERMITIAN
-        return lr.RSB_FLAG_NOFLAGS 
+        return lr.RSB_FLAG_NOFLAGS
 
     def _prt2lt(self, transA):
         """
         Python RSB transA to librsb transA.
         """
-        if transA == 'N':
+        if transA == 'N' or transA == ord('N') or transA == b'N':
                 return lr.RSB_TRANSPOSITION_N
-        if transA == 'T':
+        if transA == 'T' or transA == ord('T') or transA == b'T':
                 return lr.RSB_TRANSPOSITION_T
-        if transA == 'C':
+        if transA == 'C' or transA == ord('C') or transA == b'C':
                 return lr.RSB_TRANSPOSITION_C
         return lr.RSB_TRANSPOSITION_N
 
