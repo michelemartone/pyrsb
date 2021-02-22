@@ -11,7 +11,9 @@ multiplications in **iterative methods** on **huge symmetric sparse matrices**.
 
 **PyRSB is a Cython-based Python interface to librsb.**
 
-So far, PyRSB is only a prototype: **prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
+So far, PyRSB is a prototype tested on Linux only.
+The librsb library offers much more, and can make PyRSB much more powerful.
+**Prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
 
 ## Features
 
@@ -37,7 +39,7 @@ The following functionality is implemented:
   Please check yours.
   Or check [librsb](http://librsb.sourceforge.net/)'s web site.
 - If you want the `Makefile` to build librsb (in this directory):
- `make all-local` will attempt downloading librsb-1.2.0-rc7 from the 
+ `make all-local` will attempt downloading librsb-1.2.0.9 from the
  web and building it here before building pyrsb.
  If the file is in place, it won't download it a second time.
  After that, `make local-librsb-pyrsb` (or `make lp`) will build pyrsb
@@ -51,34 +53,36 @@ The following functionality is implemented:
 import numpy
 import scipy
 from scipy.sparse import csr_matrix
-from rsb          import rsb_matrix
-V=[11.,12.,22.]
-I=[  0,  0,  1]
-J=[  0,  1,  1]
-c=csr_matrix((V,(I,J)))
+from rsb import rsb_matrix
+
+V = [11.0, 12.0, 22.0]
+I = [0, 0, 1]
+J = [0, 1, 1]
+c = csr_matrix((V, (I, J)))
 print(c)
 # several constructor forms, as with csr_matrix:
-a=rsb_matrix((V,(I,J)))
-a=rsb_matrix((V,(I,J)),[3,3])
-a=rsb_matrix((V, I,J))
-a=rsb_matrix((V, I,J),sym='S') # symmetric example
+a = rsb_matrix((V, (I, J)))
+a = rsb_matrix((V, (I, J)), [3, 3])
+a = rsb_matrix((V, I, J))
+a = rsb_matrix((V, I, J), sym="S")  # symmetric example
 print(a)
-a=rsb_matrix(          (4,4))
-a=rsb_matrix(c)
-nrhs=1 # set to nrhs>1 to multiply by multiple vectors at once
-nr=a.shape()[0]
-nc=a.shape()[1]
-x=numpy.empty([nc,nrhs],dtype=scipy.double)
-y=numpy.empty([nr,nrhs],dtype=scipy.double)
-x[:,:]=1.0
-y[:,:]=0.0
+a = rsb_matrix((4, 4))
+a = rsb_matrix(c)
+nrhs = 1  # set to nrhs>1 to multiply by multiple vectors at once
+nr = a.shape[0]
+nc = a.shape[1]
+order = "F"
+x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+x[:, :] = 1.0
+y[:, :] = 0.0
 print(a)
 print(x)
 print(y)
-import rsb # import operators
+# import rsb # import operators
 # a.autotune() # makes only sense for large matrices
-# matrix-vector multiply
-y=y+a*x; # equivalent to y=y+c*x
+y = y + a * x
+# equivalent to y=y+c*x
 print(y)
 del a
 ```

@@ -35,10 +35,10 @@ md5check:
 	md5sum -c librsb-1.2.0.9.tar.gz.md5 || false
 
 local-librsb: local-librsb-get
-	cd librsb-1.2.0.9 && ./configure CFLAGS=-O3\ -fPIC        --prefix=`pwd`/../local --enable-shared && make -j4 && make install
+	cd librsb-1.2.0.9 && ./configure CFLAGS=-O3\ -march=native\ -mtune=native\ -fPIC\ -pipe        --prefix=`pwd`/../local --enable-shared --disable-c-examples && make -j4 && make install
 
 local-librsb-debug: local-librsb-get
-	cd librsb-1.2.0.9 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb --prefix=`pwd`/../local --enable-shared && make -j4 && make install
+	cd librsb-1.2.0.9 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb\ -pipe --prefix=`pwd`/../local --enable-shared && make -j4 && make install
 
 lp: local-librsb-pyrsb
 local-librsb-pyrsb:
