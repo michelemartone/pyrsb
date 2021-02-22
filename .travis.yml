@@ -15,13 +15,14 @@ env:
   jobs:
     - IMG=ubuntu:18.04
     - IMG=ubuntu:20.04
+    - IMG=debian:stable
     - IMG=debian:testing
     - IMG=debian:unstable
 
 jobs:
   allow_failures:
-    - env: IMG=ubuntu:19.04
     - env: IMG=debian:unstable
+    - env: IMG=debian:testing
   include:
     - env: IMG=""
       stage: post
