@@ -25,10 +25,8 @@ INCLUDE_DIRS = [get_include(), inc_dir]
 LIB_DIRS = [lib_dir]
 
 setup(
-    # name="rsb-michele.martone", version = '0.2.202005072047',
-    name="rsb",
+    name="pyrsb",
     version=VERSION,
-    # name="rsb",
     author="Michele Martone",
     author_email="michelemartone@users.sourceforge.net",
     description="PyRSB: a Cython-based Python interface to librsb",
@@ -48,7 +46,7 @@ setup(
     ],
     ext_modules=[
         Extension(
-            "rsb",
+            "pyrsb",
             ["rsb.pyx", "librsb.pxd"],
             libraries=["rsb", "z", "hwloc", "gfortran"],
             library_dirs=LIB_DIRS,
