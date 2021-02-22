@@ -5,10 +5,13 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from time import gmtime, strftime
 
-if os.environ.get("PYRSB_VERSION"):
-    VERSION = os.environ.get("PYRSB_VERSION")
+if True:
+    VERSION = "0.2.20210222"
 else:
-    VERSION = strftime("0.2.%Y%m%d%H%M%S", gmtime())
+    if os.environ.get("PYRSB_VERSION"):
+        VERSION = os.environ.get("PYRSB_VERSION")
+    else:
+        VERSION = strftime("0.2.%Y%m%d%H%M%S", gmtime())
 
 with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
@@ -46,7 +49,7 @@ setup(
     ],
     ext_modules=[
         Extension(
-            "pyrsb",
+            "rsb",
             ["rsb.pyx", "librsb.pxd"],
             libraries=["rsb", "z", "hwloc", "gfortran"],
             library_dirs=LIB_DIRS,
