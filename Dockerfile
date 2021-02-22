@@ -1,6 +1,7 @@
 # Start with a configurable base image
 ARG IMG="debian:testing"
 FROM "${IMG}"
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Declare the arguments
 ARG PKG="gcc g++"
@@ -11,11 +12,11 @@ ARG CXX="g++"
 RUN apt-get update
 
 # Install the packages needed for the build
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install --yes \
+RUN apt-get install --yes \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
     "libhwloc-dev" "libz-dev" \
-    "make" "gfortran" "libgfortran-8-dev" \
+    "make" "gfortran" \
     "octave" "octave-sparsersb" \
     "cython3" "python3-scipy" "python3-numpy" "python3-configobj" \
     "pkg-config" \
@@ -31,5 +32,5 @@ RUN useradd "user"
 RUN chown --recursive "user:user" "."
 USER "user"
 
-# Build and test librsb a bit
+# Build and test PyRSB
 RUN make

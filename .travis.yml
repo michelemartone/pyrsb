@@ -14,8 +14,6 @@ env:
     - OMP_NUM_THREADS=2
   jobs:
     - IMG=ubuntu:18.04
-    - IMG=ubuntu:19.04
-    - IMG=ubuntu:19.10
     - IMG=ubuntu:20.04
     - IMG=debian:testing
     - IMG=debian:unstable
