@@ -49,7 +49,7 @@ all-local: local-librsb local-librsb-pyrsb
 # python -c 'import rsb; import numpy; rsb.rsb_lib_init();a=rsb.rsb_matrix([11.0,22.0],[1,2],[1,2]);b=rsb.rsb_matrix([110.,220.],[1,2],[1,2]);x=numpy.array([110.,220,330]);y=numpy.array([0.,0.,0.]);b.spmv(x,y);print x,y;print(a>=b);print(a);print(a*b);del a; del b;rsb.rsb_lib_exit()'
 test: rsb.so
 	export PYTHONPATH=.
-	python3 demo.py
+	python3 demo1.py
 	python3 demo2.py
 	python3 test.py
 
@@ -58,10 +58,10 @@ itest:
 	python3 setup.py sdist bdist_wheel
 	ls dist
 	pip3 install --user $(shell ls dist/*.whl)
-	python3 demo.py
+	python3 demo1.py
 	yes | pip3 uninstall rsb
 	pip3 install --user $(shell ls dist/*.tar.gz)
-	python3 demo.py
+	python3 demo1.py
 	yes | pip3 uninstall rsb
 
 rsb.so: rsb.o setup.py
@@ -107,10 +107,10 @@ signed-dist: dist
 	gpg -sbv -u 1DBB555AEA359B8AAF0C6B88E0E669C8EF1258B8 -a pyrsb.tar.gz
 
 cleanall:
-	rm -f demo.py
+	rm -f demo1.py
 	rm -f demo2.py
 
-demo.py demo2.py: README.md
+demo1.py demo2.py: README.md
 	LSSNIPS= awk -f md2sh.awk < $<
 
 # cython3 python3-dev

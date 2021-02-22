@@ -50,7 +50,7 @@ The following functionality is implemented:
 ## Example Usage
 
 ```python
-# Example: demo.py
+# Example: demo1.py
 """
 pyrsb demo
 """
