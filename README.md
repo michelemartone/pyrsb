@@ -50,6 +50,11 @@ The following functionality is implemented:
 ## Example Usage
 
 ```python
+# Example: demo.py
+"""
+pyrsb demo
+"""
+
 import numpy
 import scipy
 from scipy.sparse import csr_matrix

@@ -105,5 +105,11 @@ dist:
 signed-dist: dist
 	gpg -sbv -u 1DBB555AEA359B8AAF0C6B88E0E669C8EF1258B8 -a pyrsb.tar.gz
 
+cleanall:
+	rm -f demo.py
+
+demo.py: README.md
+	LSSNIPS= awk -f md2sh.awk < $<
+
 # cython3 python3-dev
 
