@@ -11,6 +11,9 @@ multiplications in **iterative methods** on **huge symmetric sparse matrices**.
 
 **PyRSB is a Cython-based Python interface to librsb.**
 
+On multicore machines, PyRSB can be several times faster than e.g. `scipy.sparse.csr_matrix()`.
+For an example how to invoke it with no overhead, [see the advanced example](#ExampleAdvancedUsage).
+
 So far, PyRSB is a prototype tested on Linux only.
 The librsb library offers much more, and can make PyRSB much more powerful.
 **Prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
@@ -92,7 +95,7 @@ print(y)
 del a
 ```
 
-## Example Advanced Usage
+## <a id="ExampleAdvancedUsage"></a>Example Advanced Usage ##
 
 ```python
 # Example: demo2.py
@@ -124,8 +127,11 @@ print(a)
 print(x)
 print(y)
 
-# Autotuning: use it if you need many multiplication iterations
+# Autotuning example: use it if you need many multiplication iterations on huge matrices (>>1e6 nonzeroes).
+# Here general (nrhs=1) case:
 a.autotune()
+# Here with all the autotuning parameters specified:
+a.autotune(1.0,0,1,2.0,ord('N'),1.0,nrhs,ord('F'),1.0,False)
 
 # Inefficient: reallocate y
 y = y + a * x
