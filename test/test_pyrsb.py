@@ -114,6 +114,17 @@ def test_spmm_F_T():
     rmat._spmm(x,y,order=b'F',transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
+def test_spmm_permitted_mismatch():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)))
+    nrhs = 1
+    x1 = numpy.empty([nc, nrhs], dtype=scipy.double, order='F')
+    x2 = numpy.empty([nc, nrhs], dtype=scipy.double, order='C')
+    x1[:, :] = 1.0
+    x2[:, :] = 1.0
+    assert ( (rmat * x1).shape == (rmat * x2).shape )
+    assert ( (rmat * x1) == (rmat * x2) ).all()
+
 def test_spmm__mul__():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
