@@ -69,6 +69,21 @@ def test_spmm_C():
     rmat._spmm(x,y,order=b'C')
     assert ( y == (cmat * x) ).all()
 
+def test_spmm_C_T():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    assert rmat.shape == cmat.shape
+    assert rmat.nnz() == cmat.nnz
+    nrhs = 2
+    order = 'C'
+    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+    y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+    x[:, :] = 1.0
+    y[:, :] = 0.0
+    rmat._spmm(x,y,order=b'C',transA=b'T')
+    assert ( y == (cmat.transpose() * x) ).all()
+
 def test_spmm_F():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
@@ -83,6 +98,21 @@ def test_spmm_F():
     y[:, :] = 0.0
     rmat._spmm(x,y,order=b'F')
     assert ( y == (cmat * x) ).all()
+
+def test_spmm_F_T():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    assert rmat.shape == cmat.shape
+    assert rmat.nnz() == cmat.nnz
+    nrhs = 2
+    order = 'F'
+    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+    y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+    x[:, :] = 1.0
+    y[:, :] = 0.0
+    rmat._spmm(x,y,order=b'F',transA=b'T')
+    assert ( y == (cmat.transpose() * x) ).all()
 
 def test_spmm__mul__():
     [V,I,J,nr,nc,nnz] = gen_tri();
