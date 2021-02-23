@@ -1,3 +1,6 @@
+import numpy
+import scipy
+from scipy.sparse import csr_matrix
 from rsb import rsb_matrix
 
 
@@ -40,12 +43,29 @@ def test_init_tuples_sym():
     assert mat._is_unsymmetric() == False
 
 
-def test_demo():
-    import numpy
-    import scipy
-    from scipy.sparse import csr_matrix
-    from rsb import rsb_matrix
+def test_spmv():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    assert rmat.shape == cmat.shape
+    assert rmat.nnz() == cmat.nnz
+    nrhs = 1
+    x = numpy.empty([nc, nrhs], dtype=scipy.double)
+    x[:, :] = 1.0
+    assert ( (rmat * x) == (cmat * x) ).all()
 
+def test_spmm():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    assert rmat.shape == cmat.shape
+    assert rmat.nnz() == cmat.nnz
+    nrhs = 2
+    x = numpy.empty([nc, nrhs], dtype=scipy.double)
+    x[:, :] = 1.0
+    assert ( (rmat * x) == (cmat * x) ).all()
+
+def test_demo():
     V = [11.0, 12.0, 22.0]
     I = [0, 0, 1]
     J = [0, 1, 1]
