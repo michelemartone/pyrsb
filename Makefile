@@ -48,7 +48,7 @@ all-local: local-librsb local-librsb-pyrsb
 
 # python -c 'import rsb; import numpy; rsb.rsb_lib_init();a=rsb.rsb_matrix([11.0,22.0],[1,2],[1,2]);b=rsb.rsb_matrix([110.,220.],[1,2],[1,2]);x=numpy.array([110.,220,330]);y=numpy.array([0.,0.,0.]);b.spmv(x,y);print x,y;print(a>=b);print(a);print(a*b);del a; del b;rsb.rsb_lib_exit()'
 test: rsb.so
-	export PYTHONPATH=.
+	if which pytest-3 ; then PYTHONPATH=. pytest-3 ; fi
 	python3 demo1.py
 	python3 demo2.py
 	python3 test.py

@@ -7,6 +7,38 @@ def test_init_tuple():
     J = [0, 1, 1]
     mat = rsb_matrix((V, I, J))
     assert mat.shape == (2, 2)
+    assert mat.nnz() == 3
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_tuples():
+    V = [11.0, 12.0, 22.0]
+    I = [0, 0, 1]
+    J = [0, 1, 1]
+    mat = rsb_matrix((V, (I, J)))
+    assert mat.shape == (2, 2)
+    assert mat.nnz() == 3
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_tuples_and_dims():
+    V = [11.0, 12.0, 22.0]
+    I = [0, 0, 1]
+    J = [0, 1, 1]
+    mat = rsb_matrix((V, (I, J)),[3,3])
+    assert mat.shape == (3, 3)
+    assert mat.nnz() == 3
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_tuples_sym():
+    V = [11.0, 12.0, 22.0]
+    I = [0, 0, 1]
+    J = [0, 1, 1]
+    mat = rsb_matrix((V, (I, J)),sym="S")
+    assert mat.shape == (2, 2)
+    assert mat.nnz() == 3
+    assert mat._is_unsymmetric() == False
 
 
 def test_demo():
