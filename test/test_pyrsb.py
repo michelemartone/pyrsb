@@ -1,43 +1,42 @@
 from rsb import rsb_matrix
 
 
-def test_init_tuple():
+def gen_tri():
     V = [11.0, 12.0, 22.0]
     I = [0, 0, 1]
     J = [0, 1, 1]
+    return [V,I,J,2,2,3]
+
+
+def test_init_tuple():
+    [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, I, J))
-    assert mat.shape == (2, 2)
-    assert mat.nnz() == 3
+    assert mat.shape == (nr, nc)
+    assert mat.nnz() == nnz
     assert mat._is_unsymmetric() == True
 
 
 def test_init_tuples():
-    V = [11.0, 12.0, 22.0]
-    I = [0, 0, 1]
-    J = [0, 1, 1]
+    [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)))
-    assert mat.shape == (2, 2)
-    assert mat.nnz() == 3
+    assert mat.shape == (nr, nc)
+    assert mat.nnz() == nnz
     assert mat._is_unsymmetric() == True
 
 
 def test_init_tuples_and_dims():
-    V = [11.0, 12.0, 22.0]
-    I = [0, 0, 1]
-    J = [0, 1, 1]
-    mat = rsb_matrix((V, (I, J)),[3,3])
-    assert mat.shape == (3, 3)
-    assert mat.nnz() == 3
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    mat = rsb_matrix((V, (I, J)),[nr,nc])
+    assert mat.shape == (nr, nc)
+    assert mat.nnz() == nnz
     assert mat._is_unsymmetric() == True
 
 
 def test_init_tuples_sym():
-    V = [11.0, 12.0, 22.0]
-    I = [0, 0, 1]
-    J = [0, 1, 1]
+    [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)),sym="S")
-    assert mat.shape == (2, 2)
-    assert mat.nnz() == 3
+    assert mat.shape == (nr, nc)
+    assert mat.nnz() == nnz
     assert mat._is_unsymmetric() == False
 
 
