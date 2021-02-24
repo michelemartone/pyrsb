@@ -47,7 +47,7 @@ def test_init_tuple():
 
 
 def test_init_tuples():
-    [V,I,J,nr,nc,nnz] = gen_tri();
+    [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)))
     assert mat.shape == (nr, nc)
     assert mat.nnz() == nnz
@@ -55,11 +55,37 @@ def test_init_tuples():
 
 
 def test_init_tuples_and_dims():
-    [V,I,J,nr,nc,nnz] = gen_tri();
+    [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)),[nr,nc])
     assert mat.shape == (nr, nc)
     assert mat.nnz() == nnz
     assert mat._is_unsymmetric() == True
+
+
+def test_init_tuples__raises():
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    with assert_raises(TypeError):
+        mat = rsb_matrix((V, (I)))
+
+
+def test_init_tuples_and_dims_raises():
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    with assert_raises(TypeError):
+        mat = rsb_matrix((V, (I)),[3,3])
+
+
+def test_init_tuples_to_fix_1():
+    # TODO: shall ban this
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    mat = rsb_matrix([V, (I)])
+    assert ( mat.nnz() == 0 )
+
+
+def test_init_tuples_to_fix_2():
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    # TODO: shall ban this
+    mat = rsb_matrix((V, (I,J)),[-1,-1])
+    assert ( mat.nnz() == 3 )
 
 
 def test_nonzero():
