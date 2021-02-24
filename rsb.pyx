@@ -95,7 +95,7 @@ cdef class rsb_matrix:
                 return lr.RSB_TRANSPOSITION_C
         return lr.RSB_TRANSPOSITION_N
 
-    def _spmm(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0, order='F'):
+    def _spmm(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0):
         """
         Sparse Matrix by matrix product based on rsb_spmm().
         """
@@ -103,7 +103,8 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
-        (lr_order,ldB,ldC)=self._otn2obc(order,transA,nrhs)
+        corder =  x.flags.c_contiguous
+        (lr_order,ldB,ldC)=self._otn2obc(corder,transA,nrhs)
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
            self.errval = lr.RSB_ERR_BADARGS
@@ -305,11 +306,7 @@ cdef class rsb_matrix:
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
-            if x.itemsize == x.strides[0]:
-                order='F'
-            else:
-                order='C'
-            y = np.zeros([self.shape[0],nrhs],dtype=np.double,order=order)
+            y = np.zeros_like(x,shape=(self.shape[0],nrhs))
             self._spmm(x,y)
         return y
 
@@ -352,9 +349,9 @@ cdef class rsb_matrix:
         self._err_check(want_strict=True)
         return True
 
-    def _otn2obc(self,order,transA,nrhs):
+    def _otn2obc(self,corder,transA,nrhs):
         cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
-        if order == b'F':
+        if not corder:
             lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
             if transA == b'N':
                 ldB=self.ncA

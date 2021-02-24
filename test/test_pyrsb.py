@@ -66,7 +66,7 @@ def test_spmm_C():
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
     x[:, :] = 1.0
     y[:, :] = 0.0
-    rmat._spmm(x,y,order=b'C')
+    rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
 def test_spmm_C_T():
@@ -81,7 +81,7 @@ def test_spmm_C_T():
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
     x[:, :] = 1.0
     y[:, :] = 0.0
-    rmat._spmm(x,y,order=b'C',transA=b'T')
+    rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
 def test_spmm_C_T_forms():
@@ -98,7 +98,7 @@ def test_spmm_C_T_forms():
     x[1, :] = 2.0
     for transA in ['T', b'T', ord('T')]:
         y[:, :] = 0.0
-        rmat._spmm(x,y,order=b'C',transA=transA)
+        rmat._spmm(x,y,transA=transA)
         assert ( y == (cmat.transpose() * x) ).all()
 
 def test_spmm_F():
@@ -113,7 +113,7 @@ def test_spmm_F():
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
     x[:, :] = 1.0
     y[:, :] = 0.0
-    rmat._spmm(x,y,order=b'F')
+    rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
 def test_spmm_F_T():
@@ -128,7 +128,7 @@ def test_spmm_F_T():
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
     x[:, :] = 1.0
     y[:, :] = 0.0
-    rmat._spmm(x,y,order=b'F',transA=b'T')
+    rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
 def test_spmm_permitted_mismatch():
