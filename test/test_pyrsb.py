@@ -63,7 +63,7 @@ def test_spmv__mul__():
     x = gen_x(nc)
     assert ( (rmat * x) == (cmat * x) ).all()
 
-def test_spmv_1D():
+def test_spmv_1D_N():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
@@ -76,6 +76,21 @@ def test_spmv_1D():
         y = y[:,0]
         rmat._spmv(x,y)
         assert ( y == (cmat * x) ).all()
+
+def test_spmv_1D_T():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    nrhs = 1
+    for order in ['C', 'F']:
+        for transA in ['T', b'T', ord('T')]:
+            x = gen_x(nr,nrhs,order)
+            y = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+            y[:, :] = 0.0
+            x = x[:,0]
+            y = y[:,0]
+            rmat._spmv(x,y,transA=transA)
+            assert ( y == ( cmat.transpose() * x) ).all()
 
 def test_spmm_C():
     [V,I,J,nr,nc,nnz] = gen_tri();
