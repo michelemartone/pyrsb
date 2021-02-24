@@ -48,6 +48,17 @@ def test_init_tuples_and_dims():
     assert mat._is_unsymmetric() == True
 
 
+def test_nonzero():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    [cI,cJ] = cmat.nonzero();
+    [rI,rJ] = rmat.nonzero();
+    # order matters: won't work for any matrix
+    assert ( cI == rI ).all()
+    assert ( cJ == rJ ).all()
+
+
 def test_find():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
