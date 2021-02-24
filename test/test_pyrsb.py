@@ -131,6 +131,13 @@ def test_spmv_1D_N():
         rmat._spmv(x,y)
         assert ( y == (cmat * x) ).all()
 
+def test_autotune_simple():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    omat = rsb_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    rmat.autotune()
+    assert( rmat.todense() == omat.todense() ).all()
+
 def test_spmv_1D_T():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
