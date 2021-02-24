@@ -48,6 +48,42 @@ def test_init_tuples_and_dims():
     assert mat._is_unsymmetric() == True
 
 
+def test_find():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    [cV,cI,cJ] = scipy.sparse.find(cmat);
+    [rV,rI,rJ] = rmat.find();
+    # order matters: won't work for any matrix
+    assert ( cV == rV ).all()
+    assert ( cI == rI ).all()
+    assert ( cJ == rJ ).all()
+
+
+def test_tril():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    [cV,cI,cJ] = scipy.sparse.find(scipy.sparse.tril(cmat));
+    [rV,rI,rJ] = rmat.tril();
+    # order matters: won't work for any matrix
+    assert ( cV == rV ).all()
+    assert ( cI == rI ).all()
+    assert ( cJ == rJ ).all()
+
+
+def test_triu():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    [cV,cI,cJ] = scipy.sparse.find(scipy.sparse.triu(cmat));
+    [rV,rI,rJ] = rmat.triu();
+    # order matters: won't work for any matrix
+    assert ( cV == rV ).all()
+    assert ( cI == rI ).all()
+    assert ( cJ == rJ ).all()
+
+
 def test_init_tuples_sym():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)),sym="S")
