@@ -49,13 +49,13 @@ cpdef rsb_time():
     return rt
 
 def _print_vec(np.ndarray[np.float_t, ndim=2] x, mylen=0):
-    """Print a vector, eventually overriding its lenfth (which is DANGEROUS)."""
+    """Print a vector, possibly overriding its length (which is DANGEROUS)."""
     cdef lr.rsb_coo_idx_t ylv = 0
     cdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
     ylv = len(x)
     if mylen is not 0:
         ylv = mylen
-    return lr.rsb_file_vec_save("/dev/stdout", typecode, <lr.cvoid_ptr>x.data, ylv)
+    return lr.rsb_file_vec_save(NULL, typecode, <lr.cvoid_ptr>x.data, ylv)
 
 cdef class rsb_matrix:
     cdef lr.rsb_mtx_ptr mtxAp
@@ -213,11 +213,10 @@ cdef class rsb_matrix:
         Print the entire matrix (FIXME: currently, to stdout).
         (specific to rsb).
         """
-        cdef char* data = "/dev/stdout"
         if (brief):
             print(self.__str__())
         else:
-            return self.save(data)
+            return self.save()
 
     def _mtx_free(self):
         """
@@ -555,9 +554,10 @@ cdef class rsb_matrix:
         """
         return True
 
-    def save(self, char * filename):
+    def save(self, char * filename=NULL):
         """
         Save to a specified file, in the Matrix Market format.
+        With NULL Input, to stdout.
         (specific to rsb).
         """
         self.errval = lr.rsb_file_mtx_save(self.mtxAp,filename)
