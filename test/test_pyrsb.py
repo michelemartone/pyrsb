@@ -8,6 +8,8 @@ import scipy
 from scipy.sparse import csr_matrix
 from rsb import rsb_matrix
 from rsb import _print_vec
+import pytest
+from pytest import raises as assert_raises
 
 
 def gen_tri():
@@ -29,6 +31,11 @@ def test__print_vec():
     for order in ['C', 'F']:
         x = gen_x(3,nrhs=2,order=order)
         assert 0 == _print_vec(x)
+
+
+def test__print_vec_throw():
+    with assert_raises(ValueError):
+        _print_vec(numpy.empty([1 ], dtype=scipy.double))
 
 
 def test_init_tuple():
