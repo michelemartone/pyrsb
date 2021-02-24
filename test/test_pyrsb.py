@@ -154,8 +154,8 @@ def test_demo():
     nr = a.shape[0]
     nc = a.shape[1]
     order = "F"
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
-    y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+    x = numpy.empty([nc, nrhs], dtype=a.dtype, order=order)
+    y = numpy.empty([nr, nrhs], dtype=a.dtype, order=order)
     x[:, :] = 1.0
     y[:, :] = 0.0
     print(a)

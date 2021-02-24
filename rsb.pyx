@@ -66,6 +66,10 @@ cdef class rsb_matrix:
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
+    dtype = np.float64
+
+    def _get_dtype(self):
+        return self.dtype
 
     def _psf2lsf(self, sym):
         """
