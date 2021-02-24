@@ -7,6 +7,7 @@ import numpy
 import scipy
 from scipy.sparse import csr_matrix
 from rsb import rsb_matrix
+from rsb import _print_vec
 
 
 def gen_tri():
@@ -22,6 +23,12 @@ def gen_x(n,nrhs=1,order='C'):
         print(i)
         x[:, i] = i+1
     return x
+
+
+def test__print_vec():
+    for order in ['C', 'F']:
+        x = gen_x(3,nrhs=2,order=order)
+        assert 0 == _print_vec(x)
 
 
 def test_init_tuple():
