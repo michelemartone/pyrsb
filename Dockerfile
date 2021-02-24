@@ -34,4 +34,4 @@ RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test PyRSB
-RUN make
+RUN make clean && make

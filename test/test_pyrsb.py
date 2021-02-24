@@ -11,6 +11,14 @@ def gen_tri():
     return [V,I,J,2,2,3]
 
 
+def gen_x(n,nrhs=1,order='C'):
+    x = numpy.empty([n, nrhs], dtype=scipy.double, order=order)
+    for i in range(nrhs):
+        print(i)
+        x[:, i] = i+1
+    return x
+
+
 def test_init_tuple():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, I, J))
@@ -47,11 +55,7 @@ def test_spmv():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
-    assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
-    nrhs = 1
-    x = numpy.empty([nc, nrhs], dtype=scipy.double)
-    x[:, :] = 1.0
+    x = gen_x(nc)
     assert ( (rmat * x) == (cmat * x) ).all()
 
 def test_spmm_C():
@@ -62,9 +66,8 @@ def test_spmm_C():
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+    x = gen_x(nc,nrhs,order)
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
-    x[:, :] = 1.0
     y[:, :] = 0.0
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
@@ -77,9 +80,8 @@ def test_spmm_C_T():
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+    x = gen_x(nc,nrhs,order)
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
-    x[:, :] = 1.0
     y[:, :] = 0.0
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
@@ -92,10 +94,8 @@ def test_spmm_C_T_forms():
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
+    x = gen_x(nc,nrhs,order)
     y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
-    x[0, :] = 1.0
-    x[1, :] = 2.0
     for transA in ['T', b'T', ord('T')]:
         y[:, :] = 0.0
         rmat._spmm(x,y,transA=transA)
@@ -108,10 +108,9 @@ def test_spmm_F():
     assert rmat.shape == cmat.shape
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
-    order = 'F'
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
-    y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
-    x[:, :] = 1.0
+    order='F'
+    x = gen_x(nr,nrhs,order)
+    y = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
     y[:, :] = 0.0
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
@@ -124,10 +123,8 @@ def test_spmm_F_T():
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
     order = 'F'
-    x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
-    y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
-    x[:, :] = 1.0
-    y[:, :] = 0.0
+    x = gen_x(nr,nrhs,order)
+    y = numpy.zeros([nc, nrhs], dtype=scipy.double, order=order)
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
@@ -135,10 +132,8 @@ def test_spmm_permitted_mismatch():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)))
     nrhs = 1
-    x1 = numpy.empty([nc, nrhs], dtype=scipy.double, order='F')
-    x2 = numpy.empty([nc, nrhs], dtype=scipy.double, order='C')
-    x1[:, :] = 1.0
-    x2[:, :] = 1.0
+    x1 = gen_x(nc,nrhs,order='F')
+    x2 = gen_x(nc,nrhs,order='C')
     assert ( (rmat * x1).shape == (rmat * x2).shape )
     assert ( (rmat * x1) == (rmat * x2) ).all()
 
@@ -149,8 +144,7 @@ def test_spmm__mul__():
     assert rmat.shape == cmat.shape
     assert rmat.nnz() == cmat.nnz
     nrhs = 2
-    x = numpy.empty([nc, nrhs], dtype=scipy.double)
-    x[:, :] = 1.0
+    x = gen_x(nc,nrhs)
     assert ( (rmat * x) == (cmat * x) ).all()
 
 def test_demo():
