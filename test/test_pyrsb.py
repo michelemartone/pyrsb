@@ -228,6 +228,13 @@ def test_spmm__mul__():
     x = gen_x(nc,nrhs)
     assert ( (rmat * x) == (cmat * x) ).all()
 
+def test_rescaled():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J))).rescaled(2.0)
+    x = gen_x(nc)
+    assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
 def test_demo():
     V = [11.0, 12.0, 22.0]
     I = [0, 0, 1]

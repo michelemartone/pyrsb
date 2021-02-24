@@ -577,7 +577,7 @@ cdef class rsb_matrix:
         rm = rsb_matrix()
         self._err_check()
         rm.mtxAp = mtxBp
-        rm.__refresh()
+        rm._refresh()
         return rm
 
     def todense(self,order=None,out=None):
