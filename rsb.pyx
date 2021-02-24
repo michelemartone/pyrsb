@@ -105,6 +105,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
         corder =  x.flags.c_contiguous
         (lr_order,ldB,ldC)=self._otn2obc(corder,transA,nrhs)
+        assert x.flags.c_contiguous == y.flags.c_contiguous
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
            self.errval = lr.RSB_ERR_BADARGS
@@ -291,7 +292,7 @@ cdef class rsb_matrix:
         """
            Multiply by a scalar, dense vector, dense matrix (multivector) or another sparse matrix.
            In the case of a scalar, will return a scaled copy of this matrix.
-           In the case of a vector or multivector, order is taken from the operand array; Fortran (column-first) order is recommended.
+           In the case of a multivector, order is taken from the operand array; C (rows-first) order is recommended with librsb-1.3, otherwise F (columns-first).
            In the case of another sparse matrix, this must be conformant in size.
         """
         cdef np.ndarray y
@@ -306,7 +307,12 @@ cdef class rsb_matrix:
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
-            y = np.zeros([self.nr(),nrhs],dtype=np.double)
+            corder = x.flags.c_contiguous
+            if corder:
+                order='C'
+            else:
+                order='F'
+            y = np.zeros([self.nr(),nrhs],dtype=np.double,order=order)
             self._spmm(x,y)
         return y
 
