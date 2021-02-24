@@ -137,7 +137,7 @@ cdef class rsb_matrix:
     def __init__(self,arg1=None,shape=None,sym='U'):
         self.nrA=0
         self.ncA=0
-        cdef int brA = 0, bcA = 0
+        cdef lr.rsb_blk_idx_t brA = 0, bcA = 0
         cdef lr.cvoid_ptr VA = NULL
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         self.flagsA = flagsA
