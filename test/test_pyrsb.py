@@ -1,3 +1,8 @@
+"""
+Test file for the PyRSB interface to LIBRSB.
+Note that this file tests the PyRSB API, not LIBRSB itself.
+"""
+
 import numpy
 import scipy
 from scipy.sparse import csr_matrix
@@ -51,12 +56,26 @@ def test_init_tuples_sym():
     assert mat._is_unsymmetric() == False
 
 
-def test_spmv():
+def test_spmv__mul__():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     x = gen_x(nc)
     assert ( (rmat * x) == (cmat * x) ).all()
+
+def test_spmv_1D():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    nrhs = 1
+    for order in ['C', 'F']:
+        x = gen_x(nc,nrhs,order)
+        y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+        y[:, :] = 0.0
+        x = x[:,0]
+        y = y[:,0]
+        rmat._spmv(x,y)
+        assert ( y == (cmat * x) ).all()
 
 def test_spmm_C():
     [V,I,J,nr,nc,nnz] = gen_tri();
