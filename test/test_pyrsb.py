@@ -7,9 +7,10 @@ import numpy
 import scipy
 from scipy.sparse import csr_matrix
 from rsb import rsb_matrix
-from rsb import _print_vec
+from rsb import _print_vec, rsb_time
 import pytest
 from pytest import raises as assert_raises
+from time import sleep
 
 
 def gen_tri():
@@ -104,6 +105,13 @@ def test_nonzero():
     # order matters: won't work for any matrix
     assert ( cI == rI ).all()
     assert ( cJ == rJ ).all()
+
+
+def test_sleep():
+    t0 = rsb_time()
+    sleep(0.001)
+    t1 = rsb_time()
+    assert (t1 > t0)
 
 
 def test_todense():
