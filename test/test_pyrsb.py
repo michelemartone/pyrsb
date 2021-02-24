@@ -137,8 +137,8 @@ def test_find():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     cmat = csr_matrix((V, (I, J)),[nr,nc])
-    [cV,cI,cJ] = scipy.sparse.find(cmat);
-    [rV,rI,rJ] = rmat.find();
+    [cI,cJ,cV] = scipy.sparse.find(cmat);
+    [rI,rJ,rV] = rmat.find();
     # order matters: won't work for any matrix
     assert ( cV == rV ).all()
     assert ( cI == rI ).all()
@@ -149,8 +149,8 @@ def test_tril():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     cmat = csr_matrix((V, (I, J)),[nr,nc])
-    [cV,cI,cJ] = scipy.sparse.find(scipy.sparse.tril(cmat));
-    [rV,rI,rJ] = rmat.tril();
+    [cI,cJ,cV] = scipy.sparse.find(scipy.sparse.tril(cmat));
+    [rI,rJ,rV] = rmat.tril();
     # order matters: won't work for any matrix
     assert ( cV == rV ).all()
     assert ( cI == rI ).all()
@@ -161,8 +161,8 @@ def test_triu():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     cmat = csr_matrix((V, (I, J)),[nr,nc])
-    [cV,cI,cJ] = scipy.sparse.find(scipy.sparse.triu(cmat));
-    [rV,rI,rJ] = rmat.triu();
+    [cI,cJ,cV] = scipy.sparse.find(scipy.sparse.triu(cmat));
+    [rI,rJ,rV] = rmat.triu();
     # order matters: won't work for any matrix
     assert ( cV == rV ).all()
     assert ( cI == rI ).all()
