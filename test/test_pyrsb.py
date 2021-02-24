@@ -59,6 +59,13 @@ def test_nonzero():
     assert ( cJ == rJ ).all()
 
 
+def test_todense():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    assert ( rmat.todense() == cmat.todense() ).all()
+
+
 def test_find():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
