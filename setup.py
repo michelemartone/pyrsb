@@ -6,7 +6,7 @@ from setuptools.command.build_ext import build_ext
 from time import gmtime, strftime
 
 if True:
-    VERSION = "0.2.20210222"
+    VERSION = "0.2.20210224"
 else:
     if os.environ.get("PYRSB_VERSION"):
         VERSION = os.environ.get("PYRSB_VERSION")

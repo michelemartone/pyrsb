@@ -39,6 +39,20 @@ def test__print_vec_throw():
         _print_vec(numpy.empty([1 ], dtype=scipy.double))
 
 
+def test_init_from_none():
+    mat = rsb_matrix(None)
+    assert mat.shape == (0, 0)
+    assert mat.nnz() == 0
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_from_none_none():
+    mat = rsb_matrix(None,None)
+    assert mat.shape == (0, 0)
+    assert mat.nnz() == 0
+    assert mat._is_unsymmetric() == True
+
+
 def test_init_tuple():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, I, J))
