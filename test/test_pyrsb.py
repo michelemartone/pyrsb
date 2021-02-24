@@ -88,6 +88,13 @@ def test_init_tuples_to_fix_2():
     assert ( mat.nnz() == 3 )
 
 
+def test_do_print():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    rmat.do_print(brief=True)
+    rmat.do_print(brief=False)
+
+
 def test_nonzero():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
