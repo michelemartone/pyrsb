@@ -306,7 +306,7 @@ cdef class rsb_matrix:
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
-            y = np.zeros_like(x,shape=(self.shape[0],nrhs))
+            y = np.zeros([self.nr(),nrhs],dtype=np.double)
             self._spmm(x,y)
         return y
 
