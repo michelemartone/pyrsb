@@ -1,7 +1,7 @@
 """
 Recursive Sparse Blocks matrix format.
 librsb interface for Python.
-Proof of concept, very limited interface code, tries to resemble scipy.sparse.
+Proof of concept, very limited interface code, aims at compatibility with scipy.sparse.
 Author: Michele Martone
 License: GPLv3+
 """
@@ -22,13 +22,13 @@ cimport cython
 verbose=0
 
 cpdef rsb_lib_init():
-    """Initializes librsb."""
+    """Initialize librsb."""
     if verbose:
         print("Initializing librsb")
     return lr.rsb_lib_init(NULL)
 
 cpdef rsb_lib_exit():
-    """Finalizes librsb."""
+    """Finalize librsb."""
     if verbose:
         print("Finalizing librsb")
     return lr.rsb_lib_exit(NULL)
@@ -43,13 +43,13 @@ cpdef rsb_file_mtx_load(const char * filename):
     return rm
 
 cpdef rsb_time():
-    """Returns the current time."""
+    """Return current time."""
     cdef lr.rsb_time_t rt
     rt = <lr.rsb_time_t>lr.rsb_time()
     return rt
 
 def _print_vec(np.ndarray[np.float_t, ndim=2] x, mylen=0):
-    """Prints a vector, eventually overriding its lenfth (which is DANGEROUS)."""
+    """Print a vector, eventually overriding its lenfth (which is DANGEROUS)."""
     cdef lr.rsb_coo_idx_t ylv = 0
     cdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
     ylv = len(x)
@@ -210,7 +210,7 @@ cdef class rsb_matrix:
 
     def do_print(self, brief=False):
         """
-        Prints the entire matrix (FIXME: currently, to stdout).
+        Print the entire matrix (FIXME: currently, to stdout).
         (specific to rsb).
         """
         cdef char* data = "/dev/stdout"
@@ -221,7 +221,7 @@ cdef class rsb_matrix:
 
     def _mtx_free(self):
         """
-        Frees the matrix.
+        Free the matrix.
         """
         # print("Freeing matrix.")
         lr.rsb_mtx_free(self.mtxAp)
@@ -256,8 +256,8 @@ cdef class rsb_matrix:
 
     def _spmul(self, rsb_matrix other):
         """
-        Multiplies two rsb_matrix objects.
-        (specific to rsb).
+        Multiply two rsb_matrix objects.
+        (specific to rsb; __mul__ with scipy).
         """
         cdef double alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
@@ -272,7 +272,7 @@ cdef class rsb_matrix:
 
     def rescaled(self, double alpha):
         """
-        Returned rescaled copy.
+        Return rescaled copy.
         (specific to rsb).
         """
         rm = self.copy()
@@ -318,14 +318,14 @@ cdef class rsb_matrix:
 
     def dot(self, x):
         """
-        A wrapper to __mul__ (the * operator).
+        Wrapper to __mul__ (the * operator).
         (specific to rsb, unlike scipy.sparse).
         """
         return self.__mul__(x)
 
     def _spadd(self, rsb_matrix other):
         """
-        Adds two rsb_matrix objects.
+        Add two rsb_matrix objects.
         """
         cdef double alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
@@ -339,16 +339,16 @@ cdef class rsb_matrix:
         return rm
 
     def __add__(self,other):
-        """Adds two rsb_matrix objects."""
+        """Add two rsb_matrix objects (also in scipy.sparse)."""
         return self._spadd(other)
 
     def __complex__(self,other):
-        """Unsupported: at the moment only double precision reals are supported."""
+        """Unsupported: at the moment only double is supported."""
         return False
 
     def opt_set(self, char * opnp, char * opvp):
         """
-        Specifies individual library options in order to fine-tune the library behaviour.
+        Specify individual library options in order to fine-tune the library behaviour.
         (specific to rsb).
         """
         self.errval = lr.rsb_lib_set_opt_str(opnp,opvp)
@@ -384,7 +384,7 @@ cdef class rsb_matrix:
 
     def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', double alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', double beta=1.0, verbose = False):
         """
-        An auto-tuner based on rsb_tune_spmm(): optimizes either the matrix instance, the thread count or both for rsb_spmm() .
+        Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
         """
         cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
@@ -502,7 +502,7 @@ cdef class rsb_matrix:
 
     def nonzero(self):
         """
-        More or less as scipy.sparse.nonzero(): returns (ia,ja).
+        More or less as csr_matrix.nonzero(): returns (ia,ja).
         """
         (IA,JA,VA)=self.find()
         return (IA,JA)
@@ -557,7 +557,7 @@ cdef class rsb_matrix:
 
     def save(self, char * filename):
         """
-        Saves to a specified file, in the Matrix Market format.
+        Save to a specified file, in the Matrix Market format.
         (specific to rsb).
         """
         self.errval = lr.rsb_file_mtx_save(self.mtxAp,filename)
@@ -566,7 +566,7 @@ cdef class rsb_matrix:
 
     def copy(self):
         """
-        Returns a copy (clone) of this matrix.
+        Return a copy (clone) of this matrix.
         (specific to rsb).
         """
         cdef lr.rsb_mtx_ptr mtxBp = NULL
@@ -582,7 +582,7 @@ cdef class rsb_matrix:
 
     def todense(self,order=None,out=None):
         """
-        Returns a dense copy of this matrix.
+        Return a dense copy of this matrix.
         (as in scipy.sparse).
         """
         cdef lr.rsb_mtx_ptr mtxBp = NULL
