@@ -144,6 +144,12 @@ def test__spmul():
     rmat = rsb_matrix((V, (I, J)))
     assert( (cmat*cmat).todense() == (rmat*rmat).todense() ).all()
 
+def test__spadd():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    assert( (cmat+cmat).todense() == (rmat+rmat).todense() ).all()
+
 def test_spmv_1D_T():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
