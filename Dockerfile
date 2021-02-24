@@ -23,6 +23,7 @@ RUN apt-get install --yes \
     "python3-setuptools" \
     ${PKG}
 
+RUN apt-get install --yes python3-pytest ipython3
 # Copy the current directory to the container and continue inside it
 COPY "." "/mnt"
 WORKDIR "/mnt"
