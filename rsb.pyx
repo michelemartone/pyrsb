@@ -85,7 +85,7 @@ cdef class rsb_matrix:
                 return lr.RSB_FLAG_LOWER_SYMMETRIC
         if sym == 'H' or sym == ord('H') or sym == b'H':
                 return lr.RSB_FLAG_LOWER_HERMITIAN
-        return lr.RSB_FLAG_NOFLAGS
+        raise ValueError("Unrecognized symmetry")
 
     def _prt2lt(self, transA):
         """

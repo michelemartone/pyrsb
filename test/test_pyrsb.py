@@ -268,6 +268,12 @@ def test_init_tuples_sym():
     assert mat._is_unsymmetric() == False
 
 
+def test_init_tuples_wrong_sym():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    with assert_raises(ValueError):
+        mat = rsb_matrix((V, (I, J)),sym="W")
+
+
 def test_spmv__mul__():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))
