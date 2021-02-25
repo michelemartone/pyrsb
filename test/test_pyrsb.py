@@ -337,6 +337,16 @@ def test_spmm_C():
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
+def test_spmm_wrong_transA():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)))
+    nrhs = 2
+    x = gen_x(nc,nrhs)
+    y = numpy.empty([nr, nrhs], dtype=scipy.double)
+    y[:, :] = 0.0
+    with assert_raises(ValueError):
+       rmat._spmm(x,y,transA='?')
+
 def test_spmm_C_T():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csr_matrix((V, (I, J)))

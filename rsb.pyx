@@ -97,7 +97,7 @@ cdef class rsb_matrix:
                 return lr.RSB_TRANSPOSITION_T
         if transA == 'C' or transA == ord('C') or transA == b'C':
                 return lr.RSB_TRANSPOSITION_C
-        return lr.RSB_TRANSPOSITION_N
+        raise ValueError("Unrecognized transA")
 
     def _spmm(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0):
         """
