@@ -183,6 +183,13 @@ def test_triu():
     assert ( cJ == rJ ).all()
 
 
+def test_mini_self_print_test():
+    """Call mini self test."""
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    rmat.mini_self_print_test()
+
+
 def test_init_tuples_sym():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)),sym="S")
