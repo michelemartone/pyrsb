@@ -6,6 +6,7 @@ Note that this file tests the PyRSB API, not LIBRSB itself.
 import numpy
 import scipy
 from scipy.sparse import csr_matrix
+from scipy.sparse import csc_matrix
 from rsb import rsb_matrix
 from rsb import _print_vec, rsb_time, rsb_file_mtx_load
 import pytest
@@ -109,6 +110,13 @@ def test_init_tuple_to_fix_3():
     assert mat.shape == (0, 0)
     assert mat.nnz() == 0
     assert mat._is_unsymmetric() == True
+
+
+def test_init_from_csc():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csc_matrix((V, (I, J)),[nr,nc])
+    rmat = rsb_matrix(cmat)
+    assert ((cmat - rmat.tocsr())).nnz == 0
 
 
 def test_do_print():

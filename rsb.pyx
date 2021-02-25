@@ -58,6 +58,9 @@ def _print_vec(np.ndarray[np.float_t, ndim=2] x, mylen=0):
     return lr.rsb_file_vec_save(NULL, typecode, <lr.cvoid_ptr>x.data, ylv)
 
 cdef class rsb_matrix:
+    """
+    Recursive Sparse Blocks matrix
+    """
     cdef lr.rsb_mtx_ptr mtxAp
     cdef lr.rsb_err_t errval
     cdef lr.rsb_type_t typecode 
@@ -151,7 +154,8 @@ cdef class rsb_matrix:
             if type(arg1) == type(self):
                 self = arg1.copy()
                 return
-            elif type(arg1) == csr_matrix:
+            elif isinstance(arg1, sp.sparse.base.spmatrix):
+                # TODO: might want to use more efficient rsb_mtx_alloc_from_csc_const(), rsb_mtx_alloc_from_csr_const()
                 (I,J,V)=sp.sparse.find(arg1)
             elif isinstance(arg1, tuple):
                 if len(arg1) == 2 and not isinstance(arg1[1], tuple):
