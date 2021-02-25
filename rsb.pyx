@@ -499,6 +499,14 @@ cdef class rsb_matrix:
         self._err_check()
         return (np.array(IAa),np.array(JAa),np.array(VAa))
 
+    def _find_v_ij(self):
+        (IA,JA,VA)=self.find()
+        return (VA,(IA,JA))
+
+    def tocsr(self):
+        """Transition solution (does not exploit rsb_mtx_get_csr)."""
+        return csr_matrix(self._find_v_ij())
+
     def nonzero(self):
         """
         More or less as csr_matrix.nonzero(): returns (ia,ja).

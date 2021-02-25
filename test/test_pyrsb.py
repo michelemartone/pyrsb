@@ -155,6 +155,13 @@ def test_todense():
     assert ( rmat.todense() == cmat.todense() ).all()
 
 
+def test_tocsr():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    cmat = csr_matrix((V, (I, J)),[nr,nc])
+    assert ((cmat - rmat.tocsr())).nnz == 0
+
+
 def test_find():
     [V,I,J,nr,nc,nnz] = gen_tri();
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
