@@ -51,9 +51,18 @@ def test_init_from_none_dtype_D():
     mat = rsb_matrix(None,dtype='d')
 
 
+def test_init_from_dims_dtype_D():
+    mat = rsb_matrix([1,1],dtype='d')
+
+
 def test_init_from_none_dtype_Wrong():
     with assert_raises(TypeError):
         mat = rsb_matrix(None,dtype='W')
+
+
+def test_init_from_dims_dtype_Wrong():
+    with assert_raises(TypeError):
+        mat = rsb_matrix([1,1],dtype='W')
 
 
 def test_init_from_none_none():
