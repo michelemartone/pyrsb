@@ -45,6 +45,8 @@ def test_init_from_none():
     assert mat.shape == (0, 0)
     assert mat.nnz() == 0
     assert mat._is_unsymmetric() == True
+    assert mat.dtype == numpy.float64
+    assert mat.ndim == 2
 
 
 def test_init_from_none_dtype_D():

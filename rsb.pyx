@@ -70,6 +70,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
     dtype = np.float64
+    ndim = 2
 
     def _get_dtype(self):
         return self.dtype
