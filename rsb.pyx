@@ -137,7 +137,7 @@ cdef class rsb_matrix:
         self._err_check()
         return self.errval
 
-    def __init__(self,arg1=None,shape=None,sym='U'):
+    def __init__(self,arg1=None,shape=None,sym='U',dtype='d'):
         self.nrA=0
         self.ncA=0
         cdef lr.rsb_blk_idx_t brA = 0, bcA = 0
@@ -150,6 +150,8 @@ cdef class rsb_matrix:
         V = None
         I = None
         J = None
+        if dtype != 'd' and dtype != 'D':
+            raise TypeError("Wrong data type: for now, only 'D' suppurted.")
         if arg1 is not None:
             if type(arg1) == type(self):
                 self = arg1.copy()

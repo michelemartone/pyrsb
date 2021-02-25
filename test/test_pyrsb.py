@@ -47,6 +47,15 @@ def test_init_from_none():
     assert mat._is_unsymmetric() == True
 
 
+def test_init_from_none_dtype_D():
+    mat = rsb_matrix(None,dtype='d')
+
+
+def test_init_from_none_dtype_Wrong():
+    with assert_raises(TypeError):
+        mat = rsb_matrix(None,dtype='W')
+
+
 def test_init_from_none_none():
     mat = rsb_matrix(None,None)
     assert mat.shape == (0, 0)
