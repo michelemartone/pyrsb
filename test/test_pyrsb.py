@@ -72,11 +72,11 @@ def test_init_from_none_none():
     assert mat._is_unsymmetric() == True
 
 
-def test_init_tuple():
-    [V,I,J,nr,nc,nnz] = gen_tri();
-    mat = rsb_matrix((V, I, J))
-    assert mat.shape == (nr, nc)
-    assert mat.nnz() == nnz
+def test_init_tuple_csr():
+    # TODO: need gen_csr_tri
+    mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
+    assert mat.nnz() == 3
+    assert mat.shape == (2, 2)
     assert mat._is_unsymmetric() == True
 
 
@@ -115,11 +115,11 @@ def test_init_tuples_fixed_1():
          assert ( mat.nnz() == 0 )
 
 
-def test_init_tuples_to_fix_2():
-    [V,I,J,nr,nc,nnz] = gen_tri()
-    # TODO: shall ban this
-    mat = rsb_matrix((V, (I,J)),[-1,-1])
-    assert ( mat.nnz() == 3 )
+def test_init_tuples_fixed_2():
+    mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
+    assert mat.nnz() == 3
+    assert mat.shape == (2, 2)
+    assert mat._is_unsymmetric() == True
 
 
 def test_init_tuple_to_fix_3():

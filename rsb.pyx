@@ -169,12 +169,14 @@ cdef class rsb_matrix:
                         I = arg1[1][0]
                         J = arg1[1][1]
                     elif len(arg1) == 3:
+                        # TODO: might want to use more efficient rsb_mtx_alloc_from_csr_const()
                         # (data, indices, indptr) format
                         # raise ValueError("unrecognized %s_matrix constructor usage"% self.format)
                         # here: (data, i,j) format
                         V = arg1[0]
-                        I = arg1[1]
-                        J = arg1[2]
+                        J = arg1[1]
+                        P = arg1[2]
+                        [I,J,V]=sp.sparse.find(csr_matrix((V,J,P)))
                     else:
                         raise ValueError("unrecognized %s_matrix constructor usage"% self.format)
             else:

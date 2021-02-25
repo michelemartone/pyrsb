@@ -15,8 +15,7 @@ print(c)
 # several constructor forms, as with csr_matrix:
 a = rsb_matrix((V, (I, J)))
 a = rsb_matrix((V, (I, J)), [3, 3])
-a = rsb_matrix((V, I, J))
-a = rsb_matrix((V, I, J), sym="S")  # symmetric example
+a = rsb_matrix((V, (I, J)), sym="S")  # symmetric example
 print(a)
 a = rsb_matrix((4, 4))
 a = rsb_matrix(c)

@@ -71,8 +71,7 @@ print(c)
 # several constructor forms, as with csr_matrix:
 a = rsb_matrix((V, (I, J)))
 a = rsb_matrix((V, (I, J)), [3, 3])
-a = rsb_matrix((V, I, J))
-a = rsb_matrix((V, I, J), sym="S")  # symmetric example
+a = rsb_matrix((V, (I, J)), sym="S")  # symmetric example
 print(a)
 a = rsb_matrix((4, 4))
 a = rsb_matrix(c)
@@ -111,7 +110,7 @@ from rsb import rsb_matrix
 V = [11.0, 12.0, 22.0]
 I = [0, 0, 1]
 J = [0, 1, 1]
-a = rsb_matrix((V, I, J))
+a = rsb_matrix((V, (I, J)))
 
 nrhs = 4  # set to nrhs>1 to multiply by multiple vectors at once
 nr = a.shape[0]
