@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2008-2017 Michele Martone
+# Copyright (C) 2008-2021 Michele Martone
 # 
 # This file is part of librsb.
 # 
@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with librsb; see the file COPYING.
 # If not, see <http://www.gnu.org/licenses/>.
+set -e
 SRCDIR=
 if test $# = 0 ; then SRCDIR=. ; else SRCDIR="$1"; fi
 IF=${SRCDIR}/rsb.h
@@ -38,7 +39,7 @@ PCI='s/^/cdef int /g;' # prepend cdef int
 EHC='s/^\s*,*\s*//g;' # erase heading commas
 ETB='s/\s*$//g;' # erase trailing blanks
 ETS='s/;$//g;' # erase trailing semicolon
-C2C='s/\<const\>\s*//g;s/\<void\>\s*\*/void_ptr /g;s/struct rsb_mtx_t\s*\*/rsb_mtx_ptr /g;s/struct rsb_mtx_t\s*\*\s*\*/rsb_mtx_pptr /g;s/struct rsb_initopts\s*\*/rsb_opt_ptr /g;' # C to Cython
+C2C='s/\<const void\>\s*\*/cvoid_ptr /g;s/\<const\>\s*//g;s/\<void\>\s*\*/void_ptr /g;s/struct rsb_mtx_t\s*\*/rsb_mtx_ptr /g;s/struct rsb_mtx_t\s*\*\s*\*/rsb_mtx_pptr /g;s/struct rsb_initopts\s*\*/rsb_opt_ptr /g;' # C to Cython
 PAT='s/^/	/g;'
 (
 cat << EOF

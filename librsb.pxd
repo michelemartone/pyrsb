@@ -107,6 +107,7 @@ cdef extern from "rsb.h":
 	cdef int RSB_ERR_NO_STREAM_OUTPUT_CONFIGURED_OUT "RSB_ERR_NO_STREAM_OUTPUT_CONFIGURED_OUT"
 	cdef int RSB_ERR_INVALID_NUMERICAL_DATA "RSB_ERR_INVALID_NUMERICAL_DATA"
 	cdef int RSB_ERR_MEMORY_LEAK "RSB_ERR_MEMORY_LEAK"
+	cdef int RSB_ERR_ELEMENT_NOT_FOUND "RSB_ERR_ELEMENT_NOT_FOUND"
 	cdef int RSB_ERRS_UNSUPPORTED_FEATURES "RSB_ERRS_UNSUPPORTED_FEATURES"
 	cdef int RSB_PROGRAM_SUCCESS "RSB_PROGRAM_SUCCESS"
 	cdef int RSB_PROGRAM_ERROR "RSB_PROGRAM_ERROR"
@@ -170,6 +171,7 @@ cdef extern from "rsb.h":
 	cdef int RSB_TRANSPOSITION_N "RSB_TRANSPOSITION_N"
 	cdef int RSB_TRANSPOSITION_T "RSB_TRANSPOSITION_T"
 	cdef int RSB_TRANSPOSITION_C "RSB_TRANSPOSITION_C"
+	cdef int RSB_TRANSPOSITION_INVALID "RSB_TRANSPOSITION_INVALID"
 	cdef int RSB_SYMMETRY_U "RSB_SYMMETRY_U"
 	cdef int RSB_SYMMETRY_S "RSB_SYMMETRY_S"
 	cdef int RSB_SYMMETRY_H "RSB_SYMMETRY_H"
@@ -180,6 +182,8 @@ cdef extern from "rsb.h":
 	cdef int RSB_MATRIX_STORAGE_BCOR_STRING "RSB_MATRIX_STORAGE_BCOR_STRING"
 	cdef int RSB_MATRIX_STORAGE_BCSR_STRING "RSB_MATRIX_STORAGE_BCSR_STRING"
 	cdef int RSB_NUMERICAL_TYPE_DOUBLE "RSB_NUMERICAL_TYPE_DOUBLE"
+	cdef int RSB_NUMERICAL_TYPE_FLOAT "RSB_NUMERICAL_TYPE_FLOAT"
+	cdef int RSB_NUMERICAL_TYPE_FLOAT_COMPLEX "RSB_NUMERICAL_TYPE_FLOAT_COMPLEX"
 	cdef int RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX "RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX"
 	cdef int RSB_NUMERICAL_TYPE_FORTRAN_SAME_TYPE "RSB_NUMERICAL_TYPE_FORTRAN_SAME_TYPE"
 	cdef int RSB_NUMERICAL_TYPE_FORTRAN_INT "RSB_NUMERICAL_TYPE_FORTRAN_INT"
@@ -192,7 +196,10 @@ cdef extern from "rsb.h":
 	cdef int RSB_NUMERICAL_TYPE_INVALID_TYPE "RSB_NUMERICAL_TYPE_INVALID_TYPE"
 	cdef int RSB_NUMERICAL_TYPE_FIRST_BLAS "RSB_NUMERICAL_TYPE_FIRST_BLAS"
 	cdef int RSB_NUMERICAL_TYPE_PREPROCESSOR_SYMBOLS "RSB_NUMERICAL_TYPE_PREPROCESSOR_SYMBOLS"
+	cdef int RSB_BLAS_NUMERICAL_TYPE_PREPROCESSOR_SYMBOLS "RSB_BLAS_NUMERICAL_TYPE_PREPROCESSOR_SYMBOLS"
 	cdef int RSB_MATRIX_STORAGE_DOUBLE_PRINTF_STRING "RSB_MATRIX_STORAGE_DOUBLE_PRINTF_STRING"
+	cdef int RSB_MATRIX_STORAGE_FLOAT_PRINTF_STRING "RSB_MATRIX_STORAGE_FLOAT_PRINTF_STRING"
+	cdef int RSB_MATRIX_STORAGE_FLOAT_COMPLEX_PRINTF_STRING "RSB_MATRIX_STORAGE_FLOAT_COMPLEX_PRINTF_STRING"
 	cdef int RSB_MATRIX_STORAGE_DOUBLE_COMPLEX_PRINTF_STRING "RSB_MATRIX_STORAGE_DOUBLE_COMPLEX_PRINTF_STRING"
 	cdef int RSB_TRANSPOSITIONS_PREPROCESSOR_SYMBOLS "RSB_TRANSPOSITIONS_PREPROCESSOR_SYMBOLS"
 	cdef rsb_err_t rsb_strerror_r(rsb_err_t errval, rsb_char_t * buf, size_t buflen)
@@ -201,50 +208,49 @@ cdef extern from "rsb.h":
 	cdef rsb_err_t rsb_lib_init(rsb_opt_ptr  iop)
 	cdef rsb_err_t rsb_lib_reinit(rsb_opt_ptr  iop)
 	cdef rsb_err_t rsb_lib_set_opt_str(rsb_char_t* opnp, rsb_char_t* opvp)
-	cdef rsb_err_t rsb_lib_set_opt(rsb_opt_t iof, void_ptr iop)
+	cdef rsb_err_t rsb_lib_set_opt(rsb_opt_t iof, cvoid_ptr iop)
 	cdef rsb_err_t rsb_lib_get_opt(rsb_opt_t iof, void_ptr iop)
 	cdef rsb_err_t rsb_lib_exit(rsb_opt_ptr  iop)
 	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_coo_begin(rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_flags_t flagsA, rsb_err_t * errvalp)
 	cdef rsb_err_t rsb_mtx_alloc_from_coo_end(rsb_mtx_ptr * mtxApp)
-	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_csr_const(void_ptr VA, rsb_coo_idx_t * RP, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
-	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_csc_const(void_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * CP, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
+	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_csr_const(cvoid_ptr VA, rsb_coo_idx_t * RP, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
+	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_csc_const(cvoid_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * CP, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
 	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_csr_inplace(void_ptr  VA, rsb_nnz_idx_t * RP, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
-	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_coo_const(void_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
+	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_coo_const(cvoid_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp)
 	cdef rsb_mtx_ptr  rsb_mtx_alloc_from_coo_inplace(void_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_type_t typecode, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_blk_idx_t brA, rsb_blk_idx_t bcA, rsb_flags_t flagsA, rsb_err_t * errvalp )
-	cdef rsb_err_t rsb_mtx_clone(rsb_mtx_ptr * mtxBpp, rsb_type_t typecode, rsb_trans_t transA, void_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_flags_t flags)
+	cdef rsb_err_t rsb_mtx_clone(rsb_mtx_ptr * mtxBpp, rsb_type_t typecode, rsb_trans_t transA, cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_flags_t flags)
 	cdef rsb_mtx_ptr  rsb_mtx_free(rsb_mtx_ptr  mtxAp)
 	cdef rsb_err_t rsb_mtx_get_nrm(rsb_mtx_ptr  mtxAp , void_ptr  Np, rsb_extff_t flags)
 	cdef rsb_err_t rsb_mtx_get_vec(rsb_mtx_ptr  mtxAp , void_ptr  Dp, rsb_extff_t flags)
 	cdef rsb_err_t rsb_mtx_rndr(rsb_char_t * filename, rsb_mtx_ptr mtxAp, rsb_coo_idx_t pmWidth, rsb_coo_idx_t pmHeight, rsb_marf_t rflags)
 	cdef rsb_err_t rsb_file_mtx_rndr(void_ptr  pmp, rsb_char_t * filename, rsb_coo_idx_t pmlWidth, rsb_coo_idx_t pmWidth, rsb_coo_idx_t pmHeight, rsb_marf_t rflags)
-	cdef rsb_err_t rsb_spmv(rsb_trans_t transA, void_ptr alphap, rsb_mtx_ptr  mtxAp, void_ptr  Xp, rsb_coo_idx_t incX, void_ptr  betap, void_ptr  Yp, rsb_coo_idx_t incY)
-	cdef rsb_err_t rsb_spmm(rsb_trans_t transA, void_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, void_ptr  Bp, rsb_nnz_idx_t ldB, void_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
-	cdef rsb_err_t rsb_spsv(rsb_trans_t transT, void_ptr  alphap, rsb_mtx_ptr  mtxTp, void_ptr  Xp, rsb_coo_idx_t incX, void_ptr  Yp, rsb_coo_idx_t incY)
-	cdef rsb_err_t rsb_spsm(rsb_trans_t transT, void_ptr  alphap, rsb_mtx_ptr  mtxTp, rsb_coo_idx_t nrhs, rsb_flags_t order, void_ptr  betap, void_ptr  Bp, rsb_nnz_idx_t ldB, void_ptr  Cp, rsb_nnz_idx_t ldC)
-	cdef rsb_err_t rsb_spata(void_ptr alphap, rsb_mtx_ptr  mtxAp, void_ptr  Xp, rsb_coo_idx_t incX, void_ptr  betap, void_ptr  Yp, rsb_coo_idx_t incY)
-	cdef rsb_err_t rsb_mtx_add_to_dense(void_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_nnz_idx_t ldB, rsb_nnz_idx_t nrB, rsb_nnz_idx_t ncB, rsb_bool_t rowmajorB, void_ptr  Bp)
-	cdef rsb_mtx_ptr  rsb_sppsp(rsb_type_t typecode, rsb_trans_t transA, void_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, void_ptr betap, rsb_mtx_ptr  mtxBp, rsb_err_t * errvalp)
-	cdef rsb_mtx_ptr  rsb_spmsp(rsb_type_t typecode, rsb_trans_t transA, void_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, void_ptr betap, rsb_mtx_ptr  mtxBp, rsb_err_t * errvalp)
-	cdef rsb_err_t rsb_spmsp_to_dense(rsb_type_t typecode, rsb_trans_t transA, void_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, void_ptr betap, rsb_mtx_ptr  mtxBp , rsb_nnz_idx_t ldC, rsb_nnz_idx_t nrC, rsb_nnz_idx_t ncC, rsb_bool_t rowmajorC, void_ptr Cp)
+	cdef rsb_err_t rsb_spmv(rsb_trans_t transA, cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, cvoid_ptr  Xp, rsb_coo_idx_t incX, cvoid_ptr  betap, void_ptr  Yp, rsb_coo_idx_t incY)
+	cdef rsb_err_t rsb_spmm(rsb_trans_t transA, cvoid_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, cvoid_ptr  Bp, rsb_nnz_idx_t ldB, cvoid_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
+	cdef rsb_err_t rsb_spsv(rsb_trans_t transT, cvoid_ptr  alphap, rsb_mtx_ptr  mtxTp, cvoid_ptr  Xp, rsb_coo_idx_t incX, void_ptr  Yp, rsb_coo_idx_t incY)
+	cdef rsb_err_t rsb_spsm(rsb_trans_t transT, cvoid_ptr  alphap, rsb_mtx_ptr  mtxTp, rsb_coo_idx_t nrhs, rsb_flags_t order, cvoid_ptr  betap, cvoid_ptr  Bp, rsb_nnz_idx_t ldB, void_ptr  Cp, rsb_nnz_idx_t ldC)
+	cdef rsb_err_t rsb_mtx_add_to_dense(cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_nnz_idx_t ldB, rsb_nnz_idx_t nrB, rsb_nnz_idx_t ncB, rsb_bool_t rowmajorB, void_ptr  Bp)
+	cdef rsb_mtx_ptr  rsb_sppsp(rsb_type_t typecode, rsb_trans_t transA, cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, cvoid_ptr betap, rsb_mtx_ptr  mtxBp, rsb_err_t * errvalp)
+	cdef rsb_mtx_ptr  rsb_spmsp(rsb_type_t typecode, rsb_trans_t transA, cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, cvoid_ptr betap, rsb_mtx_ptr  mtxBp, rsb_err_t * errvalp)
+	cdef rsb_err_t rsb_spmsp_to_dense(rsb_type_t typecode, rsb_trans_t transA, cvoid_ptr alphap, rsb_mtx_ptr  mtxAp, rsb_trans_t transB, cvoid_ptr betap, rsb_mtx_ptr  mtxBp , rsb_nnz_idx_t ldC, rsb_nnz_idx_t nrC, rsb_nnz_idx_t ncC, rsb_bool_t rowmajorC, void_ptr Cp)
 	cdef rsb_err_t rsb_mtx_switch_to_coo(rsb_mtx_ptr  mtxAp, void_ptr * VAp, rsb_coo_idx_t ** IAp, rsb_coo_idx_t ** JAp, rsb_flags_t flags)
 	cdef rsb_err_t rsb_mtx_switch_to_csr(rsb_mtx_ptr  mtxAp, void_ptr * VAp, rsb_coo_idx_t ** IAp, rsb_coo_idx_t ** JAp, rsb_flags_t flags)
 	cdef rsb_err_t rsb_mtx_get_coo(rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_flags_t flags )
 	cdef rsb_err_t rsb_mtx_get_csr(rsb_type_t typecode, rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_nnz_idx_t * RP, rsb_coo_idx_t * JA, rsb_flags_t flags )
-	cdef rsb_err_t rsb_mtx_get_rows_sparse(rsb_trans_t transA, void_ptr  alphap, rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_coo_idx_t frA, rsb_coo_idx_t lrA, rsb_nnz_idx_t *rnzp, rsb_flags_t flags )
+	cdef rsb_err_t rsb_mtx_get_rows_sparse(rsb_trans_t transA, cvoid_ptr  alphap, rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_coo_idx_t frA, rsb_coo_idx_t lrA, rsb_nnz_idx_t *rnzp, rsb_flags_t flags )
 	cdef rsb_err_t rsb_mtx_get_coo_block(rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_coo_idx_t frA, rsb_coo_idx_t lrA, rsb_coo_idx_t fcA, rsb_coo_idx_t lcA, rsb_coo_idx_t * IREN, rsb_coo_idx_t * JREN, rsb_nnz_idx_t *rnzp, rsb_flags_t flags )
 	cdef rsb_err_t rsb_mtx_get_info(rsb_mtx_ptr mtxAp, rsb_mif_t miflags, void_ptr  minfop)
 	cdef rsb_err_t rsb_mtx_get_info_str(rsb_mtx_ptr mtxAp, rsb_char_t *mis, void_ptr  minfop, size_t buflen)
-	cdef rsb_err_t rsb_mtx_upd_vals(rsb_mtx_ptr  mtxAp, rsb_elopf_t elop_flags, void_ptr  omegap)
-	cdef rsb_err_t rsb_mtx_get_prec(void_ptr opdp, rsb_mtx_ptr  mtxAp, rsb_precf_t prec_flags, void_ptr ipdp)
-	cdef rsb_err_t rsb_mtx_set_vals(rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t *IA, rsb_coo_idx_t *JA, rsb_nnz_idx_t nnz, rsb_flags_t flags)
+	cdef rsb_err_t rsb_mtx_upd_vals(rsb_mtx_ptr  mtxAp, rsb_elopf_t elop_flags, cvoid_ptr  omegap)
+	cdef rsb_err_t rsb_mtx_get_prec(void_ptr opdp, rsb_mtx_ptr  mtxAp, rsb_precf_t prec_flags, cvoid_ptr ipdp)
+	cdef rsb_err_t rsb_mtx_set_vals(rsb_mtx_ptr  mtxAp, cvoid_ptr  VA, rsb_coo_idx_t *IA, rsb_coo_idx_t *JA, rsb_nnz_idx_t nnz, rsb_flags_t flags)
 	cdef rsb_err_t rsb_mtx_get_vals(rsb_mtx_ptr  mtxAp, void_ptr  VA, rsb_coo_idx_t *IA, rsb_coo_idx_t *JA, rsb_nnz_idx_t nnz, rsb_flags_t flags)
-	cdef rsb_err_t rsb_tune_spmm(rsb_mtx_ptr * mtxOpp, rsb_real_t *sfp, rsb_int_t *tnp, rsb_int_t maxr, rsb_time_t maxt, rsb_trans_t transA, void_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, void_ptr  Bp, rsb_nnz_idx_t ldB, void_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
-	cdef rsb_err_t rsb_tune_spsm(rsb_mtx_ptr * mtxOpp, rsb_real_t *sfp, rsb_int_t *tnp, rsb_int_t maxr, rsb_time_t maxt, rsb_trans_t transA, void_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, void_ptr  Bp, rsb_nnz_idx_t ldB, void_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
+	cdef rsb_err_t rsb_tune_spmm(rsb_mtx_ptr * mtxOpp, rsb_real_t *sfp, rsb_int_t *tnp, rsb_int_t maxr, rsb_time_t maxt, rsb_trans_t transA, cvoid_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, cvoid_ptr  Bp, rsb_nnz_idx_t ldB, cvoid_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
+	cdef rsb_err_t rsb_tune_spsm(rsb_mtx_ptr * mtxOpp, rsb_real_t *sfp, rsb_int_t *tnp, rsb_int_t maxr, rsb_time_t maxt, rsb_trans_t transA, cvoid_ptr  alphap, rsb_mtx_ptr  mtxAp, rsb_coo_idx_t nrhs, rsb_flags_t order, cvoid_ptr  Bp, rsb_nnz_idx_t ldB, cvoid_ptr  betap, void_ptr  Cp, rsb_nnz_idx_t ldC)
 	cdef rsb_trans_t rsb_psblas_trans_to_rsb_trans(char psbtrans)
 	cdef rsb_err_t rsb_file_mtx_save(rsb_mtx_ptr  mtxAp, rsb_char_t * filename)
 	cdef rsb_mtx_ptr  rsb_file_mtx_load(rsb_char_t * filename, rsb_flags_t flagsA, rsb_type_t typecode, rsb_err_t *errvalp)
 	cdef rsb_err_t rsb_file_vec_load(rsb_char_t * filename, rsb_type_t typecode, void_ptr  Yp, rsb_coo_idx_t *yvlp)
-	cdef rsb_err_t rsb_file_vec_save(rsb_char_t * filename, rsb_type_t typecode, void_ptr  Yp, rsb_coo_idx_t yvl)
+	cdef rsb_err_t rsb_file_vec_save(rsb_char_t * filename, rsb_type_t typecode, cvoid_ptr  Yp, rsb_coo_idx_t yvl)
 	cdef rsb_err_t rsb_file_mtx_get_dims(rsb_char_t * filename, rsb_coo_idx_t* nrp, rsb_coo_idx_t *ncp, rsb_coo_idx_t *nzp, rsb_flags_t*flagsp)
 	cdef rsb_err_t rsb_coo_sort(void_ptr VA, rsb_coo_idx_t * IA, rsb_coo_idx_t * JA, rsb_nnz_idx_t nnzA, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA,  rsb_type_t typecode, rsb_flags_t flagsA )
 	cdef rsb_err_t rsb_coo_cleanup(rsb_coo_idx_t* nnzp, void_ptr  VA, rsb_coo_idx_t* IA, rsb_coo_idx_t* JA, rsb_nnz_idx_t nnzA, rsb_coo_idx_t nrA, rsb_coo_idx_t ncA, rsb_type_t typecode, rsb_flags_t flagsA )
