@@ -26,7 +26,7 @@ The following functionality is implemented:
   * Conversion from `scipy.sparse.csr_matrix()`.
   * Multiplication by vector/multivector.
   * Rows/columns through `nr=a.shape()[0]`/`nr=a.shape()[1]`, or `nr()`/`nc()`.
-  * `find()`, `find_block()`, `tril()`, `triu()`, `shape()`, `nnz()`.
+  * `find()`, `find_block()`, `tril()`, `triu()`, `shape()`, `nnz`.
   * `print`'able.
   * PyRSB-Specific: `autotune()`, `do_print()`.
   * load from a Matrix Market file, e.g. `rsb.rsb_file_mtx_load(bytes(filename,encoding='utf-8'))`

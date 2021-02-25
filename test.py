@@ -76,7 +76,7 @@ def bench_both(a, c, psf, nrhs=1):
         a.mini_self_print_test()
     x = np.ones([a.shape[1], nrhs], dtype=sp.double)
     y = np.ones([a.shape[0], nrhs], dtype=sp.double)
-    nnz = a.nnz()
+    nnz = a.nnz
     if WANT_VERBOSE:
         a.do_print()
         print("x=", x)
@@ -161,7 +161,7 @@ def bench_random_files():
         ct = -rsb.rsb_time()
         a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
         ct = ct + rsb.rsb_time()
-        printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz(),gt,a.nnz()/gt,ct)
+        printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz,gt,a.nnz/gt,ct)
         bench_matrix(a, c)
 
 
@@ -174,7 +174,7 @@ def bench_file(filename):
     lt = - rsb.rsb_time()
     a = rsb.rsb_file_mtx_load(bytes(filename, encoding="utf-8"))
     lt = lt + rsb.rsb_time()
-    printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz(),lt,a.nnz()/lt)
+    printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
     if not a._is_unsymmetric():
         print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     if a is not None:

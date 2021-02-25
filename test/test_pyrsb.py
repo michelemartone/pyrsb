@@ -43,7 +43,7 @@ def test__print_vec_throw():
 def test_init_from_none():
     mat = rsb_matrix(None)
     assert mat.shape == (0, 0)
-    assert mat.nnz() == 0
+    assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
     assert mat.dtype == numpy.float64
     assert mat.ndim == 2
@@ -70,14 +70,14 @@ def test_init_from_dims_dtype_Wrong():
 def test_init_from_none_none():
     mat = rsb_matrix(None,None)
     assert mat.shape == (0, 0)
-    assert mat.nnz() == 0
+    assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
 
 
 def test_init_tuple_csr():
     # TODO: need gen_csr_tri
     mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
-    assert mat.nnz() == 3
+    assert mat.nnz == 3
     assert mat.shape == (2, 2)
     assert mat._is_unsymmetric() == True
 
@@ -86,7 +86,7 @@ def test_init_tuples():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)))
     assert mat.shape == (nr, nc)
-    assert mat.nnz() == nnz
+    assert mat.nnz == nnz
     assert mat._is_unsymmetric() == True
 
 
@@ -94,7 +94,7 @@ def test_init_tuples_and_dims():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)),[nr,nc])
     assert mat.shape == (nr, nc)
-    assert mat.nnz() == nnz
+    assert mat.nnz == nnz
     assert mat._is_unsymmetric() == True
 
 
@@ -114,12 +114,12 @@ def test_init_tuples_fixed_1():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix([V, (I)])
     with assert_raises(AssertionError):
-         assert ( mat.nnz() == 0 )
+         assert ( mat.nnz == 0 )
 
 
 def test_init_tuples_fixed_2():
     mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
-    assert mat.nnz() == 3
+    assert mat.nnz == 3
     assert mat.shape == (2, 2)
     assert mat._is_unsymmetric() == True
 
@@ -128,7 +128,7 @@ def test_init_tuple_to_fix_3():
     # TODO: shall align rsb_matrix to scipy's
     mat = rsb_matrix(([1.,1.], ([-1,-2], [-1,-2])))
     assert mat.shape == (0, 0)
-    assert mat.nnz() == 0
+    assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
 
 
@@ -255,7 +255,7 @@ def test_init_tuples_sym():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)),sym="S")
     assert mat.shape == (nr, nc)
-    assert mat.nnz() == nnz
+    assert mat.nnz == nnz
     assert mat._is_unsymmetric() == False
 
 
@@ -319,7 +319,7 @@ def test_spmm_C():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
     x = gen_x(nc,nrhs,order)
@@ -333,7 +333,7 @@ def test_spmm_C_T():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
     x = gen_x(nc,nrhs,order)
@@ -347,7 +347,7 @@ def test_spmm_C_T_forms():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
     x = gen_x(nc,nrhs,order)
@@ -362,7 +362,7 @@ def test_spmm_F():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     order='F'
     x = gen_x(nr,nrhs,order)
@@ -376,7 +376,7 @@ def test_spmm_F_T():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'F'
     x = gen_x(nr,nrhs,order)
@@ -398,7 +398,7 @@ def test_spmm__mul__():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     assert rmat.shape == cmat.shape
-    assert rmat.nnz() == cmat.nnz
+    assert rmat.nnz == cmat.nnz
     nrhs = 2
     x = gen_x(nc,nrhs)
     assert ( (rmat * x) == (cmat * x) ).all()

@@ -451,12 +451,16 @@ cdef class rsb_matrix:
         self._err_check()
         return (np.array(IAa),np.array(JAa),np.array(VAa))
 
+    def getnnz(self):
+        return self.nnzA
+
+    @property
     def nnz(self):
         """
         Number of nonzero entries.
         (specific to rsb).
         """
-        return self.nnzA
+        return self.getnnz()
 
     def nsubm(self):
         """
