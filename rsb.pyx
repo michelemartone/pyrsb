@@ -71,6 +71,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_flags_t flagsA
     dtype = np.float64
     ndim = 2
+    format = 'rsb'
 
     def _get_dtype(self):
         return self.dtype
@@ -529,7 +530,7 @@ cdef class rsb_matrix:
         (IA,JA,VA)=self.find()
         return (VA,(IA,JA))
 
-    def tocsr(self):
+    def tocsr(self,copy=False):
         """Transition solution (does not exploit rsb_mtx_get_csr)."""
         return csr_matrix(self._find_v_ij())
 
