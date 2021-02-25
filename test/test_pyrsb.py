@@ -190,6 +190,17 @@ def test_mini_self_print_test():
     rmat.mini_self_print_test()
 
 
+def test__find_block():
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    rmat._find_block(0,rmat.nr()-1,0,rmat.nc()-1)
+    [rI,rJ,rV] = rmat.find();
+    # order matters: won't work for any matrix
+    assert ( V == rV ).all()
+    assert ( I == rI ).all()
+    assert ( J == rJ ).all()
+
+
 def test_init_tuples_sym():
     [V,I,J,nr,nc,nnz] = gen_tri();
     mat = rsb_matrix((V, (I, J)),sym="S")
