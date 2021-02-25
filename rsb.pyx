@@ -501,11 +501,12 @@ cdef class rsb_matrix:
             return False
 
     def _refresh(self):
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
+        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
+        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
+        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
+        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
+        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
+        self._err_check(want_strict=True)
 
     def find(self):
         """

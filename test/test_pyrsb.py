@@ -136,6 +136,11 @@ def test_init_tuple_except():
     with assert_raises(AssertionError):
         mat = rsb_matrix(([1.,1.], ([0,1], [0,1])),[2,-2])
 
+def test__refresh():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    rmat._refresh()
+
 def test_init_from_csc():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csc_matrix((V, (I, J)),[nr,nc])
