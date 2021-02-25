@@ -175,6 +175,13 @@ cdef class rsb_matrix:
                         J = arg1[2]
                     else:
                         raise ValueError("unrecognized %s_matrix constructor usage"% self.format)
+            else:
+                try:
+                    arg1 = np.asarray(arg1)
+                except Exception as e:
+                    raise ValueError("unrecognized {}_matrix constructor usage" "".format(self.format)) from e
+                (I,J,V)=sp.sparse.find(csr_matrix(arg1))
+
         if V is None:
             V = []
             I = []

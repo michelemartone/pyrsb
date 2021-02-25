@@ -90,11 +90,11 @@ def test_init_tuples_and_dims_raises():
         mat = rsb_matrix((V, (I)),[3,3])
 
 
-def test_init_tuples_to_fix_1():
-    # TODO: shall ban this
+def test_init_tuples_fixed_1():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix([V, (I)])
-    assert ( mat.nnz() == 0 )
+    with assert_raises(AssertionError):
+         assert ( mat.nnz() == 0 )
 
 
 def test_init_tuples_to_fix_2():
@@ -115,6 +115,13 @@ def test_init_tuple_to_fix_3():
 def test_init_from_csc():
     [V,I,J,nr,nc,nnz] = gen_tri();
     cmat = csc_matrix((V, (I, J)),[nr,nc])
+    rmat = rsb_matrix(cmat)
+    assert ((cmat - rmat.tocsr())).nnz == 0
+
+
+def test_init_from_dense():
+    d = numpy.ones(shape=(2,2), dtype=numpy.float64)
+    cmat = csr_matrix(d)
     rmat = rsb_matrix(cmat)
     assert ((cmat - rmat.tocsr())).nnz == 0
 
