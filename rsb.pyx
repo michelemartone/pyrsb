@@ -209,6 +209,7 @@ cdef class rsb_matrix:
         IA=<lr.rsb_coo_idx_t*>IAa.data
         JA=<lr.rsb_coo_idx_t*>JAa.data
         self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&self.errval)
+        self._err_check(want_strict=True)
         self._refresh()
         return
     

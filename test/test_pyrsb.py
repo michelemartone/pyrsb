@@ -132,6 +132,9 @@ def test_init_tuple_to_fix_3():
     assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
 
+def test_init_tuple_except():
+    with assert_raises(AssertionError):
+        mat = rsb_matrix(([1.,1.], ([0,1], [0,1])),[2,-2])
 
 def test_init_from_csc():
     [V,I,J,nr,nc,nnz] = gen_tri();
