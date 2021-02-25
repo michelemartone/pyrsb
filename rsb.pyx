@@ -455,6 +455,10 @@ cdef class rsb_matrix:
         return self.nnzA
 
     @property
+    def has_sorted_indices(self):
+        return False
+
+    @property
     def nnz(self):
         """
         Number of nonzero entries.

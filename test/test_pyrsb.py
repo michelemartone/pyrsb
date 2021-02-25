@@ -47,6 +47,7 @@ def test_init_from_none():
     assert mat._is_unsymmetric() == True
     assert mat.dtype == numpy.float64
     assert mat.ndim == 2
+    assert mat.has_sorted_indices == False
 
 
 def test_init_from_none_dtype_D():
