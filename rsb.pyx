@@ -503,7 +503,7 @@ cdef class rsb_matrix:
             return False
 
     def _refresh(self):
-        cdef lr.rsb_err_t errval
+        cdef lr.rsb_err_t errval = lr.RSB_ERR_NO_ERROR
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
