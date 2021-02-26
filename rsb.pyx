@@ -444,11 +444,9 @@ cdef class rsb_matrix:
         cdef np.ndarray VAa = np.arange(rnz,dtype=self.dtype)
         cdef np.ndarray JAa = np.arange(rnz,dtype=self.idx_dtype)
         cdef np.ndarray IAa = np.arange(rnz,dtype=self.idx_dtype)
-        cdef lr.void_ptr VA = NULL
-        cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
-        VA=<lr.void_ptr> VAa.data
-        IA=<lr.rsb_coo_idx_t*> IAa.data
-        JA=<lr.rsb_coo_idx_t*> JAa.data
+        cdef lr.void_ptr VA = <lr.void_ptr> VAa.data
+        cdef lr.rsb_coo_idx_t *IA = <lr.rsb_coo_idx_t*> IAa.data
+        cdef lr.rsb_coo_idx_t *JA = <lr.rsb_coo_idx_t*> JAa.data
         errval = lr.rsb_mtx_get_coo_block(self.mtxAp,VA,IA,JA,frA,lrA,fcA,lcA,NULL,NULL,NULL,lr.RSB_FLAG_NOFLAGS)
         _err_check(errval)
         return (np.array(IAa),np.array(JAa),np.array(VAa))
@@ -517,14 +515,12 @@ cdef class rsb_matrix:
         (specific to rsb).
         """
         cdef lr.rsb_err_t errval
-        cdef lr.void_ptr VA = NULL
-        cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
         cdef np.ndarray VAa = np.arange(self.nnzA,dtype=self.dtype)
         cdef np.ndarray IAa = np.arange(self.nnzA,dtype=self.idx_dtype)
         cdef np.ndarray JAa = np.arange(self.nnzA,dtype=self.idx_dtype)
-        VA=<lr.void_ptr> VAa.data
-        IA=<lr.rsb_coo_idx_t*> IAa.data
-        JA=<lr.rsb_coo_idx_t*> JAa.data
+        cdef lr.void_ptr VA = <lr.void_ptr> VAa.data
+        cdef lr.rsb_coo_idx_t *IA = <lr.rsb_coo_idx_t*> IAa.data
+        cdef lr.rsb_coo_idx_t *JA = <lr.rsb_coo_idx_t*> JAa.data
         errval = lr.rsb_mtx_get_coo(self.mtxAp,VA,IA,JA,lr.RSB_FLAG_NOFLAGS)
         _err_check(errval)
         return (np.array(IAa),np.array(JAa),np.array(VAa))
