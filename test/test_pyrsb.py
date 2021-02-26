@@ -8,7 +8,7 @@ import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
 from rsb import rsb_matrix
-from rsb import _print_vec, rsb_time, rsb_file_mtx_load
+from rsb import _print_vec, rsb_time, file_mtx_load
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
@@ -178,7 +178,7 @@ def test_io():
     smat = rsb_matrix((sV, (sI, sJ)))
     filename = b"pyrsb_test.tmp.mtx"
     smat.save(filename)
-    lmat = rsb_file_mtx_load(filename)
+    lmat = file_mtx_load(filename)
     [lI,lJ,lV] = lmat.find();
     assert ( sV == lV ).all()
     assert ( sI == lI ).all()

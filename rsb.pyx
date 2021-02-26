@@ -33,7 +33,7 @@ cpdef rsb_lib_exit():
         print("Finalizing librsb")
     return lr.rsb_lib_exit(NULL)
 
-cpdef rsb_file_mtx_load(const char * filename):
+cpdef file_mtx_load(const char * filename):
     """Load an rsb_matrix matrix from a Matrix Market file."""
     cdef lr.rsb_err_t errval
     rm = rsb_matrix()
