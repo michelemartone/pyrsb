@@ -25,6 +25,13 @@ def test__err_check_err():
         _err_check(1,want_strict=True)
 
 
+def gen_tri_csr_larger():
+    V = [11.,11.]
+    J = [0,9]
+    P = [0,1,1,1,1,1,1,1,1,1,2]
+    return [V,J,P,10,10,2]
+
+
 def gen_tri_csr():
     V = [11., 12., 22.]
     J = (0,1,1)
@@ -95,6 +102,14 @@ def test_init_from_none_none():
 
 def test_init_tuple_csr():
     [V,J,P,nr,nc,nnz] = gen_tri_csr()
+    mat = rsb_matrix((V, J, P),[nr,nc])
+    assert mat.nnz == nnz
+    assert mat.shape == (nr, nc)
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_tuple_csr_larger():
+    [V,J,P,nr,nc,nnz] = gen_tri_csr_larger()
     mat = rsb_matrix((V, J, P),[nr,nc])
     assert mat.nnz == nnz
     assert mat.shape == (nr, nc)
@@ -460,8 +475,7 @@ def test_demo():
     # several constructor forms, as with csr_matrix:
     a = rsb_matrix((V, (I, J)))
     a = rsb_matrix((V, (I, J)), [3, 3])
-    a = rsb_matrix((V, I, J))
-    a = rsb_matrix((V, I, J), sym="S")  # symmetric example
+    a = rsb_matrix((V, (I, J)), sym="S")  # symmetric example
     print(a)
     a = rsb_matrix((4, 4))
     a = rsb_matrix(c)

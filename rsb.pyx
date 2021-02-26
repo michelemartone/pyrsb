@@ -139,6 +139,10 @@ cdef class rsb_matrix:
         return errval
 
     def __init__(self,arg1=None,shape=None,sym='U',dtype='d'):
+        cdef lr.rsb_err_t errval
+        cdef np.ndarray VA
+        cdef np.ndarray IP # IA/PA
+        cdef np.ndarray JA
         self.nrA=0
         self.ncA=0
         cdef lr.rsb_blk_idx_t brA = 0, bcA = 0
@@ -150,6 +154,7 @@ cdef class rsb_matrix:
         V = None
         I = None
         J = None
+        P = None
         if dtype != 'd' and dtype != 'D':
             raise TypeError("Wrong data type: for now, only 'D' suppurted.")
         if arg1 is not None:
@@ -179,14 +184,9 @@ cdef class rsb_matrix:
                         if min(I) < 0:
                             raise ValueError('negative I index found')
                     elif len(arg1) == 3:
-                        # TODO: might want to use more efficient rsb_mtx_alloc_from_csr_const()
-                        # (data, indices, indptr) format
-                        # raise ValueError("unrecognized %s_matrix constructor usage"% self.format)
-                        # here: (data, i,j) format
                         V = arg1[0]
                         J = arg1[1]
                         P = arg1[2]
-                        [I,J,V]=sp.sparse.find(csr_matrix((V,J,P)))
                     else:
                         raise ValueError("unrecognized %s_matrix constructor usage"% self.format)
             else:
@@ -206,15 +206,18 @@ cdef class rsb_matrix:
             if len(I):
                 shape=[max(I)+1,max(J)+1]
 
-        self.nrA=shape[0]
-        self.ncA=shape[1]
+        self.nrA = shape[0]
+        self.ncA = shape[1]
         self.flagsA = self.flagsA + self._psf2lsf(sym)
-        cdef lr.rsb_err_t errval
-        cdef np.ndarray VA = np.array(V,dtype=self.dtype)
-        cdef np.ndarray IA = np.array(I,dtype=self.idx_dtype)
-        cdef np.ndarray JA = np.array(J,dtype=self.idx_dtype)
+        VA = np.array(V,dtype=self.dtype)
+        JA = np.array(J,dtype=self.idx_dtype)
         self.nnzA = len(VA)
-        self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IA.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
+        if P is not None:
+            IP = np.array(P,dtype=self.idx_dtype)
+            self.mtxAp = lr.rsb_mtx_alloc_from_csr_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IP.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
+        else:
+            IP = np.array(I,dtype=self.idx_dtype)
+            self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IP.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
         _err_check(errval,want_strict=True)
         self._refresh()
         return
