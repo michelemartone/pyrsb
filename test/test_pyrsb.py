@@ -116,6 +116,15 @@ def test_init_tuple_csr_larger():
     assert mat._is_unsymmetric() == True
 
 
+def test_init_tuple_csr_larger_err():
+    [V,J,P,nr,nc,nnz] = gen_tri_csr_larger()
+    mat = rsb_matrix((V + [1.], J, P),[nr,nc])
+    with assert_raises(AssertionError):
+        assert mat.nnz == nnz
+        assert mat.shape == (nr, nc)
+        assert mat._is_unsymmetric() == True
+
+
 def test_init_tuples():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)))
