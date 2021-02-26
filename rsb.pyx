@@ -211,7 +211,7 @@ cdef class rsb_matrix:
         self.flagsA = self.flagsA + self._psf2lsf(sym)
         cdef lr.rsb_err_t errval
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
-        cdef np.ndarray VAa = np.array(V,dtype=np.double)
+        cdef np.ndarray VAa = np.array(V,dtype=self.dtype)
         cdef np.ndarray IAa = np.array(I,dtype=np.int32)
         cdef np.ndarray JAa = np.array(J,dtype=np.int32)
         self.nnzA=len(VAa)
@@ -331,7 +331,7 @@ cdef class rsb_matrix:
         if type(x) is type(self):
             return self._spmul(x)
         if x.ndim is 1:
-            y = np.zeros([self.nr()         ],dtype=np.double)
+            y = np.zeros([self.nr()         ],dtype=self.dtype)
             self._spmv(x,y)
         if x.ndim is 2:
             nrhs=x.shape[1]
@@ -340,7 +340,7 @@ cdef class rsb_matrix:
                 order='C'
             else:
                 order='F'
-            y = np.zeros([self.nr(),nrhs],dtype=np.double,order=order)
+            y = np.zeros([self.nr(),nrhs],dtype=self.dtype,order=order)
             self._spmm(x,y)
         return y
 
@@ -439,7 +439,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t*rnzp = &rnz
         errval = lr.rsb_mtx_get_coo_block(self.mtxAp,NULL,NULL,NULL,frA,lrA,fcA,lcA,NULL,NULL,rnzp,lr.RSB_FLAG_NOFLAGS)
         _err_check(errval)
-        cdef np.ndarray VAa = np.arange(rnz,dtype=np.double)
+        cdef np.ndarray VAa = np.arange(rnz,dtype=self.dtype)
         cdef np.ndarray JAa = np.arange(rnz,dtype=np.int32)
         cdef np.ndarray IAa = np.arange(rnz,dtype=np.int32)
         cdef lr.void_ptr VA = NULL
@@ -517,7 +517,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_err_t errval
         cdef lr.void_ptr VA = NULL
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
-        cdef np.ndarray VAa = np.arange(self.nnzA,dtype=np.double)
+        cdef np.ndarray VAa = np.arange(self.nnzA,dtype=self.dtype)
         cdef np.ndarray IAa = np.arange(self.nnzA,dtype=np.int32)
         cdef np.ndarray JAa = np.arange(self.nnzA,dtype=np.int32)
         VA=<lr.void_ptr> VAa.data
@@ -628,8 +628,8 @@ cdef class rsb_matrix:
         cdef double alpha = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        #cdef np.ndarray b = np.zeros([self.nrA,self.ncA],dtype=np.double)
-        cdef np.ndarray b = np.ascontiguousarray(np.zeros([self.nrA,self.ncA],dtype=np.double))
+        #cdef np.ndarray b = np.zeros([self.nrA,self.ncA],dtype=self.dtype)
+        cdef np.ndarray b = np.ascontiguousarray(np.zeros([self.nrA,self.ncA],dtype=self.dtype))
         cdef lr.rsb_bool_t rowmajorB
         cdef lr.rsb_nnz_idx_t ldB, nrB, ncB
         if ( order is not 'C' ) and ( order is not 'F' ):
