@@ -25,6 +25,13 @@ def test__err_check_err():
         _err_check(1,want_strict=True)
 
 
+def gen_tri_csr():
+    V = [11., 12., 22.]
+    J = (0,1,1)
+    P = (0,2,3)
+    return [V,J,P,2,2,3]
+
+
 def gen_tri():
     V = [11.0, 12.0, 22.0]
     I = [0, 0, 1]
@@ -87,10 +94,10 @@ def test_init_from_none_none():
 
 
 def test_init_tuple_csr():
-    # TODO: need gen_csr_tri
-    mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
-    assert mat.nnz == 3
-    assert mat.shape == (2, 2)
+    [V,J,P,nr,nc,nnz] = gen_tri_csr()
+    mat = rsb_matrix((V, J, P),[nr,nc])
+    assert mat.nnz == nnz
+    assert mat.shape == (nr, nc)
     assert mat._is_unsymmetric() == True
 
 
@@ -130,9 +137,10 @@ def test_init_tuples_fixed_1():
 
 
 def test_init_tuples_fixed_2():
-    mat = rsb_matrix(((11., 12., 22.), (0,1,1), (0,2,3)),[2,2])
-    assert mat.nnz == 3
-    assert mat.shape == (2, 2)
+    [V,J,P,nr,nc,nnz] = gen_tri_csr()
+    mat = rsb_matrix((V, J, P),[nr,nc])
+    assert mat.nnz == nnz
+    assert mat.shape == (nr, nc)
     assert mat._is_unsymmetric() == True
 
 
