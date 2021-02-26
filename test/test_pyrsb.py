@@ -8,10 +8,21 @@ import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
 from rsb import rsb_matrix
-from rsb import _print_vec, rsb_time
+from rsb import _print_vec, rsb_time, _err_check
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
+
+
+def test__err_check_ok():
+    _err_check(0)
+    _err_check(0,want_strict=True)
+
+
+def test__err_check_err():
+    _err_check(1,want_strict=False)
+    with assert_raises(AssertionError):
+        _err_check(1,want_strict=True)
 
 
 def gen_tri():
