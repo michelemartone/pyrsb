@@ -219,6 +219,7 @@ cdef class rsb_matrix:
             self.mtxAp = lr.rsb_mtx_alloc_from_csr_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IP.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
         else:
             IP = np.array(I,dtype=self.idx_dtype)
+            assert len(IP) == self.nnzA
             self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IP.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
         _err_check(errval,want_strict=True)
         self._refresh()
