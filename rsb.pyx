@@ -35,10 +35,11 @@ cpdef rsb_lib_exit():
 
 cpdef rsb_file_mtx_load(const char * filename):
     """Load an rsb_matrix matrix from a Matrix Market file."""
+    cdef lr.rsb_err_t errval
     rm = rsb_matrix()
     lr.rsb_mtx_free(rm.mtxAp) # workaround: shall maybe pass string to rsb_matrix ?
-    rm.mtxAp = lr.rsb_file_mtx_load(filename,rm.flagsA,rm.typecode,&rm.errval)
-    rm._err_check()
+    rm.mtxAp = lr.rsb_file_mtx_load(filename,rm.flagsA,rm.typecode,&errval)
+    _err_check(errval)
     rm._refresh()
     return rm
 
@@ -57,12 +58,27 @@ def _print_vec(np.ndarray[np.float_t, ndim=2] x, mylen=0):
         ylv = mylen
     return lr.rsb_file_vec_save(NULL, typecode, <lr.cvoid_ptr>x.data, ylv)
 
+def _err_check(lr.rsb_err_t errval,want_strict=False):
+    """
+    Basic error checking.
+    (specific to rsb).
+    """
+    cdef size_t buflen = 256
+    cdef char buf[256]
+    if ( errval ):
+        lr.rsb_strerror_r(errval,buf,buflen)
+        errval = lr.RSB_ERR_NO_ERROR
+        print "Error reported by librsb: ", str(buf,'ascii')
+        if want_strict:
+            assert False
+        return False
+    return True
+
 cdef class rsb_matrix:
     """
     Recursive Sparse Blocks matrix
     """
     cdef lr.rsb_mtx_ptr mtxAp
-    cdef lr.rsb_err_t errval
     cdef lr.rsb_type_t typecode 
     cdef lr.rsb_coo_idx_t ncA
     cdef lr.rsb_coo_idx_t nrA
@@ -108,16 +124,17 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB, ldC
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
+        cdef lr.rsb_err_t errval
         corder =  x.flags.c_contiguous
         (lr_order,ldB,ldC)=self._otn2obc(corder,transA,nrhs)
         assert x.flags.c_contiguous == y.flags.c_contiguous
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
-           self.errval = lr.RSB_ERR_BADARGS
+           errval = lr.RSB_ERR_BADARGS
         else:
-           self.errval = lr.rsb_spmm(transA_, &alpha, self.mtxAp, nrhs, lr_order, <lr.cvoid_ptr>x.data, ldB, &beta, <lr.void_ptr>y.data, ldC);
-        self._err_check()
-        return self.errval
+           errval = lr.rsb_spmm(transA_, &alpha, self.mtxAp, nrhs, lr_order, <lr.cvoid_ptr>x.data, ldB, &beta, <lr.void_ptr>y.data, ldC);
+        _err_check(errval)
+        return errval
 
     def _spmv(self,np.ndarray[np.float_t, ndim=1] x, np.ndarray[np.float_t, ndim=1] y, transA='N', double alpha = 1.0, double beta = 1.0):
         """
@@ -125,9 +142,10 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_coo_idx_t incX = 1, incY = 1
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        self.errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
-        self._err_check()
-        return self.errval
+        cdef lr.rsb_err_t errval
+        errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
+        _err_check(errval)
+        return errval
 
     def __init__(self,arg1=None,shape=None,sym='U',dtype='d'):
         self.nrA=0
@@ -191,6 +209,7 @@ cdef class rsb_matrix:
         self.nrA=shape[0]
         self.ncA=shape[1]
         self.flagsA = self.flagsA + self._psf2lsf(sym)
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
         cdef np.ndarray VAa = np.array(V,dtype=np.double)
         cdef np.ndarray IAa = np.array(I,dtype=np.int32)
@@ -199,18 +218,19 @@ cdef class rsb_matrix:
         VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*>IAa.data
         JA=<lr.rsb_coo_idx_t*>JAa.data
-        self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&self.errval)
-        self._err_check(want_strict=True)
+        self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
+        _err_check(errval,want_strict=True)
         self._refresh()
         return
     
     def __str__(self):
         """Return a brief matrix description string."""
+        cdef lr.rsb_err_t errval
         cdef size_t buflen = 256
         cdef char buf[256]
         cdef bytes info = b"["
-        self.errval = lr.rsb_mtx_get_info_str(self.mtxAp, "RSB_MIF_MATRIX_INFO__TO__CHAR_P", buf, buflen)
-        self._err_check()
+        errval = lr.rsb_mtx_get_info_str(self.mtxAp, "RSB_MIF_MATRIX_INFO__TO__CHAR_P", buf, buflen)
+        _err_check(errval)
         # self.do_print()
         info += buf
         info += b"]"
@@ -266,14 +286,14 @@ cdef class rsb_matrix:
         Multiply two rsb_matrix objects.
         (specific to rsb; __mul__ with scipy).
         """
+        cdef lr.rsb_err_t errval
         cdef double alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         rm = rsb_matrix()
-        self._err_check()
-        rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&self.errval)
-        self._err_check()
+        rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&errval)
+        _err_check(errval)
         rm._refresh()
         return rm
 
@@ -291,8 +311,9 @@ cdef class rsb_matrix:
         Rescale this matrix.
         (specific to rsb).
         """
-        self.errval = lr.rsb_mtx_upd_vals(self.mtxAp,lr.RSB_ELOPF_MUL,&alpha)
-        self._err_check()
+        cdef lr.rsb_err_t errval
+        errval = lr.rsb_mtx_upd_vals(self.mtxAp,lr.RSB_ELOPF_MUL,&alpha)
+        _err_check(errval)
         return True
 
     def __mul__(self, x):
@@ -334,14 +355,14 @@ cdef class rsb_matrix:
         """
         Add two rsb_matrix objects.
         """
+        cdef lr.rsb_err_t errval
         cdef double alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         rm = rsb_matrix()
-        self._err_check()
-        rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&self.errval)
-        self._err_check()
+        rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&errval)
+        _err_check(errval)
         rm._refresh()
         return rm
 
@@ -358,8 +379,9 @@ cdef class rsb_matrix:
         Specify individual library options in order to fine-tune the library behaviour.
         (specific to rsb).
         """
-        self.errval = lr.rsb_lib_set_opt_str(opnp,opvp)
-        self._err_check(want_strict=True)
+        cdef lr.rsb_err_t errval
+        errval = lr.rsb_lib_set_opt_str(opnp,opvp)
+        _err_check(errval,want_strict=True)
         return True
 
     def _otn2obc(self,corder,transA,nrhs):
@@ -394,32 +416,17 @@ cdef class rsb_matrix:
         Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
         """
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_flags_t lr_order = self._o2o(order)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
-        self.errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
+        errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
-        self._err_check(want_strict=True)
+        _err_check(errval)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
-        return True
-
-    def _err_check(self,want_strict=False):
-        """
-        Basic error checking.
-        (specific to rsb).
-        """
-        cdef size_t buflen = 256
-        cdef char buf[256]
-        if ( self.errval ):
-            lr.rsb_strerror_r(self.errval,buf,buflen)
-            self.errval = lr.RSB_ERR_NO_ERROR
-            print "Error reported by librsb: ", str(buf,'ascii')
-            if want_strict:
-                assert False
-            return False
         return True
 
     def _find_block(self,frA,lrA,fcA,lcA):
@@ -427,10 +434,11 @@ cdef class rsb_matrix:
         Extract sparse block as COO.
         Unfinished.
         """
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_nnz_idx_t rnz = 0
         cdef lr.rsb_nnz_idx_t*rnzp = &rnz
-        self.errval = lr.rsb_mtx_get_coo_block(self.mtxAp,NULL,NULL,NULL,frA,lrA,fcA,lcA,NULL,NULL,rnzp,lr.RSB_FLAG_NOFLAGS)
-        self._err_check()
+        errval = lr.rsb_mtx_get_coo_block(self.mtxAp,NULL,NULL,NULL,frA,lrA,fcA,lcA,NULL,NULL,rnzp,lr.RSB_FLAG_NOFLAGS)
+        _err_check(errval)
         cdef np.ndarray VAa = np.arange(rnz,dtype=np.double)
         cdef np.ndarray JAa = np.arange(rnz,dtype=np.int32)
         cdef np.ndarray IAa = np.arange(rnz,dtype=np.int32)
@@ -439,8 +447,8 @@ cdef class rsb_matrix:
         VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*> IAa.data
         JA=<lr.rsb_coo_idx_t*> JAa.data
-        self.errval = lr.rsb_mtx_get_coo_block(self.mtxAp,VA,IA,JA,frA,lrA,fcA,lcA,NULL,NULL,NULL,lr.RSB_FLAG_NOFLAGS)
-        self._err_check()
+        errval = lr.rsb_mtx_get_coo_block(self.mtxAp,VA,IA,JA,frA,lrA,fcA,lcA,NULL,NULL,NULL,lr.RSB_FLAG_NOFLAGS)
+        _err_check(errval)
         return (np.array(IAa),np.array(JAa),np.array(VAa))
 
     def getnnz(self):
@@ -484,26 +492,29 @@ cdef class rsb_matrix:
         RSB matrix symmetry.
         (specific to rsb).
         """
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        self.errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
+        errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
         if ( ( flagsA & (lr.RSB_FLAG_HERMITIAN | lr.RSB_FLAG_SYMMETRIC ) ) == lr.RSB_FLAG_NOFLAGS ):
             return True
         else:
             return False
 
     def _refresh(self):
-        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
-        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
-        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
-        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
-        self.errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
-        self._err_check(want_strict=True)
+        cdef lr.rsb_err_t errval
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_NNZ__TO__RSB_NNZ_INDEX_T,&self.nnzA)
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
+        _err_check(errval,want_strict=True)
 
     def find(self):
         """
         More or less as scipy.sparse.find(): returns (ia,ja,va).
         (specific to rsb).
         """
+        cdef lr.rsb_err_t errval
         cdef lr.void_ptr VA = NULL
         cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
         cdef np.ndarray VAa = np.arange(self.nnzA,dtype=np.double)
@@ -512,8 +523,8 @@ cdef class rsb_matrix:
         VA=<lr.void_ptr> VAa.data
         IA=<lr.rsb_coo_idx_t*> IAa.data
         JA=<lr.rsb_coo_idx_t*> JAa.data
-        self.errval = lr.rsb_mtx_get_coo(self.mtxAp,VA,IA,JA,lr.RSB_FLAG_NOFLAGS)
-        self._err_check()
+        errval = lr.rsb_mtx_get_coo(self.mtxAp,VA,IA,JA,lr.RSB_FLAG_NOFLAGS)
+        _err_check(errval)
         return (np.array(IAa),np.array(JAa),np.array(VAa))
 
     def _find_v_ij(self):
@@ -585,8 +596,9 @@ cdef class rsb_matrix:
         With NULL Input, to stdout.
         (specific to rsb).
         """
-        self.errval = lr.rsb_file_mtx_save(self.mtxAp,filename)
-        self._err_check()
+        cdef lr.rsb_err_t errval
+        errval = lr.rsb_file_mtx_save(self.mtxAp,filename)
+        _err_check(errval)
         return True
 
     def copy(self):
@@ -594,13 +606,14 @@ cdef class rsb_matrix:
         Return a copy (clone) of this matrix.
         (specific to rsb).
         """
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
         cdef double alpha = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        self.errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,&alpha,self.mtxAp,flagsA)
+        errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,&alpha,self.mtxAp,flagsA)
         rm = rsb_matrix()
-        self._err_check()
+        _err_check(errval)
         rm.mtxAp = mtxBp
         rm._refresh()
         return rm
@@ -610,6 +623,7 @@ cdef class rsb_matrix:
         Return a dense copy of this matrix.
         (as in scipy.sparse).
         """
+        cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
         cdef double alpha = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
@@ -626,8 +640,8 @@ cdef class rsb_matrix:
         else:
             rowmajorB = lr.RSB_BOOL_FALSE
             ldB=self.nrA; nrB=self.nrA; ncB=self.ncA
-        self.errval = lr.rsb_mtx_add_to_dense(&alpha,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
-        self._err_check()
+        errval = lr.rsb_mtx_add_to_dense(&alpha,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
+        _err_check(errval)
         return b
 
     def mini_self_print_test(self):
