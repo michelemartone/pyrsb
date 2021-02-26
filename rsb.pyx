@@ -142,7 +142,6 @@ cdef class rsb_matrix:
         self.nrA=0
         self.ncA=0
         cdef lr.rsb_blk_idx_t brA = 0, bcA = 0
-        cdef lr.cvoid_ptr VA = NULL
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         self.flagsA = flagsA
         self.mtxAp = NULL
@@ -211,15 +210,11 @@ cdef class rsb_matrix:
         self.ncA=shape[1]
         self.flagsA = self.flagsA + self._psf2lsf(sym)
         cdef lr.rsb_err_t errval
-        cdef lr.rsb_coo_idx_t*IA = NULL, *JA = NULL
-        cdef np.ndarray VAa = np.array(V,dtype=self.dtype)
-        cdef np.ndarray IAa = np.array(I,dtype=self.idx_dtype)
-        cdef np.ndarray JAa = np.array(J,dtype=self.idx_dtype)
-        self.nnzA=len(VAa)
-        VA=<lr.void_ptr> VAa.data
-        IA=<lr.rsb_coo_idx_t*>IAa.data
-        JA=<lr.rsb_coo_idx_t*>JAa.data
-        self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(VA,IA,JA,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
+        cdef np.ndarray VA = np.array(V,dtype=self.dtype)
+        cdef np.ndarray IA = np.array(I,dtype=self.idx_dtype)
+        cdef np.ndarray JA = np.array(J,dtype=self.idx_dtype)
+        self.nnzA = len(VA)
+        self.mtxAp = lr.rsb_mtx_alloc_from_coo_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IA.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
         _err_check(errval,want_strict=True)
         self._refresh()
         return
