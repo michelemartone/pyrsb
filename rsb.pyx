@@ -164,7 +164,13 @@ cdef class rsb_matrix:
         if dtype != 'd' and dtype != 'D':
             raise TypeError("Wrong data type: for now, only 'D' suppurted.")
         if arg1 is not None:
-            if type(arg1) == type(self):
+            if isinstance(arg1, bytes):
+                filename = arg1
+                self.mtxAp = lr.rsb_file_mtx_load(filename,flagsA,self.typecode,&errval)
+                _err_check(errval)
+                self._refresh()
+                return
+            elif type(arg1) == type(self):
                 self = arg1.copy()
                 return
             elif isinstance(arg1, sp.sparse.base.spmatrix):

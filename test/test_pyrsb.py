@@ -185,6 +185,18 @@ def test_io():
     assert ( sJ == lJ ).all()
 
 
+def test_io_bytes_ctor():
+    [sV,sI,sJ,nr,nc,nnz] = gen_tri();
+    smat = rsb_matrix((sV, (sI, sJ)))
+    filename = b"pyrsb_test.tmp.mtx"
+    smat.save(filename)
+    lmat = rsb_matrix(filename)
+    [lI,lJ,lV] = lmat.find();
+    assert ( sV == lV ).all()
+    assert ( sI == lI ).all()
+    assert ( sJ == lJ ).all()
+
+
 def test_sleep():
     t0 = rsb_time()
     sleep(0.001)
