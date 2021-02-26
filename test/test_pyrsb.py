@@ -124,10 +124,8 @@ def test_init_tuple_csr_smaller_JA_err():
 
 def test_init_tuple_csr_larger_IP_err():
     [V,J,P,nr,nc,nnz] = gen_tri_csr_larger()
-    mat = rsb_matrix((V, J, P + [nnz]),[nr,nc])
-    assert mat.nnz == nnz
-    assert mat.shape == (nr, nc)
-    assert mat._is_unsymmetric() == True
+    with assert_raises(AssertionError):
+        mat = rsb_matrix((V, J, P + [nnz]),[nr,nc])
 
 
 def test_init_tuples():

@@ -215,6 +215,7 @@ cdef class rsb_matrix:
         assert len(JA) == self.nnzA
         if P is not None:
             IP = np.array(P,dtype=self.idx_dtype)
+            assert len(IP) == self.nrA+1 or self.nrA == 0 # recall nrA might be zero (auto)
             self.mtxAp = lr.rsb_mtx_alloc_from_csr_const(<lr.cvoid_ptr> VA.data,<const lr.rsb_coo_idx_t*>IP.data,<const lr.rsb_coo_idx_t*>JA.data,self.nnzA,self.typecode,self.nrA,self.ncA,brA,bcA,self.flagsA,&errval)
         else:
             IP = np.array(I,dtype=self.idx_dtype)
