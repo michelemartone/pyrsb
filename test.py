@@ -172,7 +172,7 @@ def bench_file(filename):
     """
     print("# loading from file ", filename)
     lt = - rsb.rsb_time()
-    a = rsb.rsb_file_mtx_load(bytes(filename, encoding="utf-8"))
+    a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"))
     lt = lt + rsb.rsb_time()
     printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
     if not a._is_unsymmetric():

@@ -51,6 +51,7 @@ test: rsb.so
 	if which pytest-3 ; then PYTHONPATH=. pytest-3 ; fi
 	python3 demo1.py
 	python3 demo2.py
+	python3 test.py A.mtx
 	python3 test.py
 
 itest:
