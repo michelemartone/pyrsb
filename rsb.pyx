@@ -129,16 +129,6 @@ cdef class rsb_matrix:
         self._err_check()
         return self.errval
 
-    def _spmv(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0):
-        """
-        Sparse Matrix by vector product based on rsb_spmv().
-        """
-        cdef lr.rsb_coo_idx_t incX = 1, incY = 1
-        cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
-        self.errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
-        self._err_check()
-        return self.errval
-
     def __init__(self,arg1=None,shape=None,sym='U',dtype='d'):
         self.nrA=0
         self.ncA=0
