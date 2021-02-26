@@ -8,7 +8,7 @@ import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
 from rsb import rsb_matrix
-from rsb import _print_vec, rsb_time, file_mtx_load
+from rsb import _print_vec, rsb_time
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
@@ -171,18 +171,6 @@ def test_nonzero():
     # order matters: won't work for any matrix
     assert ( cI == rI ).all()
     assert ( cJ == rJ ).all()
-
-
-def test_io():
-    [sV,sI,sJ,nr,nc,nnz] = gen_tri();
-    smat = rsb_matrix((sV, (sI, sJ)))
-    filename = b"pyrsb_test.tmp.mtx"
-    smat.save(filename)
-    lmat = file_mtx_load(filename)
-    [lI,lJ,lV] = lmat.find();
-    assert ( sV == lV ).all()
-    assert ( sI == lI ).all()
-    assert ( sJ == lJ ).all()
 
 
 def test_io_bytes_ctor():

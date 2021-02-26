@@ -33,16 +33,6 @@ cpdef rsb_lib_exit():
         print("Finalizing librsb")
     return lr.rsb_lib_exit(NULL)
 
-cpdef file_mtx_load(const char * filename):
-    """Load an rsb_matrix matrix from a Matrix Market file."""
-    cdef lr.rsb_err_t errval
-    rm = rsb_matrix()
-    lr.rsb_mtx_free(rm.mtxAp) # workaround: shall maybe pass string to rsb_matrix ?
-    rm.mtxAp = lr.rsb_file_mtx_load(filename,rm.flagsA,rm.typecode,&errval)
-    _err_check(errval)
-    rm._refresh()
-    return rm
-
 cpdef rsb_time():
     """Return current time."""
     cdef lr.rsb_time_t rt
