@@ -175,6 +175,10 @@ cdef class rsb_matrix:
                         V = arg1[0]
                         I = arg1[1][0]
                         J = arg1[1][1]
+                        if min(J) < 0:
+                            raise ValueError('negative J index found')
+                        if min(I) < 0:
+                            raise ValueError('negative I index found')
                     elif len(arg1) == 3:
                         # TODO: might want to use more efficient rsb_mtx_alloc_from_csr_const()
                         # (data, indices, indptr) format

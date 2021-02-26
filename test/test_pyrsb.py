@@ -144,12 +144,9 @@ def test_init_tuples_fixed_2():
     assert mat._is_unsymmetric() == True
 
 
-def test_init_tuple_to_fix_3():
-    # TODO: shall align rsb_matrix to scipy's
-    mat = rsb_matrix(([1.,1.], ([-1,-2], [-1,-2])))
-    assert mat.shape == (0, 0)
-    assert mat.nnz == 0
-    assert mat._is_unsymmetric() == True
+def test_init_tuple_fixed_3():
+    with assert_raises(ValueError):
+        mat = rsb_matrix(([1.,1.], ([-1,-2], [-1,-2])))
 
 def test_init_tuple_except():
     with assert_raises(AssertionError):
