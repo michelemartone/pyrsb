@@ -1,0 +1,11 @@
+%%MatrixMarket matrix coordinate real symmetric
+%
+% A Hilbert Matrix of order 3, so with 3 rows, 3 columns, and 6 nonzeroes.
+%
+3 3 6
+1 1 1.0
+2 1 0.5
+2 2 0.33
+3 1 0.33
+3 2 0.25
+3 3 0.2
