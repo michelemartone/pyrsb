@@ -128,6 +128,14 @@ def test_init_tuple_csr_larger_IP_err():
         mat = rsb_matrix((V, J, P + [nnz]),[nr,nc])
 
 
+def test_init_tuples_err():
+    [V,I,J,nr,nc,nnz] = gen_tri()
+    mat = rsb_matrix((V, (I+[0], J)))
+    assert mat.shape == (nr, nc)
+    assert mat.nnz == nnz
+    assert mat._is_unsymmetric() == True
+
+
 def test_init_tuples():
     [V,I,J,nr,nc,nnz] = gen_tri()
     mat = rsb_matrix((V, (I, J)))
