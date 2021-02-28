@@ -1,3 +1,4 @@
+# cython: language_level=3
 """
 Recursive Sparse Blocks matrix format.
 librsb interface for Python.
@@ -58,7 +59,7 @@ def _err_check(lr.rsb_err_t errval,want_strict=False):
     if ( errval ):
         lr.rsb_strerror_r(errval,buf,buflen)
         errval = lr.RSB_ERR_NO_ERROR
-        print "Error reported by librsb: ", str(buf,'ascii')
+        print("Error reported by librsb: ", str(buf,'ascii'))
         if want_strict:
             assert False
         return False
