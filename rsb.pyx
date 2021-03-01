@@ -125,13 +125,13 @@ cdef class rsb_matrix:
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
-    cdef public type dtype
+    cdef type dtypeA
     idx_dtype = np.int32
     ndim = 2
     format = 'rsb'
 
     def _get_dtype(self):
-        return self.dtype
+        return self.dtypeA
 
     def _psf2lsf(self, sym):
         """
@@ -204,7 +204,7 @@ cdef class rsb_matrix:
         I = None
         J = None
         P = None
-        self.dtype = _dt2dt(dtype)
+        self.dtypeA = _dt2dt(dtype)
         self.typecode = _dt2tc(dtype)
         if arg1 is not None:
             if isinstance(arg1, bytes):
@@ -506,6 +506,10 @@ cdef class rsb_matrix:
     @property
     def has_sorted_indices(self):
         return False
+
+    @property
+    def dtype(self):
+        return self.dtypeA
 
     @property
     def nnz(self):
