@@ -34,6 +34,25 @@ ctypedef double prv_t
 #rsb_dtype = np.float32
 #ctypedef float prv_t
 
+def _dt2dt(dtype):
+    if dtype == np.float64:
+        return dtype
+    elif dtype == np.float32:
+        return dtype
+    elif dtype == np.complex128:
+        return dtype
+    elif dtype == np.complex64:
+        return dtype
+    elif dtype.upper() == 'D':
+        return np.float64
+    elif dtype.upper() == 'S':
+        return np.float32
+    elif dtype.upper() == 'Z':
+        return np.complex128
+    elif dtype.upper() == 'C':
+        return np.complex64
+    raise TypeError("Wrong data type: ", dtype)
+
 def _dt2tc(dtype):
     if dtype == np.float64:
         return lr.RSB_NUMERICAL_TYPE_DOUBLE
@@ -106,7 +125,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
-    dtype = rsb_dtype
+    cdef public type dtype
     idx_dtype = np.int32
     ndim = 2
     format = 'rsb'
@@ -185,6 +204,7 @@ cdef class rsb_matrix:
         I = None
         J = None
         P = None
+        self.dtype = _dt2dt(dtype)
         self.typecode = _dt2tc(dtype)
         if arg1 is not None:
             if isinstance(arg1, bytes):
