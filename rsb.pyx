@@ -22,6 +22,22 @@ cimport cython
 
 verbose=0
 
+#rsb_dtype = np.complex64
+#ctypedef float complex prv_t
+#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
+
+#rsb_dtype = np.complex128
+#ctypedef double complex prv_t
+#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
+
+rsb_dtype = np.float64
+ctypedef double prv_t
+cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
+
+#rsb_dtype = np.float32
+#ctypedef float prv_t
+#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_FLOAT
+
 cpdef rsb_lib_init():
     """Initialize librsb."""
     if verbose:
@@ -40,10 +56,9 @@ cpdef rsb_time():
     rt = <lr.rsb_time_t>lr.rsb_time()
     return rt
 
-def _print_vec(np.ndarray[np.float_t, ndim=2] x, mylen=0):
+def _print_vec(np.ndarray[prv_t, ndim=2] x, mylen=0):
     """Print a vector, possibly overriding its length (which is DANGEROUS)."""
     cdef lr.rsb_coo_idx_t ylv = 0
-    cdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
     ylv = len(x)
     if mylen is not 0:
         ylv = mylen
@@ -76,7 +91,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_flags_t flagsA
-    dtype = np.float64
+    dtype = rsb_dtype
     idx_dtype = np.int32
     ndim = 2
     format = 'rsb'
@@ -108,7 +123,7 @@ cdef class rsb_matrix:
                 return lr.RSB_TRANSPOSITION_C
         raise ValueError("Unrecognized transA")
 
-    def _spmm(self,np.ndarray[np.float_t, ndim=2] x, np.ndarray[np.float_t, ndim=2] y, transA='N', double alpha = 1.0, double beta = 1.0):
+    def _spmm(self,np.ndarray[prv_t, ndim=2] x, np.ndarray[prv_t, ndim=2] y, transA='N', prv_t alpha = 1.0, prv_t beta = 1.0):
         """
         Sparse Matrix by matrix product based on rsb_spmm().
         """
@@ -128,7 +143,7 @@ cdef class rsb_matrix:
         _err_check(errval)
         return errval
 
-    def _spmv(self,np.ndarray[np.float_t, ndim=1] x, np.ndarray[np.float_t, ndim=1] y, transA='N', double alpha = 1.0, double beta = 1.0):
+    def _spmv(self,np.ndarray[prv_t, ndim=1] x, np.ndarray[prv_t, ndim=1] y, transA='N', prv_t alpha = 1.0, prv_t beta = 1.0):
         """
         Sparse Matrix by vector product based on rsb_spmv().
         """
@@ -150,7 +165,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         self.flagsA = flagsA
         self.mtxAp = NULL
-        self.typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
+        self.typecode = typecode
         self.nnzA=0
         V = None
         I = None
@@ -290,7 +305,7 @@ cdef class rsb_matrix:
         (specific to rsb; __mul__ with scipy).
         """
         cdef lr.rsb_err_t errval
-        cdef double alpha = 1.0, beta = 1.0
+        cdef prv_t alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
@@ -300,7 +315,7 @@ cdef class rsb_matrix:
         rm._refresh()
         return rm
 
-    def rescaled(self, double alpha):
+    def rescaled(self, prv_t alpha):
         """
         Return rescaled copy.
         (specific to rsb).
@@ -309,7 +324,7 @@ cdef class rsb_matrix:
         rm.rescale(alpha)
         return rm
 
-    def rescale(self, double alpha):
+    def rescale(self, prv_t alpha):
         """
         Rescale this matrix.
         (specific to rsb).
@@ -328,8 +343,8 @@ cdef class rsb_matrix:
         """
         cdef np.ndarray y
         if type(x) is type(int(1)):
-            return self.__mul__(float(x))
-        if type(x) is type(float(1)):
+            return self.__mul__(rsb_dtype(x))
+        if type(x) is type(rsb_dtype(1)):
             return self.rescaled(x)
         if type(x) is type(self):
             return self._spmul(x)
@@ -359,7 +374,7 @@ cdef class rsb_matrix:
         Add two rsb_matrix objects.
         """
         cdef lr.rsb_err_t errval
-        cdef double alpha = 1.0, beta = 1.0
+        cdef prv_t alpha = 1.0, beta = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
@@ -374,7 +389,7 @@ cdef class rsb_matrix:
         return self._spadd(other)
 
     def __complex__(self,other):
-        """Unsupported: at the moment only double is supported."""
+        """Unsupported: at the moment only one type is supported."""
         return False
 
     def opt_set(self, char * opnp, char * opvp):
@@ -414,7 +429,7 @@ cdef class rsb_matrix:
                 assert False
         return lr_order
 
-    def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', double alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', double beta=1.0, verbose = False):
+    def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', prv_t alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', prv_t beta=1.0, verbose = False):
         """
         Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
@@ -607,7 +622,7 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
-        cdef double alpha = 1.0
+        cdef prv_t alpha = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,&alpha,self.mtxAp,flagsA)
@@ -624,7 +639,7 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
-        cdef double alpha = 1.0
+        cdef prv_t alpha = 1.0
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         #cdef np.ndarray b = np.zeros([self.nrA,self.ncA],dtype=self.dtype)

@@ -5,7 +5,7 @@ pyrsb demo
 import numpy
 import scipy
 from scipy.sparse import csr_matrix
-from rsb import rsb_matrix
+from rsb import rsb_matrix, rsb_dtype
 
 V = [11.0, 12.0, 22.0]
 I = [0, 0, 1]
@@ -23,8 +23,8 @@ nrhs = 1  # set to nrhs>1 to multiply by multiple vectors at once
 nr = a.shape[0]
 nc = a.shape[1]
 order = "F"
-x = numpy.empty([nc, nrhs], dtype=scipy.double, order=order)
-y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+x = numpy.empty([nc, nrhs], dtype=rsb_dtype, order=order)
+y = numpy.empty([nr, nrhs], dtype=rsb_dtype, order=order)
 x[:, :] = 1.0
 y[:, :] = 0.0
 print(a)

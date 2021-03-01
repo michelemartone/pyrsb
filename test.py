@@ -74,8 +74,8 @@ def bench_both(a, c, psf, nrhs=1):
         print("Benchmarking SPMV on matrix ", a)
     if WANT_VERBOSE:
         a.mini_self_print_test()
-    x = np.ones([a.shape[1], nrhs], dtype=sp.double)
-    y = np.ones([a.shape[0], nrhs], dtype=sp.double)
+    x = np.ones([a.shape[1], nrhs], dtype=a.dtype)
+    y = np.ones([a.shape[0], nrhs], dtype=a.dtype)
     nnz = a.nnz
     if WANT_VERBOSE:
         a.do_print()
@@ -158,6 +158,8 @@ def bench_random_files():
         c = sp.sparse.rand(nrA, ncA, density=dnst, format=WANT_PSF, dtype=sp.double)
         gt = gt + rsb.rsb_time()
         (I, J, V) = sp.sparse.find(c)
+        V = rsb.rsb_dtype(V)
+        c = sp.sparse.csr_matrix((V, (I, J)), [nrA, ncA])
         ct = -rsb.rsb_time()
         a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
         ct = ct + rsb.rsb_time()
