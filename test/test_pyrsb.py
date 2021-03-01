@@ -344,6 +344,20 @@ def test_spmv_1D_N():
         rmat._spmv(x,y)
         assert ( y == (cmat * x) ).all()
 
+def test_spmv_1D_N_alpha():
+    [V,I,J,nr,nc,nnz] = gen_tri();
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)))
+    nrhs = 1
+    for order in ['C', 'F']:
+        x = gen_x(nc,nrhs,order)
+        y = numpy.empty([nr, nrhs], dtype=scipy.double, order=order)
+        y[:, :] = 0.0
+        x = x[:,0]
+        y = y[:,0]
+        rmat._spmv(x,y,alpha=2)
+        assert ( y == 2 * (cmat * x) ).all()
+
 def test_autotune_simple():
     [V,I,J,nr,nc,nnz] = gen_tri();
     omat = rsb_matrix((V, (I, J)))
