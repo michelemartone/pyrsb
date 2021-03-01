@@ -22,6 +22,12 @@ cimport cython
 
 verbose=0
 
+ctypedef fused any_t:
+    cython.doublecomplex
+    cython.floatcomplex
+    cython.double
+    cython.float
+
 #rsb_dtype = np.complex64
 #ctypedef float complex prv_t
 
@@ -90,9 +96,11 @@ cpdef rsb_time():
     rt = <lr.rsb_time_t>lr.rsb_time()
     return rt
 
-def _print_vec(np.ndarray[prv_t, ndim=2] x, mylen=0):
+def _print_vec(np.ndarray x, mylen=0):
     """Print a vector, possibly overriding its length (which is DANGEROUS)."""
     cdef lr.rsb_coo_idx_t ylv = 0
+    if x.ndim != 2:
+        raise ValueError
     ylv = len(x)
     if mylen is not 0:
         ylv = mylen
@@ -157,7 +165,7 @@ cdef class rsb_matrix:
                 return lr.RSB_TRANSPOSITION_C
         raise ValueError("Unrecognized transA")
 
-    def _spmm(self,np.ndarray[prv_t, ndim=2] x, np.ndarray[prv_t, ndim=2] y, transA='N', prv_t alpha = 1.0, prv_t beta = 1.0):
+    def _spmm(self,np.ndarray[any_t, ndim=2] x, np.ndarray[any_t, ndim=2] y, transA='N', alpha = 1.0, beta = 1.0):
         """
         Sparse Matrix by matrix product based on rsb_spmm().
         """
@@ -168,23 +176,27 @@ cdef class rsb_matrix:
         cdef lr.rsb_err_t errval
         corder =  x.flags.c_contiguous
         (lr_order,ldB,ldC)=self._otn2obc(corder,transA,nrhs)
+        cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
+        cdef np.ndarray tbeta = np.array([beta],dtype=self.dtype)
         assert x.flags.c_contiguous == y.flags.c_contiguous
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
            errval = lr.RSB_ERR_BADARGS
         else:
-           errval = lr.rsb_spmm(transA_, &alpha, self.mtxAp, nrhs, lr_order, <lr.cvoid_ptr>x.data, ldB, &beta, <lr.void_ptr>y.data, ldC);
+           errval = lr.rsb_spmm(transA_, talpha.data, self.mtxAp, nrhs, lr_order, <lr.cvoid_ptr>x.data, ldB, tbeta.data, <lr.void_ptr>y.data, ldC);
         _err_check(errval)
         return errval
 
-    def _spmv(self,np.ndarray[prv_t, ndim=1] x, np.ndarray[prv_t, ndim=1] y, transA='N', prv_t alpha = 1.0, prv_t beta = 1.0):
+    def _spmv(self,np.ndarray[any_t, ndim=1] x, np.ndarray[any_t, ndim=1] y, transA='N', alpha = 1.0, beta = 1.0):
         """
         Sparse Matrix by vector product based on rsb_spmv().
         """
         cdef lr.rsb_coo_idx_t incX = 1, incY = 1
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_err_t errval
-        errval = lr.rsb_spmv(transA_, &alpha, self.mtxAp, <lr.cvoid_ptr>x.data, incX, &beta, <lr.void_ptr>y.data, incY)
+        cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
+        cdef np.ndarray tbeta = np.array([beta],dtype=self.dtype)
+        errval = lr.rsb_spmv(transA_, talpha.data, self.mtxAp, <lr.cvoid_ptr>x.data, incX, tbeta.data, <lr.void_ptr>y.data, incY)
         _err_check(errval)
         return errval
 
@@ -338,32 +350,36 @@ cdef class rsb_matrix:
         (specific to rsb; __mul__ with scipy).
         """
         cdef lr.rsb_err_t errval
-        cdef prv_t alpha = 1.0, beta = 1.0
+        cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
+        cdef np.ndarray tbeta = np.array([1.0],dtype=self.dtype)
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         rm = rsb_matrix()
-        rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&errval)
+        rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
         rm._refresh()
         return rm
 
-    def rescaled(self, prv_t alpha):
+    def rescaled(self, alpha):
         """
         Return rescaled copy.
         (specific to rsb).
         """
-        rm = self.copy()
-        rm.rescale(alpha)
+        cdef rsb_matrix rm = self.copy()
+        cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
+        errval = lr.rsb_mtx_upd_vals(rm.mtxAp,lr.RSB_ELOPF_MUL,talpha.data)
+        _err_check(errval)
         return rm
 
-    def rescale(self, prv_t alpha):
+    def rescale(self, alpha):
         """
         Rescale this matrix.
         (specific to rsb).
         """
         cdef lr.rsb_err_t errval
-        errval = lr.rsb_mtx_upd_vals(self.mtxAp,lr.RSB_ELOPF_MUL,&alpha)
+        cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
+        errval = lr.rsb_mtx_upd_vals(self.mtxAp,lr.RSB_ELOPF_MUL,talpha.data)
         _err_check(errval)
         return True
 
@@ -407,12 +423,13 @@ cdef class rsb_matrix:
         Add two rsb_matrix objects.
         """
         cdef lr.rsb_err_t errval
-        cdef prv_t alpha = 1.0, beta = 1.0
+        cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
+        cdef np.ndarray tbeta = np.array([1.0],dtype=self.dtype)
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         rm = rsb_matrix()
-        rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,&alpha,self.mtxAp,transB,&beta,other.mtxAp,&errval)
+        rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
         rm._refresh()
         return rm
@@ -462,7 +479,7 @@ cdef class rsb_matrix:
                 assert False
         return lr_order
 
-    def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', prv_t alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', prv_t beta=1.0, verbose = False):
+    def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', beta=1.0, verbose = False):
         """
         Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
@@ -471,9 +488,11 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_flags_t lr_order = self._o2o(order)
+        cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
+        cdef np.ndarray tbeta = np.array([beta],dtype=self.dtype)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"1")
-        errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,&alpha,NULL,nrhs,lr_order,NULL,ldB,&beta,NULL,ldC);
+        errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,talpha.data,NULL,nrhs,lr_order,NULL,ldB,tbeta.data,NULL,ldC);
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         _err_check(errval)
         if (verbose == True):
@@ -659,11 +678,11 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
-        cdef prv_t alpha = 1.0
+        cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,&alpha,self.mtxAp,flagsA)
-        rm = rsb_matrix()
+        errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,talpha.data,self.mtxAp,flagsA)
+        rm = rsb_matrix(None,dtype=self.dtype)
         _err_check(errval)
         rm.mtxAp = mtxBp
         rm._refresh()
@@ -676,7 +695,7 @@ cdef class rsb_matrix:
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL
-        cdef prv_t alpha = 1.0
+        cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         #cdef np.ndarray b = np.zeros([self.nrA,self.ncA],dtype=self.dtype)
@@ -691,7 +710,7 @@ cdef class rsb_matrix:
         else:
             rowmajorB = lr.RSB_BOOL_FALSE
             ldB=self.nrA; nrB=self.nrA; ncB=self.ncA
-        errval = lr.rsb_mtx_add_to_dense(&alpha,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
+        errval = lr.rsb_mtx_add_to_dense(talpha.data,self.mtxAp,ldB,nrB,ncB,rowmajorB,b.data)
         _err_check(errval)
         return b
 

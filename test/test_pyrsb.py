@@ -8,7 +8,7 @@ import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
 from rsb import rsb_matrix
-from rsb import _print_vec, rsb_time, _err_check, rsb_dtype
+from rsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
@@ -33,21 +33,21 @@ def gen_tri_csr_larger():
     return [V,J,P,10,10,2]
 
 
-def gen_tri_csr():
-    V = [11., 12., 22.]
+def gen_tri_csr(dtype=prv_t):
+    V = numpy.array([11., 12., 22.],dtype=dtype)
     J = (0,1,1)
     P = (0,2,3)
     return [V,J,P,2,2,3]
 
 
-def gen_tri():
-    V = [11.0, 12.0, 22.0]
+def gen_tri(dtype=prv_t):
+    V = numpy.array([11.0, 12.0, 22.0],dtype=dtype)
     I = [0, 0, 1]
     J = [0, 1, 1]
     return [V,I,J,2,2,3]
 
 
-def gen_x(n,nrhs=1,order='C'):
+def gen_x(n,nrhs=1,order='C', dtype=prv_t):
     x = numpy.empty([n, nrhs], dtype=prv_t, order=order)
     for i in range(nrhs):
         print(i)
@@ -71,13 +71,18 @@ def test_init_from_none():
     assert mat.shape == (0, 0)
     assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
-    assert mat.dtype == prv_t
     assert mat.ndim == 2
     assert mat.has_sorted_indices == False
 
 
 def test_init_from_none_dtype_D():
     mat = rsb_matrix(None,dtype='d')
+    assert mat.shape == (0, 0)
+    assert mat.nnz == 0
+    assert mat._is_unsymmetric() == True
+    assert mat.dtype == _dt2dt('d')
+    assert mat.ndim == 2
+    assert mat.has_sorted_indices == False
 
 
 def test_init_from_dims_dtype_D():
@@ -98,6 +103,14 @@ def test_init_from_none_none():
     mat = rsb_matrix(None,None)
     assert mat.shape == (0, 0)
     assert mat.nnz == 0
+    assert mat._is_unsymmetric() == True
+
+
+def test_init_tuple_csr_f32():
+    [V,J,P,nr,nc,nnz] = gen_tri_csr(dtype=numpy.float32)
+    mat = rsb_matrix((V, J, P),[nr,nc])
+    assert mat.nnz == nnz
+    assert mat.shape == (nr, nc)
     assert mat._is_unsymmetric() == True
 
 
@@ -498,6 +511,15 @@ def test_rescaled():
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J))).rescaled(2.0)
     x = gen_x(nc)
+    assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
+def test_rescaled_f64():
+    [V,I,J,nr,nc,nnz] = gen_tri(dtype=numpy.float64);
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)),dtype=numpy.float64)
+    rmat = rsb_matrix((V, (I, J)),dtype=numpy.float64).rescaled(2.0)
+    x = gen_x(nc, dtype=numpy.float64)
+    rmat.save()
     assert ( (rmat * x) == (2.0 * cmat * x) ).all()
 
 def test_demo():
