@@ -24,19 +24,34 @@ verbose=0
 
 #rsb_dtype = np.complex64
 #ctypedef float complex prv_t
-#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
 
 #rsb_dtype = np.complex128
 #ctypedef double complex prv_t
-#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
 
 rsb_dtype = np.float64
 ctypedef double prv_t
-cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_DOUBLE
 
 #rsb_dtype = np.float32
 #ctypedef float prv_t
-#cpdef lr.rsb_type_t typecode = lr.RSB_NUMERICAL_TYPE_FLOAT
+
+def _dt2tc(dtype):
+    if dtype == np.float64:
+        return lr.RSB_NUMERICAL_TYPE_DOUBLE
+    elif dtype == np.float32:
+        return lr.RSB_NUMERICAL_TYPE_FLOAT
+    elif dtype == np.complex128:
+        return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
+    elif dtype == np.complex64:
+        return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
+    elif dtype.upper() == 'D':
+        return lr.RSB_NUMERICAL_TYPE_DOUBLE
+    elif dtype.upper() == 'S':
+        return lr.RSB_NUMERICAL_TYPE_FLOAT
+    elif dtype.upper() == 'Z':
+        return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
+    elif dtype.upper() == 'C':
+        return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
+    raise TypeError("Wrong data type: ", dtype)
 
 cpdef rsb_lib_init():
     """Initialize librsb."""
@@ -62,7 +77,7 @@ def _print_vec(np.ndarray[prv_t, ndim=2] x, mylen=0):
     ylv = len(x)
     if mylen is not 0:
         ylv = mylen
-    return lr.rsb_file_vec_save(NULL, typecode, <lr.cvoid_ptr>x.data, ylv)
+    return lr.rsb_file_vec_save(NULL, _dt2tc(x.dtype), <lr.cvoid_ptr>x.data, ylv)
 
 def _err_check(lr.rsb_err_t errval,want_strict=False):
     """
@@ -154,7 +169,7 @@ cdef class rsb_matrix:
         _err_check(errval)
         return errval
 
-    def __init__(self,arg1=None,shape=None,sym='U',dtype='d'):
+    def __init__(self,arg1=None,shape=None,sym='U',dtype=rsb_dtype):
         cdef lr.rsb_err_t errval
         cdef np.ndarray VA
         cdef np.ndarray IP # IA/PA
@@ -165,14 +180,12 @@ cdef class rsb_matrix:
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         self.flagsA = flagsA
         self.mtxAp = NULL
-        self.typecode = typecode
         self.nnzA=0
         V = None
         I = None
         J = None
         P = None
-        if dtype != 'd' and dtype != 'D':
-            raise TypeError("Wrong data type: for now, only 'D' suppurted.")
+        self.typecode = _dt2tc(dtype)
         if arg1 is not None:
             if isinstance(arg1, bytes):
                 filename = arg1
