@@ -174,9 +174,10 @@ def bench_file(filename):
     """
     print("# loading from file ", filename)
     lt = - rsb.rsb_time()
-    a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"))
+    a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"),dtype=np.float64)
     lt = lt + rsb.rsb_time()
     printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
+    printf("# loaded as type %s (default is %s)\n", a.dtype, rsb.rsb_dtype)
     if not a._is_unsymmetric():
         print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     if a is not None:

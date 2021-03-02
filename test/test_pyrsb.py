@@ -238,15 +238,16 @@ def test_nonzero():
 
 
 def test_io_bytes_ctor():
-    [sV,sI,sJ,nr,nc,nnz] = gen_tri();
-    smat = rsb_matrix((sV, (sI, sJ)))
-    filename = b"pyrsb_test.tmp.mtx"
-    smat.save(filename)
-    lmat = rsb_matrix(filename)
-    [lI,lJ,lV] = lmat.find();
-    assert ( sV == lV ).all()
-    assert ( sI == lI ).all()
-    assert ( sJ == lJ ).all()
+    for dtype in rsb_dtypes:
+        [sV,sI,sJ,nr,nc,nnz] = gen_tri();
+        smat = rsb_matrix((sV, (sI, sJ)))
+        filename = b"pyrsb_test.tmp.mtx"
+        smat.save(filename)
+        lmat = rsb_matrix(filename,dtype=dtype)
+        [lI,lJ,lV] = lmat.find();
+        assert ( sV == lV ).all()
+        assert ( sI == lI ).all()
+        assert ( sJ == lJ ).all()
 
 
 def test_sleep():
@@ -382,10 +383,11 @@ def test_autotune_simple():
     assert( rmat.todense() == omat.todense() ).all()
 
 def test__spmul():
-    [V,I,J,nr,nc,nnz] = gen_tri();
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
-    assert( (cmat*cmat).todense() == (rmat*rmat).todense() ).all()
+    for dtype in rsb_dtypes:
+        [V,I,J,nr,nc,nnz] = gen_tri(dtype=dtype);
+        cmat = csr_matrix((V, (I, J)))
+        rmat = rsb_matrix((V, (I, J)))
+        assert( (cmat*cmat).todense() == (rmat*rmat).todense() ).all()
 
 def test__spadd():
     [V,I,J,nr,nc,nnz] = gen_tri();

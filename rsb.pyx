@@ -28,54 +28,58 @@ ctypedef fused any_t:
     cython.double
     cython.float
 
-#rsb_dtype = np.complex64
-#ctypedef float complex prv_t
+rsb_dtype = np.complex64
+ctypedef float complex prv_t
 
 #rsb_dtype = np.complex128
 #ctypedef double complex prv_t
 
-rsb_dtype = np.float64
-ctypedef double prv_t
+#rsb_dtype = np.float64
+#ctypedef double prv_t
 
 #rsb_dtype = np.float32
 #ctypedef float prv_t
 
 def _dt2dt(dtype):
-    if dtype == np.float64:
-        return dtype
-    elif dtype == np.float32:
-        return dtype
-    elif dtype == np.complex128:
-        return dtype
-    elif dtype == np.complex64:
-        return dtype
-    elif dtype.upper() == 'D':
-        return np.float64
-    elif dtype.upper() == 'S':
-        return np.float32
-    elif dtype.upper() == 'Z':
-        return np.complex128
-    elif dtype.upper() == 'C':
-        return np.complex64
+    if isinstance(dtype, np.dtype) or isinstance(dtype, type):
+        if dtype == np.float64:
+            return np.float64
+        elif dtype == np.float32:
+            return np.float32
+        elif dtype == np.complex128:
+            return np.complex128
+        elif dtype == np.complex64:
+            return np.complex64
+    else:
+        if dtype.upper() == 'D':
+            return np.float64
+        elif dtype.upper() == 'S':
+            return np.float32
+        elif dtype.upper() == 'Z':
+            return np.complex128
+        elif dtype.upper() == 'C':
+            return np.complex64
     raise TypeError("Wrong data type: ", dtype)
 
 def _dt2tc(dtype):
-    if dtype == np.float64:
-        return lr.RSB_NUMERICAL_TYPE_DOUBLE
-    elif dtype == np.float32:
-        return lr.RSB_NUMERICAL_TYPE_FLOAT
-    elif dtype == np.complex128:
-        return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
-    elif dtype == np.complex64:
-        return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
-    elif dtype.upper() == 'D':
-        return lr.RSB_NUMERICAL_TYPE_DOUBLE
-    elif dtype.upper() == 'S':
-        return lr.RSB_NUMERICAL_TYPE_FLOAT
-    elif dtype.upper() == 'Z':
-        return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
-    elif dtype.upper() == 'C':
-        return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
+    if isinstance(dtype, np.dtype) or isinstance(dtype, type):
+        if dtype == np.float64:
+            return lr.RSB_NUMERICAL_TYPE_DOUBLE
+        elif dtype == np.float32:
+            return lr.RSB_NUMERICAL_TYPE_FLOAT
+        elif dtype == np.complex128:
+            return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
+        elif dtype == np.complex64:
+            return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
+    else:
+        if dtype.upper() == 'D':
+            return lr.RSB_NUMERICAL_TYPE_DOUBLE
+        elif dtype.upper() == 'S':
+            return lr.RSB_NUMERICAL_TYPE_FLOAT
+        elif dtype.upper() == 'Z':
+            return lr.RSB_NUMERICAL_TYPE_DOUBLE_COMPLEX
+        elif dtype.upper() == 'C':
+            return lr.RSB_NUMERICAL_TYPE_FLOAT_COMPLEX
     raise TypeError("Wrong data type: ", dtype)
 
 cpdef rsb_lib_init():
@@ -200,7 +204,7 @@ cdef class rsb_matrix:
         _err_check(errval)
         return errval
 
-    def __init__(self,arg1=None,shape=None,sym='U',dtype=rsb_dtype):
+    def __init__(self,arg1=None,shape=None,sym='U',dtype=None):
         cdef lr.rsb_err_t errval
         cdef np.ndarray VA
         cdef np.ndarray IP # IA/PA
@@ -216,11 +220,17 @@ cdef class rsb_matrix:
         I = None
         J = None
         P = None
-        self.dtypeA = _dt2dt(dtype)
-        self.typecode = _dt2tc(dtype)
+        self.dtypeA = None
+
+        if dtype is not None:
+            self.dtypeA = _dt2dt(dtype)
+
         if arg1 is not None:
             if isinstance(arg1, bytes):
+                if dtype is None:
+                    self.dtypeA = _dt2dt(rsb_dtype)
                 filename = arg1
+                self.typecode = _dt2tc(self.dtype)
                 self.mtxAp = lr.rsb_file_mtx_load(filename,flagsA,self.typecode,&errval)
                 _err_check(errval)
                 self._refresh()
@@ -231,6 +241,8 @@ cdef class rsb_matrix:
             elif isinstance(arg1, sp.sparse.base.spmatrix):
                 # TODO: might want to use more efficient rsb_mtx_alloc_from_csc_const(), rsb_mtx_alloc_from_csr_const()
                 (I,J,V)=sp.sparse.find(arg1)
+                if dtype is None:
+                    self.dtypeA = _dt2dt(arg1.dtype)
             elif isinstance(arg1, tuple):
                 if len(arg1) == 2 and not isinstance(arg1[1], tuple):
                     shape=[arg1[0], arg1[1]]
@@ -253,14 +265,20 @@ cdef class rsb_matrix:
             else:
                 try:
                     arg1 = np.asarray(arg1)
+                    if dtype is None:
+                        self.dtypeA = _dt2dt(arg1.dtype)
                 except Exception as e:
                     raise ValueError("unrecognized {}_matrix constructor usage" "".format(self.format)) from e
                 (I,J,V)=sp.sparse.find(csr_matrix(arg1))
+
+        if self.dtypeA is None:
+            self.dtypeA = rsb_dtype
 
         if V is None:
             V = []
             I = []
             J = []
+        self.typecode = _dt2tc(self.dtype)
 
         if shape is None:
             shape=[0,0]
