@@ -6,7 +6,7 @@ from setuptools.command.build_ext import build_ext
 from time import gmtime, strftime
 
 if True:
-    VERSION = "0.2.20210226"
+    VERSION = "0.2.20210301"
 else:
     if os.environ.get("PYRSB_VERSION"):
         VERSION = os.environ.get("PYRSB_VERSION")
@@ -36,7 +36,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/michelemartone/pyrsb",
-    packages=setuptools.find_packages(),  # rsb
+    py_modules=['pyrsb'],
     project_urls={
         "Bug Tracker": "https://github.com/michelemartone/pyrsb/issues",
         "Source Code": "https://github.com/michelemartone/pyrsb",

@@ -5,7 +5,7 @@ pyrsb demo
 import numpy
 import scipy
 from scipy.sparse import csr_matrix
-from rsb import rsb_matrix, rsb_dtype
+from pyrsb import *
 
 V = [11.0, 12.0, 22.0]
 I = [0, 0, 1]

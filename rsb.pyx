@@ -20,6 +20,11 @@ import scipy as sp
 import cython
 cimport cython
 
+__all__ = [
+    'rsb_matrix', 'rsb_time', 'rsb_dtype',
+    '_print_vec', '_err_check', '_dt2dt'
+]
+
 verbose=0
 
 ctypedef fused any_t:
@@ -28,14 +33,14 @@ ctypedef fused any_t:
     cython.double
     cython.float
 
-rsb_dtype = np.complex64
-ctypedef float complex prv_t
+#rsb_dtype = np.complex64
+#ctypedef float complex prv_t
 
 #rsb_dtype = np.complex128
 #ctypedef double complex prv_t
 
-#rsb_dtype = np.float64
-#ctypedef double prv_t
+rsb_dtype = np.float64
+ctypedef double prv_t
 
 #rsb_dtype = np.float32
 #ctypedef float prv_t

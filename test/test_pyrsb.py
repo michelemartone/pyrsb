@@ -7,8 +7,8 @@ import numpy
 import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
-from rsb import rsb_matrix
-from rsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
+from pyrsb import rsb_matrix
+from pyrsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
@@ -564,7 +564,7 @@ def test_demo():
     print(a)
     print(x)
     print(y)
-    # import rsb # import operators
+    # import pyrsb # import operators
     # a.autotune() # makes only sense for large matrices
     y = y + a * x
     # equivalent to y=y+c*x
