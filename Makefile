@@ -108,8 +108,12 @@ signed-dist: dist
 	gpg -sbv -u 1DBB555AEA359B8AAF0C6B88E0E669C8EF1258B8 -a pyrsb.tar.gz
 
 cleanall:
-	rm -f demo1.py
-	rm -f demo2.py
+	rm -fR demo1.py
+	rm -fR demo2.py
+	rm -fR EGG-INFO
+	rm -fR build
+	rm -fR dist
+	rm -fR pyrsb.egg-info __pycache__
 
 demo1.py demo2.py: README.md
 	LSSNIPS= awk -f md2sh.awk < $<
