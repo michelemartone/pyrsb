@@ -13,6 +13,7 @@ import pytest
 from pytest import raises as assert_raises
 from time import sleep
 
+rsb_dtypes = [numpy.float32, numpy.float64, numpy.complex64, numpy.complex128 ]
 prv_t = rsb_dtype
 
 def test__err_check_ok():
@@ -48,7 +49,7 @@ def gen_tri(dtype=prv_t):
 
 
 def gen_x(n,nrhs=1,order='C', dtype=prv_t):
-    x = numpy.empty([n, nrhs], dtype=prv_t, order=order)
+    x = numpy.empty([n, nrhs], dtype=dtype, order=order)
     for i in range(nrhs):
         print(i)
         x[:, i] = i+1
@@ -521,6 +522,21 @@ def test_rescaled_f64():
     x = gen_x(nc, dtype=numpy.float64)
     rmat.save()
     assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
+def test_rescaled_c64():
+    [V,I,J,nr,nc,nnz] = gen_tri(dtype=numpy.complex128);
+    cmat = csr_matrix((V, (I, J)))
+    rmat = rsb_matrix((V, (I, J)),dtype=numpy.complex128).rescaled(2.0)
+    x = gen_x(nc, dtype=numpy.complex128)
+    assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
+def test_rescaled_any_type():
+    for dtype in rsb_dtypes:
+        [V,I,J,nr,nc,nnz] = gen_tri(dtype=dtype);
+        cmat = csr_matrix((V, (I, J)))
+        rmat = rsb_matrix((V, (I, J)),dtype=dtype).rescaled(2.0)
+        x = gen_x(nc, dtype=dtype)
+        assert ( (rmat * x) == (2.0 * cmat * x) ).all()
 
 def test_demo():
     V = [11.0, 12.0, 22.0]
