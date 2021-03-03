@@ -47,10 +47,9 @@ def gen_tri(dtype=prv_t):
     J = [0, 1, 1]
     return [V,I,J,2,2,3]
 
-
-@pytest.fixture
-def f_gen_tri():
-    return gen_tri()
+@pytest.fixture(params=rsb_dtypes)
+def f_gen_tri(request):
+    return gen_tri(dtype=request.param)
 
 
 def gen_x(n,nrhs=1,order='C', dtype=prv_t):
