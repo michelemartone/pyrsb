@@ -261,24 +261,26 @@ def test_sleep():
     assert (t1 > t0)
 
 
-def test_todense(f_gen_tri):
+@pytest.fixture(params=rsb_dtypes)
+def f_gen_mats(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     cmat = csr_matrix((V, (I, J)),[nr,nc])
+    return [rmat,cmat]
+
+
+def test_todense(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert ( rmat.todense() == cmat.todense() ).all()
 
 
-def test_tocsr(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    rmat = rsb_matrix((V, (I, J)),[nr,nc])
-    cmat = csr_matrix((V, (I, J)),[nr,nc])
+def test_tocsr(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert ((cmat - rmat.tocsr())).nnz == 0
 
 
-def test_find(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    rmat = rsb_matrix((V, (I, J)),[nr,nc])
-    cmat = csr_matrix((V, (I, J)),[nr,nc])
+def test_find(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     [cI,cJ,cV] = scipy.sparse.find(cmat);
     [rI,rJ,rV] = rmat.find();
     # order matters: won't work for any matrix
@@ -287,10 +289,8 @@ def test_find(f_gen_tri):
     assert ( cJ == rJ ).all()
 
 
-def test_tril(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    rmat = rsb_matrix((V, (I, J)),[nr,nc])
-    cmat = csr_matrix((V, (I, J)),[nr,nc])
+def test_tril(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     [cI,cJ,cV] = scipy.sparse.find(scipy.sparse.tril(cmat));
     [rI,rJ,rV] = rmat.tril();
     # order matters: won't work for any matrix
@@ -299,10 +299,8 @@ def test_tril(f_gen_tri):
     assert ( cJ == rJ ).all()
 
 
-def test_triu(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    rmat = rsb_matrix((V, (I, J)),[nr,nc])
-    cmat = csr_matrix((V, (I, J)),[nr,nc])
+def test_triu(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     [cI,cJ,cV] = scipy.sparse.find(scipy.sparse.triu(cmat));
     [rI,rJ,rV] = rmat.triu();
     # order matters: won't work for any matrix
@@ -343,36 +341,30 @@ def test_init_tuples_wrong_sym(f_gen_tri):
         mat = rsb_matrix((V, (I, J)),sym="W")
 
 
-def test_spmv__mul__(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
-    x = gen_x(nc)
+def test_spmv__mul__(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
+    x = gen_x(rmat.nc())
     assert ( (rmat * x) == (cmat * x) ).all()
 
 
-def test_spmv_1D_N(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmv_1D_N(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     nrhs = 1
     for order in ['C', 'F']:
-        x = gen_x(nc,nrhs,order)
-        y = numpy.empty([nr, nrhs], dtype=prv_t, order=order)
+        x = gen_x(rmat.nc(),nrhs,order)
+        y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
         y[:, :] = 0.0
         x = x[:,0]
         y = y[:,0]
         rmat._spmv(x,y)
         assert ( y == (cmat * x) ).all()
 
-def test_spmv_1D_N_alpha(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmv_1D_N_alpha(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     nrhs = 1
     for order in ['C', 'F']:
-        x = gen_x(nc,nrhs,order)
-        y = numpy.empty([nr, nrhs], dtype=prv_t, order=order)
+        x = gen_x(rmat.nc(),nrhs,order)
+        y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
         y[:, :] = 0.0
         x = x[:,0]
         y = y[:,0]
@@ -393,21 +385,17 @@ def test__spmul():
         rmat = rsb_matrix((V, (I, J)))
         assert( (cmat*cmat).todense() == (rmat*rmat).todense() ).all()
 
-def test__spadd(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test__spadd(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert( (cmat+cmat).todense() == (rmat+rmat).todense() ).all()
 
-def test_spmv_1D_T(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmv_1D_T(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     nrhs = 1
     for order in ['C', 'F']:
         for transA in ['T', b'T', ord('T')]:
-            x = gen_x(nr,nrhs,order)
-            y = numpy.empty([nc, nrhs], dtype=prv_t, order=order)
+            x = gen_x(rmat.nr(),nrhs,order)
+            y = numpy.empty([rmat.nc(), nrhs], dtype=prv_t, order=order)
             y[:, :] = 0.0
             x = x[:,0]
             y = y[:,0]
@@ -415,16 +403,14 @@ def test_spmv_1D_T(f_gen_tri):
             assert ( y == ( cmat.transpose() * x) ).all()
 
 
-def test_spmm_C(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm_C(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = gen_x(nc,nrhs,order)
-    y = numpy.empty([nr, nrhs], dtype=prv_t, order=order)
+    x = gen_x(rmat.nc(),nrhs,order)
+    y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
     y[:, :] = 0.0
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
@@ -439,59 +425,51 @@ def test_spmm_wrong_transA(f_gen_tri):
     with assert_raises(ValueError):
        rmat._spmm(x,y,transA='?')
 
-def test_spmm_C_T(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm_C_T(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = gen_x(nc,nrhs,order)
-    y = numpy.empty([nr, nrhs], dtype=prv_t, order=order)
+    x = gen_x(rmat.nc(),nrhs,order)
+    y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
     y[:, :] = 0.0
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
-def test_spmm_C_T_forms(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm_C_T_forms(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'C'
-    x = gen_x(nc,nrhs,order)
-    y = numpy.empty([nr, nrhs], dtype=prv_t, order=order)
+    x = gen_x(rmat.nc(),nrhs,order)
+    y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
     for transA in ['T', b'T', ord('T')]:
         y[:, :] = 0.0
         rmat._spmm(x,y,transA=transA)
         assert ( y == (cmat.transpose() * x) ).all()
 
-def test_spmm_F(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm_F(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
     order='F'
-    x = gen_x(nr,nrhs,order)
-    y = numpy.empty([nc, nrhs], dtype=prv_t, order=order)
+    x = gen_x(rmat.nr(),nrhs,order)
+    y = numpy.empty([rmat.nc(), nrhs], dtype=prv_t, order=order)
     y[:, :] = 0.0
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
-def test_spmm_F_T(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm_F_T(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
     order = 'F'
-    x = gen_x(nr,nrhs,order)
-    y = numpy.zeros([nc, nrhs], dtype=prv_t, order=order)
+    x = gen_x(rmat.nr(),nrhs,order)
+    y = numpy.zeros([rmat.nc(), nrhs], dtype=prv_t, order=order)
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
@@ -504,14 +482,12 @@ def test_spmm_permitted_mismatch(f_gen_tri):
     assert ( (rmat * x1).shape == (rmat * x2).shape )
     assert ( (rmat * x1) == (rmat * x2) ).all()
 
-def test_spmm__mul__(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
-    cmat = csr_matrix((V, (I, J)))
-    rmat = rsb_matrix((V, (I, J)))
+def test_spmm__mul__(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
     assert rmat.nnz == cmat.nnz
     nrhs = 2
-    x = gen_x(nc,nrhs)
+    x = gen_x(rmat.nc(),nrhs)
     assert ( (rmat * x) == (cmat * x) ).all()
 
 def test_rescaled(f_gen_tri):
