@@ -49,6 +49,7 @@ def gen_tri(dtype=prv_t):
     J = [0, 1, 1]
     return [V,I,J,2,2,3]
 
+
 @pytest.fixture(params=rsb_dtypes)
 def f_gen_tri(request):
     return gen_tri(dtype=request.param)
@@ -267,8 +268,8 @@ def test_sleep():
 
 
 @pytest.fixture(params=rsb_dtypes)
-def f_gen_mats(f_gen_tri):
-    [V,I,J,nr,nc,nnz] = f_gen_tri
+def f_gen_mats(request):
+    [V,I,J,nr,nc,nnz] = gen_tri(dtype=request.param)
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     cmat = csr_matrix((V, (I, J)),[nr,nc])
     return [rmat,cmat]
