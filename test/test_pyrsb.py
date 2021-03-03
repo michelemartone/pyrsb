@@ -13,8 +13,10 @@ import pytest
 from pytest import raises as assert_raises
 from time import sleep
 
+
 rsb_dtypes = [numpy.float32, numpy.float64, numpy.complex64, numpy.complex128 ]
 prv_t = rsb_dtype
+
 
 def test__err_check_ok():
     _err_check(0)
@@ -200,14 +202,17 @@ def test_init_tuple_fixed_3():
     with assert_raises(ValueError):
         mat = rsb_matrix(([1.,1.], ([-1,-2], [-1,-2])))
 
+
 def test_init_tuple_except():
     with assert_raises(AssertionError):
         mat = rsb_matrix(([1.,1.], ([0,1], [0,1])),[2,-2])
+
 
 def test__refresh(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     rmat._refresh()
+
 
 def test_init_from_csc(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
@@ -359,6 +364,7 @@ def test_spmv_1D_N(f_gen_mats):
         rmat._spmv(x,y)
         assert ( y == (cmat * x) ).all()
 
+
 def test_spmv_1D_N_alpha(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     nrhs = 1
@@ -371,12 +377,14 @@ def test_spmv_1D_N_alpha(f_gen_mats):
         rmat._spmv(x,y,alpha=2)
         assert ( y == 2 * (cmat * x) ).all()
 
+
 def test_autotune_simple(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     omat = rsb_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     rmat.autotune()
     assert( rmat.todense() == omat.todense() ).all()
+
 
 def test__spmul():
     for dtype in rsb_dtypes:
@@ -385,9 +393,11 @@ def test__spmul():
         rmat = rsb_matrix((V, (I, J)))
         assert( (cmat*cmat).todense() == (rmat*rmat).todense() ).all()
 
+
 def test__spadd(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     assert( (cmat+cmat).todense() == (rmat+rmat).todense() ).all()
+
 
 def test_spmv_1D_T(f_gen_mats):
     [rmat,cmat] = f_gen_mats
@@ -415,6 +425,7 @@ def test_spmm_C(f_gen_mats):
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
+
 def test_spmm_wrong_transA(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)))
@@ -424,6 +435,7 @@ def test_spmm_wrong_transA(f_gen_tri):
     y[:, :] = 0.0
     with assert_raises(ValueError):
        rmat._spmm(x,y,transA='?')
+
 
 def test_spmm_C_T(f_gen_mats):
     [rmat,cmat] = f_gen_mats
@@ -436,6 +448,7 @@ def test_spmm_C_T(f_gen_mats):
     y[:, :] = 0.0
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
+
 
 def test_spmm_C_T_forms(f_gen_mats):
     [rmat,cmat] = f_gen_mats
@@ -450,6 +463,7 @@ def test_spmm_C_T_forms(f_gen_mats):
         rmat._spmm(x,y,transA=transA)
         assert ( y == (cmat.transpose() * x) ).all()
 
+
 def test_spmm_F(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
@@ -462,6 +476,7 @@ def test_spmm_F(f_gen_mats):
     rmat._spmm(x,y)
     assert ( y == (cmat * x) ).all()
 
+
 def test_spmm_F_T(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
@@ -473,6 +488,7 @@ def test_spmm_F_T(f_gen_mats):
     rmat._spmm(x,y,transA=b'T')
     assert ( y == (cmat.transpose() * x) ).all()
 
+
 def test_spmm_permitted_mismatch(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)))
@@ -482,6 +498,7 @@ def test_spmm_permitted_mismatch(f_gen_tri):
     assert ( (rmat * x1).shape == (rmat * x2).shape )
     assert ( (rmat * x1) == (rmat * x2) ).all()
 
+
 def test_spmm__mul__(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     assert rmat.shape == cmat.shape
@@ -490,12 +507,14 @@ def test_spmm__mul__(f_gen_mats):
     x = gen_x(rmat.nc(),nrhs)
     assert ( (rmat * x) == (cmat * x) ).all()
 
+
 def test_rescaled(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J))).rescaled(2.0)
     x = gen_x(nc)
     assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
 
 def test_rescaled_f64():
     [V,I,J,nr,nc,nnz] = gen_tri(dtype=numpy.float64);
@@ -506,12 +525,14 @@ def test_rescaled_f64():
     rmat.save()
     assert ( (rmat * x) == (2.0 * cmat * x) ).all()
 
+
 def test_rescaled_c64():
     [V,I,J,nr,nc,nnz] = gen_tri(dtype=numpy.complex128);
     cmat = csr_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)),dtype=numpy.complex128).rescaled(2.0)
     x = gen_x(nc, dtype=numpy.complex128)
     assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
 
 def test_rescaled_any_type():
     for dtype in rsb_dtypes:
@@ -520,6 +541,7 @@ def test_rescaled_any_type():
         rmat = rsb_matrix((V, (I, J)),dtype=dtype).rescaled(2.0)
         x = gen_x(nc, dtype=dtype)
         assert ( (rmat * x) == (2.0 * cmat * x) ).all()
+
 
 def test_demo():
     V = [11.0, 12.0, 22.0]
