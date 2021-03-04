@@ -348,18 +348,12 @@ cdef class rsb_matrix:
         """Destructor."""
         self._mtx_free()
 
-    def getshape(self):
-        """
-        Shape of the matrix.
-        """
-        return (self.nrA,self.ncA)
-
     @property
     def shape(self):
         """
         Shape of the matrix.
         """
-        return self.getshape()
+        return (self.nrA,self.ncA)
 
     def __richcmp__(self,f,b):
         """Unfinished."""
