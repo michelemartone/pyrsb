@@ -2,7 +2,7 @@
 """
 Recursive Sparse Blocks matrix format.
 librsb interface for Python.
-Proof of concept, very limited interface code, aims at compatibility with scipy.sparse.
+Proof of concept, limited interface code, aims at compatibility with scipy.sparse.
 Author: Michele Martone
 License: GPLv3+
 """
@@ -181,6 +181,8 @@ cdef class rsb_matrix:
     def _spmm(self,np.ndarray[any_t, ndim=2] x, np.ndarray[any_t, ndim=2] y, transA='N', alpha = 1.0, beta = 1.0):
         """
         Sparse Matrix by matrix product based on rsb_spmm().
+        See scipy.sparse.spmatrix._mul_multivector().
+        (specific to rsb).
         """
         cdef lr.rsb_coo_idx_t nrhs = x.shape[1]
         cdef lr.rsb_nnz_idx_t ldB, ldC
@@ -203,6 +205,8 @@ cdef class rsb_matrix:
     def _spmv(self,np.ndarray[any_t, ndim=1] x, np.ndarray[any_t, ndim=1] y, transA='N', alpha = 1.0, beta = 1.0):
         """
         Sparse Matrix by vector product based on rsb_spmv().
+        See scipy.sparse.spmatrix._mul_vector().
+        (specific to rsb).
         """
         cdef lr.rsb_coo_idx_t incX = 1, incY = 1
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
@@ -338,7 +342,8 @@ cdef class rsb_matrix:
 
     def _mtx_free(self):
         """
-        Free the matrix.
+        Free the librsb matrix.
+        (specific to rsb).
         """
         # print("Freeing matrix.")
         lr.rsb_mtx_free(self.mtxAp)
@@ -368,7 +373,8 @@ cdef class rsb_matrix:
     def _spmul(self, rsb_matrix other):
         """
         Multiply two rsb_matrix objects.
-        (specific to rsb; __mul__ with scipy).
+        See scipy.sparse.spmatrix._mul_vector().
+        (specific to rsb).
         """
         cdef lr.rsb_err_t errval
         cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
@@ -442,6 +448,7 @@ cdef class rsb_matrix:
     def _spadd(self, rsb_matrix other):
         """
         Add two rsb_matrix objects.
+        (specific to rsb).
         """
         cdef lr.rsb_err_t errval
         cdef np.ndarray talpha = np.array([1.0],dtype=self.dtype)
@@ -519,7 +526,7 @@ cdef class rsb_matrix:
     def _find_block(self,frA,lrA,fcA,lcA):
         """
         Extract sparse block as COO.
-        Unfinished.
+        (specific to rsb).
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_nnz_idx_t rnz = 0
@@ -541,6 +548,7 @@ cdef class rsb_matrix:
 
     @property
     def has_sorted_indices(self):
+        """Unfinished."""
         return False
 
     @property
@@ -590,6 +598,7 @@ cdef class rsb_matrix:
             return False
 
     def _refresh(self):
+        """Refresh cached variables. (specific to rsb). Candidate for removal."""
         cdef lr.rsb_err_t errval = lr.RSB_ERR_NO_ERROR
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_ROWS__TO__RSB_COO_INDEX_T,&self.nrA)
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_COLS__TO__RSB_COO_INDEX_T,&self.ncA)
@@ -624,7 +633,8 @@ cdef class rsb_matrix:
 
     def nonzero(self):
         """
-        More or less as csr_matrix.nonzero(): returns (ia,ja).
+        Returns non-zero elements indices.
+        Just as scipy.sparse.nonzero().
         """
         (IA,JA,VA)=self.find()
         return (IA,JA)
@@ -690,8 +700,9 @@ cdef class rsb_matrix:
 
     def copy(self):
         """
-        Return a copy (clone) of this matrix.
-        (specific to rsb).
+        Return a copy of this matrix.
+        No data/indices will be shared between the returned value and current matrix.
+        (as in scipy.sparse).
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_mtx_ptr mtxBp = NULL

@@ -7,16 +7,16 @@
 [librsb](http://librsb.sourceforge.net/) is a **high performance sparse matrix
 library** implementing the Recursive Sparse Blocks format,
 which is especially well suited for
-multiplications in **iterative methods** on **huge symmetric sparse matrices**.
+multiplications in **iterative methods** on **very large sparse matrices**.
 
 **PyRSB is a Cython-based Python interface to librsb.**
 
 On multicore machines, PyRSB can be several times faster than e.g. `scipy.sparse.csr_matrix()`.
-For an example how to invoke it with no overhead, [see the advanced example](#ExampleAdvancedUsage).
+For an example how to invoke it with minimal overhead, [see the advanced example](#ExampleAdvancedUsage).
 
 So far, PyRSB is a prototype tested on Linux only.
-The librsb library offers much more, and can make PyRSB much more powerful.
-**Prospective users and collaborators feedback are sought**; [please contact me](http://librsb.sourceforge.net/#a_contacts) to feedback and help.
+The librsb library instead is mature and well tested.
+**Prospective PyRSB users and collaborators are welcome to** [contact me](http://librsb.sourceforge.net/#a_contacts).
 
 ## Features
 
@@ -29,24 +29,26 @@ The following functionality is implemented:
   * `find()`, `find_block()`, `tril()`, `triu()`, `shape()`, `nnz`.
   * `print`'able.
   * PyRSB-Specific: `autotune()`, `do_print()`.
-  * load from a Matrix Market file, e.g. `rsb.rsb_file_mtx_load(bytes(filename,encoding='utf-8'))`
+  * load from a Matrix Market file, e.g. `rsb_matrix(bytes(filename,encoding='utf-8'))`
 
 ## Build and Use
 
-- If you have librsb installed:
- `make` shall build and test.
-- Make sure you have `cython`, `scipy`, `numpy`. installed.
-- If you want to install librsb on Ubuntu or Debian:
- `sudo apt-get install librsb-dev` shall suffice.
-  Other operating systems have librsb, too.
-  Please check yours.
-  Or check [librsb](http://librsb.sourceforge.net/)'s web site.
 - If you want the `Makefile` to build librsb (in this directory):
  `make all-local` will attempt downloading librsb-1.2.0.9 from the
  web and building it here before building pyrsb.
  If the file is in place, it won't download it a second time.
  After that, `make local-librsb-pyrsb` (or `make lp`) will build pyrsb
  using local librsb, then run it.
+ This method shall use the best compilation flags.
+- If you have librsb already installed:
+ `make` shall build and test.
+- Make sure you have `cython`, `scipy`, `numpy`. installed.
+- If you don't have librsb installed you may want to try via [pip](https://pypi.org/project/pyrsb/) `pip install pyrsb`
+- If you want to install librsb on Ubuntu or Debian:
+ `sudo apt-get install librsb-dev` shall suffice.
+  Other operating systems have librsb, too.
+  Please check yours.
+  Or check [librsb](http://librsb.sourceforge.net/)'s web site.
 - `make test` will test benchmark code using `test.py` (*to compare speed to SciPy*)
 - `make b` will also produce graphs (requires `gnuplot`)
 
