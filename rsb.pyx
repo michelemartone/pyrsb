@@ -731,8 +731,8 @@ cdef class rsb_matrix:
         _err_check(errval)
         return b
 
-    def mini_self_print_test(self):
-        """Unfinished."""
+    def _mini_self_print_test(self):
+        """ Candidate for removal."""
         print("*")
         print(self)
         print("*")

@@ -73,7 +73,7 @@ def bench_both(a, c, psf, nrhs=1):
     if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
     if WANT_VERBOSE:
-        a.mini_self_print_test()
+        a._mini_self_print_test()
     x = np.ones([a.shape[1], nrhs], dtype=a.dtype)
     y = np.ones([a.shape[0], nrhs], dtype=a.dtype)
     nnz = a.nnz

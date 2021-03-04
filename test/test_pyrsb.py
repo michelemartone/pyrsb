@@ -331,7 +331,7 @@ def test_mini_self_print_test(f_gen_tri):
     """Call mini self test."""
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
-    rmat.mini_self_print_test()
+    rmat._mini_self_print_test()
 
 
 def test__find_block(f_gen_tri):
