@@ -315,6 +315,18 @@ def test_triu(f_gen_mats):
     assert ( cJ == rJ ).all()
 
 
+def test_conj(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
+    pytest.skip("Not implemented yet", allow_module_level=True)
+    assert ( rmat.conj() == cmat.conj() )
+
+
+def test_conjugate(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
+    pytest.skip("Not implemented yet", allow_module_level=True)
+    assert ( rmat.conjugate() == cmat.conjugate() )
+
+
 def test_mini_self_print_test(f_gen_tri):
     """Call mini self test."""
     [V,I,J,nr,nc,nnz] = f_gen_tri
