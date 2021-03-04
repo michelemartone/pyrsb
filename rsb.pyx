@@ -91,13 +91,17 @@ cpdef rsb_lib_init():
     """Initialize librsb."""
     if verbose:
         print("Initializing librsb")
-    return lr.rsb_lib_init(NULL)
+    cdef lr.rsb_err_t errval = lr.rsb_lib_init(NULL)
+    _err_check(errval)
+    return errval
 
 cpdef rsb_lib_exit():
     """Finalize librsb."""
     if verbose:
         print("Finalizing librsb")
-    return lr.rsb_lib_exit(NULL)
+    cdef lr.rsb_err_t errval = lr.rsb_lib_exit(NULL)
+    _err_check(errval)
+    return errval
 
 cpdef rsb_time():
     """Return current time."""
