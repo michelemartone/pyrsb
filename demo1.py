@@ -18,7 +18,7 @@ a = rsb_matrix((V, (I, J)), [3, 3])
 a = rsb_matrix((V, (I, J)), sym="S")  # symmetric example
 print(a)
 a = rsb_matrix((4, 4))
-a = rsb_matrix(c,dtype=rsb_dtype)
+a = rsb_matrix(c)
 nrhs = 1  # set to nrhs>1 to multiply by multiple vectors at once
 nr = a.shape[0]
 nc = a.shape[1]
