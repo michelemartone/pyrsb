@@ -459,10 +459,6 @@ cdef class rsb_matrix:
         """Add two rsb_matrix objects (also in scipy.sparse)."""
         return self._spadd(other)
 
-    def __complex__(self,other):
-        """Unsupported: at the moment only one type is supported."""
-        return False
-
     def opt_set(self, char * opnp, char * opvp):
         """
         Specify individual library options in order to fine-tune the library behaviour.
