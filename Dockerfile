@@ -23,7 +23,12 @@ RUN apt-get install --yes \
     "python3-setuptools" \
     ${PKG}
 
-RUN apt-get install --yes python3-pytest ipython3
+# Install asv
+# RUN apt-get install --yes python3-pytest ipython3 git
+# RUN apt-get install --yes python3-pip python3-virtualenv
+# RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 100
+# RUN pip3 install asv
+
 # Copy the current directory to the container and continue inside it
 COPY "." "/mnt"
 WORKDIR "/mnt"
@@ -34,4 +39,7 @@ RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test PyRSB
-RUN make clean && make
+RUN make clean && make && python setup.py install --user
+
+# Run asv
+#RUN export HOME=/mnt ; cd /mnt/benchmarks && asv machine --yes && asv run --python=python
