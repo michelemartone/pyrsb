@@ -82,6 +82,7 @@
     // },
 
     "matrix": {
+        "pyrsb": [],
         "numpy": [],
         "cython": []
     },
