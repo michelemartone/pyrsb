@@ -19,29 +19,23 @@ def gen_dense(dtype):
     return [y,d,x]
 
 dtypes = [numpy.float64, numpy.float32]
-class BenchCsr():
-    params = dtypes
-    param_names = ["dtype"]
-    def setup(self,dtype):
+
+class BenchDense():
+    params = [ dtypes, ['csr','rsb'] ]
+    param_names = ["dtype","format"]
+    def setup(self,dtype,format):
         [self.y,self.d,self.x] = gen_dense(dtype)
-        self.c = csr_matrix(self.d)
+        if format == 'rsb':
+            self.a = rsb_matrix(self.d)
+        else:
+            self.a = csr_matrix(self.d)
 
-    def time_csr(self,dtype):
-        y = self.c * self.x
+    def time_bare(self,dtype,format):
+        if format == 'rsb':
+            self.a._spmm(self.x,self.y)
+        else:
+            scipy.sparse._sparsetools.csr_matvecs(self.a.shape[0], self.a.shape[1], self.x.shape[1], self.a.indptr, self.a.indices, self.a.data, self.x.ravel(), self.y.ravel())
 
-    def time_csr_bare(self,dtype):
-        scipy.sparse._sparsetools.csr_matvecs(self.c.shape[0], self.c.shape[1], self.x.shape[1], self.c.indptr, self.c.indices, self.c.data, self.x.ravel(), self.y.ravel())
-
-class BenchRsb():
-    params = dtypes
-    param_names = ["dtype"]
-    def setup(self,dtype):
-        [self.y,self.d,self.x] = gen_dense(dtype)
-        self.a = rsb_matrix(self.d)
-
-    def time_rsb_bare(self,dtype):
-        self.a._spmm(self.x,self.y)
-
-    def time_rsb(self,dtype):
+    def time_rsb(self,dtype,format):
         y = self.a * self.x
 
