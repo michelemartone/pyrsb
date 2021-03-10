@@ -18,7 +18,7 @@ def gen_dense(dtype):
     y = numpy.ones([nr, nrhs], dtype=dtype, order=order)
     return [y,d,x]
 
-dtypes = [numpy.float64, numpy.float32]
+dtypes = [numpy.float64, numpy.float32, numpy.complex128, numpy.complex64]
 
 class BenchDense():
     params = [ dtypes, ['csr','rsb'] ]
