@@ -8,8 +8,8 @@ from pyrsb import rsb_matrix
 from pyrsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
 prv_t = rsb_dtype
 
-def gen_dense(dtype,order,nrhs):
-    nr = 1000
+def gen_dense(dtype,order,nrhs,n=1000):
+    nr = n
     nc = nr
     d = numpy.ones(shape=(nr,nc), dtype=dtype)
     x = numpy.ones([nc, nrhs], dtype=dtype, order=order)
@@ -24,12 +24,12 @@ def from_dense(format,d):
         else:
             return csr_matrix(d)
 
-class BenchDenseMatvecs():
+class BenchMatvecs():
     params = [ dtypes, [1, 2, 4, 8], ['C','F'], ['csr','rsb'] ]
     param_names = ["dtype","nrhs","order","format"]
 
     def setup(self,dtype,nrhs,order,format):
-        [self.y,self.d,self.x] = gen_dense(dtype,order,nrhs)
+        [self.y,self.d,self.x] = gen_dense(dtype,order,nrhs,n=1000)
         self.a = from_dense(format,self.d)
 
     def do_bare_mul(self,format):
@@ -50,8 +50,15 @@ class BenchDenseMatvecs():
     def peakmem_mul(self,dtype,nrhs,order,format):
         y = self.a * self.x
 
+class BenchDenseMatvecs(BenchMatvecs):
+    params = [ dtypes, [1, 2, 4, 8], ['C','F'], ['csr','rsb'] ]
+    param_names = ["dtype","nrhs","order","format"]
 
-class BenchCtors():
+    def setup(self,dtype,nrhs,order,format):
+        [self.y,self.d,self.x] = gen_dense(dtype,order,nrhs,n=2000)
+        self.a = from_dense(format,self.d)
+
+class BenchDenseCtor():
     params = [ dtypes, ['csr','rsb'] ]
     param_names = ["dtype","format"]
 
