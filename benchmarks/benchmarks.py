@@ -8,12 +8,16 @@ from pyrsb import rsb_matrix
 from pyrsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
 prv_t = rsb_dtype
 
+def gen_xy(dtype,order,nrhs,nx,ny):
+    x = numpy.ones([nx, nrhs], dtype=dtype, order=order)
+    y = numpy.ones([ny, nrhs], dtype=dtype, order=order)
+    return [x,y]
+
 def gen_dense(dtype,order,nrhs,n=1000):
     nr = n
     nc = nr
     d = numpy.ones(shape=(nr,nc), dtype=dtype)
-    x = numpy.ones([nc, nrhs], dtype=dtype, order=order)
-    y = numpy.ones([nr, nrhs], dtype=dtype, order=order)
+    [x,y] = gen_xy(dtype,order,nrhs,nc,nr)
     return [y,d,x]
 
 dtypes = [numpy.float64, numpy.float32, numpy.complex128, numpy.complex64]
@@ -56,6 +60,17 @@ class BenchDenseMatvecs(BenchMatvecs):
 
     def setup(self,dtype,nrhs,order,format):
         [self.y,self.d,self.x] = gen_dense(dtype,order,nrhs,n=2000)
+        self.a = from_dense(format,self.d)
+
+class BenchRandomSparseMatvecs(BenchMatvecs):
+    params = [ dtypes, [1, 2, 4, 8], ['C','F'], ['csr','rsb'] ]
+    param_names = ["dtype","nrhs","order","format"]
+
+    def setup(self,dtype,nrhs,order,format):
+        n = 3000
+        [self.x,self.y] = gen_xy(dtype,order,nrhs,n,n)
+        dnst = (math.sqrt(1.0 * n)) / n
+        self.d = scipy.sparse.rand(n, n, density=dnst, format="csr", dtype=dtype)
         self.a = from_dense(format,self.d)
 
 class BenchDenseCtor():
