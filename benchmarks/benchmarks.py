@@ -18,22 +18,49 @@ def gen_dense(dtype,order,nrhs):
 
 dtypes = [numpy.float64, numpy.float32, numpy.complex128, numpy.complex64]
 
-class BenchDense():
+def from_dense(format,d):
+        if format == 'rsb':
+            return rsb_matrix(d)
+        else:
+            return csr_matrix(d)
+
+class BenchDenseMatvecs():
     params = [ dtypes, [1, 2, 4, 8], ['C','F'], ['csr','rsb'] ]
     param_names = ["dtype","nrhs","order","format"]
+
     def setup(self,dtype,nrhs,order,format):
         [self.y,self.d,self.x] = gen_dense(dtype,order,nrhs)
-        if format == 'rsb':
-            self.a = rsb_matrix(self.d)
-        else:
-            self.a = csr_matrix(self.d)
+        self.a = from_dense(format,self.d)
 
-    def time_bare(self,dtype,nrhs,order,format):
+    def do_bare_mul(self,format):
         if format == 'rsb':
             self.a._spmm(self.x,self.y)
         else:
             scipy.sparse._sparsetools.csr_matvecs(self.a.shape[0], self.a.shape[1], self.x.shape[1], self.a.indptr, self.a.indices, self.a.data, self.x.ravel(), self.y.ravel())
 
+    def time_bare_mul(self,dtype,nrhs,order,format):
+        self.do_bare_mul(format)
+
     def time_mul(self,dtype,nrhs,order,format):
         y = self.a * self.x
 
+    def peakmem_bare_mul(self,dtype,nrhs,order,format):
+        self.do_bare_mul(format)
+
+    def peakmem_mul(self,dtype,nrhs,order,format):
+        y = self.a * self.x
+
+
+class BenchCtors():
+    params = [ dtypes, ['csr','rsb'] ]
+    param_names = ["dtype","format"]
+
+    def setup(self,dtype,format):
+        [self.y,self.d,self.x] = gen_dense(dtype,'C',1)
+        self.a = from_dense(format,self.d)
+
+    def time_ctor(self,dtype,format):
+        a = from_dense(format,self.d)
+
+    def peakmem_ctor(self,dtype,format):
+        a = from_dense(format,self.d)
