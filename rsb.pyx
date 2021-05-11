@@ -503,7 +503,7 @@ cdef class rsb_matrix:
                 assert False
         return lr_order
 
-    def autotune(self, lr.rsb_real_t sf=1.0, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', beta=1.0, verbose = False):
+    def autotune(self, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', beta=1.0, verbose = False):
         """
         Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
@@ -512,6 +512,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_nnz_idx_t ldB=0, ldC=0
         cdef lr.rsb_trans_t transA_ = self._prt2lt(transA)
         cdef lr.rsb_flags_t lr_order = self._o2o(order)
+        cdef lr.rsb_real_t sf=1.0
         cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
         cdef np.ndarray tbeta = np.array([beta],dtype=self.dtype)
         if (verbose == True):
@@ -521,7 +522,7 @@ cdef class rsb_matrix:
         _err_check(errval)
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
-        return True
+        return sf
 
     def _find_block(self,frA,lrA,fcA,lcA):
         """

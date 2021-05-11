@@ -132,7 +132,7 @@ print(y)
 # Here general (nrhs=1) case:
 a.autotune()
 # Here with all the autotuning parameters specified:
-a.autotune(1.0,0,1,2.0,ord('N'),1.0,nrhs,ord('F'),1.0,False)
+a.autotune(1.0,1,2.0,ord('N'),1.0,nrhs,ord('F'),1.0,False)
 
 # Inefficient: reallocate y
 y = y + a * x
