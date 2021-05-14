@@ -194,7 +194,8 @@ cdef class rsb_matrix:
         cdef np.ndarray talpha = np.array([alpha],dtype=self.dtype)
         cdef np.ndarray tbeta = np.array([beta],dtype=self.dtype)
         assert x.flags.c_contiguous == y.flags.c_contiguous
-        assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
+        if nrhs is not 1:
+            assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         if x.shape[1] is not y.shape[1]:
            errval = lr.RSB_ERR_BADARGS
         else:
