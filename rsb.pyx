@@ -504,7 +504,7 @@ cdef class rsb_matrix:
                 assert False
         return lr_order
 
-    def autotune(self, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'F', beta=1.0, verbose = False):
+    def autotune(self, lr.rsb_int_t tn=0, lr.rsb_int_t maxr=1, lr.rsb_time_t tmax=2.0, lr.rsb_trans_t transA=b'N', alpha=1.0, lr.rsb_coo_idx_t nrhs=1, lr.rsb_flags_t order=b'C', beta=1.0, verbose = False):
         """
         Auto-tuner based on rsb_tune_spmm(): optimize either the matrix instance, the thread count or both for rsb_spmm() .
         (specific to rsb).
@@ -705,7 +705,7 @@ cdef class rsb_matrix:
     def save(self, char * filename=NULL):
         """
         Save to a specified file, in the Matrix Market format.
-        With NULL Input, to stdout.
+        With NULL filename, write to stdout.
         (specific to rsb).
         """
         cdef lr.rsb_err_t errval
