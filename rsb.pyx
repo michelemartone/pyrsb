@@ -688,6 +688,19 @@ cdef class rsb_matrix:
         """
         return True
 
+    def render(self, char * filename=NULL):
+        """
+        Render block structure to a specified file, in the Encapsulated Postscript (EPS) format.
+        With NULL filename, write to stdout.
+        (specific to rsb).
+        """
+        cdef lr.rsb_err_t errval
+        cdef lr.rsb_coo_idx_t pmWidth=512, pmHeight=512
+        cdef lr.rsb_marf_t rflags = lr.RSB_MARF_EPS_B
+        errval = lr.rsb_mtx_rndr(filename, self.mtxAp, pmWidth, pmHeight, rflags)
+        _err_check(errval)
+        return True
+
     def save(self, char * filename=NULL):
         """
         Save to a specified file, in the Matrix Market format.
