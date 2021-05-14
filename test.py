@@ -58,7 +58,7 @@ WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
-def bench_both(a, c, psf, nrhs=1):
+def bench_both(a, c, psf, order='C', nrhs=1):
     """
     Perform comparative benchmark: rsb vs csr.
     :param a: rsb matrix
@@ -74,8 +74,8 @@ def bench_both(a, c, psf, nrhs=1):
         print("Benchmarking SPMV on matrix ", a)
     if WANT_VERBOSE:
         a._mini_self_print_test()
-    x = np.ones([a.shape[1], nrhs], dtype=a.dtype)
-    y = np.ones([a.shape[0], nrhs], dtype=a.dtype)
+    x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
+    y = np.ones([a.shape[0], nrhs], dtype=a.dtype, order=order)
     nnz = a.nnz
     if WANT_VERBOSE:
         a.do_print()
@@ -116,13 +116,14 @@ def bench_both(a, c, psf, nrhs=1):
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
     printf(
-        "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d"
+        "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  order: %c"
         "  psf_mflops: %.2e  psf_dt: %.2e  rsb_mflops: %.2e  rsb_dt: %.2e  rsb_nsubm: %d\n",
         a.shape[0],
         a.shape[1],
         nnz,
         su,
         nrhs,
+        order,
         psf_mflops,
         psf_dt,
         rsb_mflops,
@@ -140,7 +141,8 @@ def bench_matrix(a, c):
     :param c: csr matrix
     """
     for nrhs in WANT_NRHS:
-        bench_both(a, c, WANT_PSF, nrhs)
+        bench_both(a, c, WANT_PSF, 'C', nrhs)
+        bench_both(a, c, WANT_PSF, 'F', nrhs)
     del a
     del c
 
