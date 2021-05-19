@@ -33,16 +33,16 @@ def bench(timeout, a, x, y):
 
     if zero_alloc:
         if (isinstance(a,rsb.rsb_matrix)):
-            while dt + rsb.rsb_time() < timeout:
+            while dt + rsb.rsb_time() < timeout or iterations == 0:
                 iterations = iterations + 1
                 a._spmm(x,y) # This form avoids the copy of y
         else:
-            while dt + rsb.rsb_time() < timeout:
+            while dt + rsb.rsb_time() < timeout or iterations == 0:
                 iterations = iterations + 1
                 # y += a._mul_multivector(x) # inefficient
                 sp.sparse._sparsetools.csr_matvecs(a.shape[0], a.shape[1], x.shape[1], a.indptr, a.indices, a.data, x.ravel(), y.ravel())
     else:
-        while dt + rsb.rsb_time() < timeout:
+        while dt + rsb.rsb_time() < timeout or iterations == 0:
             iterations = iterations + 1
             y += a * x  # Inefficient (result created repeatedly) see __mul__
     dt = dt + rsb.rsb_time()
