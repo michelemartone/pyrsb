@@ -52,10 +52,11 @@ def bench(timeout, a, x, y):
 
 WANT_MAX_DUMP_NNZ = 16
 WANT_VERBOSE = 0
-WANT_AUTOTUNE = 0
+WANT_AUTOTUNE = 0 # 0..2
 WANT_VERBOSE_TUNING = False
 WANT_PSF = "csr"
 WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
+WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
@@ -68,13 +69,6 @@ def bench_both(a, c, psf, order='C', nrhs=1):
     :param nrhs: number of right-hand-side vectors
     """
     timeout = 0.2
-    if WANT_AUTOTUNE:
-        if WANT_VERBOSE:
-            print("About to autotune matrix    ", a)
-        if WANT_AUTOTUNE > 1:
-            a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
-        else:
-            a.autotune(verbose=WANT_VERBOSE_TUNING)
     if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
     x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
@@ -143,9 +137,28 @@ def bench_matrix(a, c):
     :param a: rsb matrix
     :param c: csr matrix
     """
-    for nrhs in WANT_NRHS:
-        bench_both(a, c, WANT_PSF, 'C', nrhs)
-        bench_both(a, c, WANT_PSF, 'F', nrhs)
+    if WANT_AUTOTUNE == 0:
+        for nrhs in WANT_NRHS:
+            for order in WANT_ORDER:
+                bench_both(a, c, WANT_PSF, order, nrhs)
+    elif WANT_AUTOTUNE == 1:
+        o = a.copy()
+        if WANT_VERBOSE:
+            print("Will autotune matrix for SpMV    ", a)
+        o.autotune(verbose=WANT_VERBOSE_TUNING)
+        for nrhs in WANT_NRHS:
+            for order in WANT_ORDER:
+                 bench_both(o, c, WANT_PSF, order, nrhs)
+        del o
+    elif WANT_AUTOTUNE >= 2:
+        for nrhs in WANT_NRHS:
+            for order in WANT_ORDER:
+                o = a.copy()
+                if WANT_VERBOSE:
+                    print("Will autotune matrix for specific SpMM    ", a)
+                o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                bench_both(o, c, WANT_PSF, order, nrhs)
+                del o
     del a
     del c
 
