@@ -50,6 +50,7 @@ def bench(timeout, a, x, y):
     return (op_dt, dt, iterations)
 
 
+WANT_MAX_DUMP_NNZ = 16
 WANT_VERBOSE = 0
 WANT_AUTOTUNE = 0
 WANT_VERBOSE_TUNING = False
@@ -77,7 +78,7 @@ def bench_both(a, c, psf, order='C', nrhs=1):
     x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
     y = np.ones([a.shape[0], nrhs], dtype=a.dtype, order=order)
     nnz = a.nnz
-    if WANT_VERBOSE:
+    if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
         a.do_print()
         print("x=", x)
         print("y=", y)
@@ -130,7 +131,7 @@ def bench_both(a, c, psf, order='C', nrhs=1):
         rsb_dt,
         a.nsubm(),
     )
-    if WANT_VERBOSE:
+    if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
         print("y=", y)
 
 
