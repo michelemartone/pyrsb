@@ -524,6 +524,7 @@ cdef class rsb_matrix:
         errval = lr.rsb_tune_spmm(&self.mtxAp,&sf,&tn,maxr,tmax,transA_,talpha.data,NULL,nrhs,lr_order,NULL,ldB,tbeta.data,NULL,ldC);
         assert lr_order==lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER or lr_order==lr.RSB_FLAG_WANT_ROW_MAJOR_ORDER
         _err_check(errval)
+        self._refresh()
         if (verbose == True):
             self.opt_set(b"RSB_IO_WANT_VERBOSE_TUNING",b"0")
         return sf
