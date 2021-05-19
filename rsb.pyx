@@ -478,10 +478,13 @@ cdef class rsb_matrix:
         return True
 
     def _otn2obc(self,corder,transA,nrhs):
+        """
+        Compute operands' leading dimensions.
+        """
         cdef lr.rsb_flags_t lr_order = lr.RSB_FLAG_NOFLAGS
         if not corder:
             lr_order=lr.RSB_FLAG_WANT_COLUMN_MAJOR_ORDER
-            if transA == b'N':
+            if self._prt2lt(transA) == lr.RSB_TRANSPOSITION_N:
                 ldB=self.ncA
                 ldC=self.nrA
             else:

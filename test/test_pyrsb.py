@@ -345,6 +345,16 @@ def test__find_block(f_gen_tri):
     assert ( J == rJ ).all()
 
 
+def test__otn2obc_tri(f_gen_tri):
+    [V,I,J,nr,nc,nnz] = f_gen_tri
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    nrhs = 1
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'N',nrhs)
+    assert ( (cm_ldB,cm_ldC) == ( nr, nc ) )
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'N',nrhs)
+    assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
+
+
 def test_init_tuples_sym(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     mat = rsb_matrix((V, (I, J)),sym="S")
