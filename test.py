@@ -6,6 +6,7 @@ License: GPLv3+
 """
 import math
 import sys
+import os
 import numpy as np
 import scipy as sp
 import rsb
@@ -112,21 +113,114 @@ def bench_both(a, c, psf, order='C', nrhs=1):
     su = psf_dt / rsb_dt
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
-    printf(
-        "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  order: %c"
-        "  psf_mflops: %.2e  psf_dt: %.2e  rsb_mflops: %.2e  rsb_dt: %.2e  rsb_nsubm: %d\n",
-        a.shape[0],
-        a.shape[1],
-        nnz,
-        su,
-        nrhs,
-        order,
-        psf_mflops,
-        psf_dt,
-        rsb_mflops,
-        rsb_dt,
-        a.nsubm(),
-    )
+
+    if False:
+        # in the style of librsb's output (unfinished)
+        SEP = " "
+        if rsb_dt > psf_dt:
+            BESTCODE = order+":P" # FIXME: note order shouldn't be here
+        else:
+            BESTCODE = order+":R" # FIXME: note order shouldn't be here
+        TYPE = "D" # FIXME
+        if a._is_unsymmetric():
+            SYM = "G" # FIXME
+        else:
+            SYM = "S" # FIXME
+        TRANS = "N"
+        MTX = "A" # FIXME: matrix name
+        NT0 = 1 # FIXME: threads
+        if os.environ.get("OMP_NUM_THREADS") is not None:
+            NT0 = int(os.environ.get("OMP_NUM_THREADS"))
+            # FIXME : shall use RSB_IO_WANT_EXECUTING_THREADS instead
+        NT1 = NT0 # AT-NT
+        NT2 = NT0 # AT-SPS-NT
+        BPNZ = -1 # FIXME: see RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T
+        AT_BPNZ = -1 # FIXME: see RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T
+        NSUBM = a.nsubm() # FIXME
+        AT_NSUBM = a.nsubm()
+        RSBBEST_MFLOPS = rsb_mflops # FIXME: differentiate tuned from untuned
+        OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
+        SPS_OPTIME = psf_dt
+        AT_SPS_OPTIME = psf_dt
+        AT_OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
+        AT_TIME = 0 # FIXME
+        RWminBW_GBps = 1 # FIXME
+        CB_bpf = 1 # FIXME
+        AT_MS = 0 # FIXME: merge/split
+        CMFLOPS = 2*(a.shape[0]/1e6)*a.shape[1]*nrhs
+        if False: # FIXME: on complex
+            CMFLOPS *= 4
+        printf(
+                "pr:    %s"
+                "%s%s"
+                "%s%d"
+                "%s%d"
+                "%s%d"
+                "%s%d"
+                "%s%c"
+                "%s%c"
+                "%s%c"
+                "%s%d"
+                "%s%d"
+                "%s%d"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%d"
+                "%s%d"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+                "%s%.2e"
+            "\n",
+            BESTCODE,
+            SEP, MTX,
+            SEP, a.shape[0],
+            SEP, a.shape[1],
+            SEP, nnz,
+            SEP, nrhs,
+            SEP, TYPE,
+            SEP, SYM,
+            SEP, TRANS,
+            SEP, NT0,
+            SEP, NT1,
+            SEP, NT2,
+            SEP, BPNZ,
+            SEP, AT_BPNZ,
+            SEP, NSUBM,
+            SEP, AT_NSUBM,
+            SEP, RSBBEST_MFLOPS,
+            SEP, OPTIME,
+            SEP, SPS_OPTIME,
+            SEP, AT_OPTIME,
+            SEP, AT_SPS_OPTIME,
+            SEP, AT_TIME,
+            SEP, RWminBW_GBps,
+            SEP, CB_bpf,
+            SEP, AT_MS,
+            SEP, CMFLOPS
+        )
+    else:
+        printf(
+            "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  order: %c"
+            "  psf_mflops: %.2e  psf_dt: %.2e  rsb_mflops: %.2e  rsb_dt: %.2e  rsb_nsubm: %d\n",
+            a.shape[0],
+            a.shape[1],
+            nnz,
+            su,
+            nrhs,
+            order,
+            psf_mflops,
+            psf_dt,
+            rsb_mflops,
+            rsb_dt,
+            a.nsubm(),
+        )
     if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
         print("y=", y)
 
