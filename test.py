@@ -52,7 +52,7 @@ def bench(timeout, a, x, y):
 
 WANT_MAX_DUMP_NNZ = 16
 WANT_VERBOSE = 0
-WANT_AUTOTUNE = 0 # 0..3
+WANT_AUTOTUNE = 0 # 0..
 WANT_VERBOSE_TUNING = False
 WANT_PSF = "csr"
 WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -157,17 +157,16 @@ def bench_matrix(a, c):
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 bench_both(a, c, WANT_PSF, order, nrhs)
-    elif WANT_AUTOTUNE == 3:
+    elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
                 o = a.copy()
                 if WANT_VERBOSE:
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
-                o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                for i in range(2,+WANT_AUTOTUNE):
+                    o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 bench_both(o, c, WANT_PSF, order, nrhs)
                 del o
-    elif WANT_AUTOTUNE >= 4:
-        raise ValueError("Unrecognized WANT_AUTOTUNE")
     del a
     del c
 
