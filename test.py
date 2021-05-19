@@ -68,9 +68,13 @@ def bench_both(a, c, psf, order='C', nrhs=1):
     :param nrhs: number of right-hand-side vectors
     """
     timeout = 0.2
-    # timeout=2.0
     if WANT_AUTOTUNE:
-        a.autotune(verbose=WANT_VERBOSE_TUNING)
+        if WANT_VERBOSE:
+            print("About to autotune matrix    ", a)
+        if WANT_AUTOTUNE > 1:
+            a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+        else:
+            a.autotune(verbose=WANT_VERBOSE_TUNING)
     if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
     x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
