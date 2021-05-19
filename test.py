@@ -150,7 +150,7 @@ def bench_matrix(a, c):
             for order in WANT_ORDER:
                  bench_both(o, c, WANT_PSF, order, nrhs)
         del o
-    elif WANT_AUTOTUNE >= 2:
+    elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
                 if WANT_VERBOSE:
@@ -166,6 +166,8 @@ def bench_matrix(a, c):
                 o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 bench_both(o, c, WANT_PSF, order, nrhs)
                 del o
+    elif WANT_AUTOTUNE >= 4:
+        raise ValueError("Unrecognized WANT_AUTOTUNE")
     del a
     del c
 
