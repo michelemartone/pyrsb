@@ -50,6 +50,18 @@ def gen_tri(dtype=prv_t):
     return [V,I,J,2,2,3]
 
 
+def gen_rect(dtype=prv_t):
+    V = numpy.array([11.0, 60.0],dtype=dtype)
+    I = [0, 5]
+    J = [0, 0]
+    return [V,I,J,6,1,2]
+
+
+@pytest.fixture(params=rsb_dtypes)
+def f_gen_rect(request):
+    return gen_rect(dtype=request.param)
+
+
 @pytest.fixture(params=rsb_dtypes)
 def f_gen_tri(request):
     return gen_tri(dtype=request.param)
@@ -343,6 +355,26 @@ def test__find_block(f_gen_tri):
     assert ( V == rV ).all()
     assert ( I == rI ).all()
     assert ( J == rJ ).all()
+
+
+def test__otn2obc_rect_n(f_gen_rect):
+    [V,I,J,nr,nc,nnz] = f_gen_rect
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    nrhs = 2
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'N',nrhs)
+    assert ( (cm_ldB,cm_ldC) == ( nc, nr ) )
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'N',nrhs)
+    assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
+
+
+def test__otn2obc_rect_t(f_gen_rect):
+    [V,I,J,nr,nc,nnz] = f_gen_rect
+    rmat = rsb_matrix((V, (I, J)),[nr,nc])
+    nrhs = 2
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'T',nrhs)
+    assert ( (cm_ldB,cm_ldC) == ( nr, nc ) )
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'T',nrhs)
+    assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
 
 
 def test__otn2obc_tri(f_gen_tri):
