@@ -55,13 +55,14 @@ WANT_MAX_DUMP_NNZ = 16
 WANT_VERBOSE = 0
 WANT_AUTOTUNE = 0 # 0..
 WANT_VERBOSE_TUNING = False
+WANT_LIBRSB_STYLE_OUTPUT = False
 WANT_PSF = "csr"
 WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
 WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
-def bench_record(a, psf, rsb_dt, psf_dt, order, nrhs):
+def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
     """
     Print benchmark record line
     """
@@ -71,7 +72,7 @@ def bench_record(a, psf, rsb_dt, psf_dt, order, nrhs):
     su = psf_dt / rsb_dt
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
-    if False:
+    if WANT_LIBRSB_STYLE_OUTPUT:
         # in the style of librsb's output (unfinished)
         SEP = " "
         if rsb_dt > psf_dt:
@@ -84,7 +85,7 @@ def bench_record(a, psf, rsb_dt, psf_dt, order, nrhs):
         else:
             SYM = "S" # FIXME
         TRANS = "N"
-        MTX = "A" # FIXME: matrix name
+        MTX = mtxname
         NT0 = 1 # FIXME: threads
         if os.environ.get("OMP_NUM_THREADS") is not None:
             NT0 = int(os.environ.get("OMP_NUM_THREADS"))
@@ -182,7 +183,7 @@ def bench_record(a, psf, rsb_dt, psf_dt, order, nrhs):
         print("y=", y)
 
 
-def bench_both(a, c, psf, order='C', nrhs=1):
+def bench_both(a, c, psf, mtxname, order='C', nrhs=1):
     """
     Perform comparative benchmark: rsb vs csr.
     :param a: rsb matrix
@@ -229,10 +230,10 @@ def bench_both(a, c, psf, order='C', nrhs=1):
             rsb_mflops,
             " MFLOPS",
         )
-    bench_record(a, psf, rsb_dt, psf_dt, order, nrhs)
+    bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs)
 
 
-def bench_matrix(a, c):
+def bench_matrix(a, c, mtxname):
     """
     Perform comparative benchmark: rsb vs csr.
     :param a: rsb matrix
@@ -241,7 +242,7 @@ def bench_matrix(a, c):
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                bench_both(a, c, WANT_PSF, order, nrhs)
+                bench_both(a, c, WANT_PSF, mtxname, order, nrhs)
     elif WANT_AUTOTUNE == 1:
         o = a.copy()
         if WANT_VERBOSE:
@@ -249,7 +250,7 @@ def bench_matrix(a, c):
         o.autotune(verbose=WANT_VERBOSE_TUNING)
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                 bench_both(o, c, WANT_PSF, order, nrhs)
+                 bench_both(o, c, WANT_PSF, mtxname, order, nrhs)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
@@ -257,7 +258,7 @@ def bench_matrix(a, c):
                 if WANT_VERBOSE:
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
-                bench_both(a, c, WANT_PSF, order, nrhs)
+                bench_both(a, c, WANT_PSF, mtxname, order, nrhs)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -266,7 +267,7 @@ def bench_matrix(a, c):
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
-                bench_both(o, c, WANT_PSF, order, nrhs)
+                bench_both(o, c, WANT_PSF, mtxname, order, nrhs)
                 del o
     del a
     del c
@@ -291,7 +292,7 @@ def bench_random_files():
         a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
         ct = ct + rsb.rsb_time()
         printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz,gt,a.nnz/gt,ct)
-        bench_matrix(a, c)
+        bench_matrix(a, c, "random")
 
 
 def bench_file(filename):
@@ -310,7 +311,9 @@ def bench_file(filename):
     if a is not None:
         (I, J, V) = a.find()
         c = sp.sparse.csr_matrix((V, (I, J)))
-        bench_matrix(a, c)
+        ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
+        ( mtxname, _ ) = os.path.splitext(mtxname)
+        bench_matrix(a, c, mtxname)
 
 
 if len(sys.argv) > 1:
