@@ -86,10 +86,7 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
             SYM = "S" # FIXME
         TRANS = "N"
         MTX = mtxname
-        NT0 = 1 # FIXME: threads
-        if os.environ.get("OMP_NUM_THREADS") is not None:
-            NT0 = int(os.environ.get("OMP_NUM_THREADS"))
-            # FIXME : shall use RSB_IO_WANT_EXECUTING_THREADS instead
+        NT0 = rsb._get_rsb_threads()
         NT1 = NT0 # AT-NT
         NT2 = NT0 # AT-SPS-NT
         BPNZ = -1 # FIXME: see RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T
