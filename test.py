@@ -61,59 +61,16 @@ WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
-def bench_both(a, c, psf, order='C', nrhs=1):
+def bench_record(a, psf, rsb_dt, psf_dt, order, nrhs):
     """
-    Perform comparative benchmark: rsb vs csr.
-    :param a: rsb matrix
-    :param c: csr matrix
-    :param psf: format string for matrix c
-    :param nrhs: number of right-hand-side vectors
+    Print benchmark record line
     """
-    timeout = 0.2
-    if WANT_VERBOSE:
-        print("Benchmarking SPMV on matrix ", a)
-    x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
-    y = np.ones([a.shape[0], nrhs], dtype=a.dtype, order=order)
     nnz = a.nnz
-    if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
-        a.do_print()
-        print("x=", x)
-        print("y=", y)
-        print("Benchmarking y<-A*x+y ... ")
-    (psf_dt, dt, iterations) = bench(timeout, c, x, y)
     psf_mflops = (2 * nrhs * nnz) / (psf_dt * 1e6)
-    if WANT_VERBOSE:
-        print(
-            "Done ",
-            iterations,
-            " ",
-            psf,
-            " SPMV iterations in ",
-            dt,
-            " s: ",
-            psf_dt,
-            "s per iteration, ",
-            psf_mflops,
-            " MFLOPS",
-        )
-    (rsb_dt, dt, iterations) = bench(timeout, a, x, y)
     rsb_mflops = (2 * nrhs * nnz) / (rsb_dt * 1e6)
-    if WANT_VERBOSE:
-        print(
-            "Done ",
-            iterations,
-            " rsb SPMV iterations in ",
-            dt,
-            " s: ",
-            rsb_dt,
-            "s per iteration, ",
-            rsb_mflops,
-            " MFLOPS",
-        )
     su = psf_dt / rsb_dt
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
-
     if False:
         # in the style of librsb's output (unfinished)
         SEP = " "
@@ -223,6 +180,56 @@ def bench_both(a, c, psf, order='C', nrhs=1):
         )
     if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
         print("y=", y)
+
+
+def bench_both(a, c, psf, order='C', nrhs=1):
+    """
+    Perform comparative benchmark: rsb vs csr.
+    :param a: rsb matrix
+    :param c: csr matrix
+    :param psf: format string for matrix c
+    :param nrhs: number of right-hand-side vectors
+    """
+    timeout = 0.2
+    if WANT_VERBOSE:
+        print("Benchmarking SPMV on matrix ", a)
+    x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
+    y = np.ones([a.shape[0], nrhs], dtype=a.dtype, order=order)
+    nnz = a.nnz
+    if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
+        a.do_print()
+        print("x=", x)
+        print("y=", y)
+        print("Benchmarking y<-A*x+y ... ")
+    (psf_dt, dt, iterations) = bench(timeout, c, x, y)
+    if WANT_VERBOSE:
+        print(
+            "Done ",
+            iterations,
+            " ",
+            psf,
+            " SPMV iterations in ",
+            dt,
+            " s: ",
+            psf_dt,
+            "s per iteration, ",
+            psf_mflops,
+            " MFLOPS",
+        )
+    (rsb_dt, dt, iterations) = bench(timeout, a, x, y)
+    if WANT_VERBOSE:
+        print(
+            "Done ",
+            iterations,
+            " rsb SPMV iterations in ",
+            dt,
+            " s: ",
+            rsb_dt,
+            "s per iteration, ",
+            rsb_mflops,
+            " MFLOPS",
+        )
+    bench_record(a, psf, rsb_dt, psf_dt, order, nrhs)
 
 
 def bench_matrix(a, c):
