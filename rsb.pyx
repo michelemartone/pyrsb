@@ -21,7 +21,7 @@ import cython
 cimport cython
 
 __all__ = [
-    'rsb_matrix', 'rsb_time', 'rsb_dtype',
+    'rsb_matrix', 'rsb_time', 'rsb_dtype', '_get_rsb_threads',
     '_print_vec', '_err_check', '_dt2dt'
 ]
 
@@ -108,6 +108,15 @@ cpdef rsb_time():
     cdef lr.rsb_time_t rt
     rt = <lr.rsb_time_t>lr.rsb_time()
     return rt
+
+cpdef _get_rsb_threads():
+    """Return current LIBRSB threads."""
+    cdef int iof = lr.RSB_IO_WANT_EXECUTING_THREADS # FIXME
+    #cdef lr.rsb_opt_t iof = lr.RSB_IO_WANT_EXECUTING_THREADS
+    cdef lr.rsb_int_t nt = 0
+    cdef lr.rsb_err_t errval = lr.rsb_lib_get_opt(iof, &nt)
+    _err_check(errval)
+    return nt
 
 def _print_vec(np.ndarray x, mylen=0):
     """Print a vector, possibly overriding its length (which is DANGEROUS)."""

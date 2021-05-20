@@ -8,7 +8,7 @@ import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse import csc_matrix
 from pyrsb import rsb_matrix
-from pyrsb import _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
+from pyrsb import _get_rsb_threads, _print_vec, rsb_time, _err_check, rsb_dtype, _dt2dt
 import pytest
 from pytest import raises as assert_raises
 from time import sleep
@@ -27,6 +27,10 @@ def test__err_check_err():
     _err_check(1,want_strict=False)
     with assert_raises(AssertionError):
         _err_check(1,want_strict=True)
+
+
+def test__get_rsb_threads():
+    assert _get_rsb_threads() > 0
 
 
 def gen_tri_csr_larger():
