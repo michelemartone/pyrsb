@@ -80,10 +80,7 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
         else:
             BESTCODE = order+":R" # FIXME: note order shouldn't be here
         TYPE = a._get_typechar()
-        if a._is_unsymmetric():
-            SYM = "G" # FIXME
-        else:
-            SYM = "S" # FIXME
+        SYM = a._get_symchar()
         TRANS = "N"
         MTX = mtxname
         NT0 = rsb._get_rsb_threads()

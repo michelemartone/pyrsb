@@ -128,6 +128,7 @@ def test_init_from_none_none():
     assert mat.shape == (0, 0)
     assert mat.nnz == 0
     assert mat._is_unsymmetric() == True
+    assert mat._get_symchar() == 'G'
 
 
 def test_init_tuple_csr_f32():
@@ -136,6 +137,7 @@ def test_init_tuple_csr_f32():
     assert mat.nnz == nnz
     assert mat.shape == (nr, nc)
     assert mat._is_unsymmetric() == True
+    assert mat._get_symchar() == 'G'
 
 
 def test_init_tuple_csr():
@@ -144,6 +146,7 @@ def test_init_tuple_csr():
     assert mat.nnz == nnz
     assert mat.shape == (nr, nc)
     assert mat._is_unsymmetric() == True
+    assert mat._get_symchar() == 'G'
 
 
 def test_init_tuple_csr_larger():
@@ -398,6 +401,7 @@ def test_init_tuples_sym(f_gen_tri):
     assert mat.shape == (nr, nc)
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == False
+    assert mat._get_symchar() == 'S'
 
 
 def test_init_tuples_wrong_sym(f_gen_tri):
