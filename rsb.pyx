@@ -167,10 +167,13 @@ cdef class rsb_matrix:
         return chr(_dt2tc(self._get_dtype()))
 
     def _get_symchar(self):
-        if self._is_unsymmetric():
+        cdef lr.rsb_err_t errval
+        cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
+        errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
+        if ( ( flagsA & (lr.RSB_FLAG_HERMITIAN | lr.RSB_FLAG_SYMMETRIC ) ) == lr.RSB_FLAG_NOFLAGS ):
             return 'G'
         else:
-            return 'S' # FIXME: catch-all
+            return 'S'
 
     def _psf2lsf(self, sym):
         """
@@ -613,10 +616,7 @@ cdef class rsb_matrix:
         RSB matrix symmetry.
         (specific to rsb).
         """
-        cdef lr.rsb_err_t errval
-        cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
-        if ( ( flagsA & (lr.RSB_FLAG_HERMITIAN | lr.RSB_FLAG_SYMMETRIC ) ) == lr.RSB_FLAG_NOFLAGS ):
+        if self._get_symchar() == 'G':
             return True
         else:
             return False
