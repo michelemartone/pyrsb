@@ -75,10 +75,11 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
     if WANT_LIBRSB_STYLE_OUTPUT:
         # in the style of librsb's output (unfinished)
         SEP = " "
+        BESTCODE = order # FIXME: note order shouldn't be here
         if rsb_dt > psf_dt:
-            BESTCODE = order+":P" # FIXME: note order shouldn't be here
+            BESTCODE += ":P"
         else:
-            BESTCODE = order+":R" # FIXME: note order shouldn't be here
+            BESTCODE += ":R"
         TYPE = a._get_typechar()
         SYM = a._get_symchar()
         TRANS = "N"
@@ -90,18 +91,27 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         AT_BPNZ = a._idx_bpnz()
         NSUBM = brdict['nsubm']
         AT_NSUBM = a.nsubm()
-        RSBBEST_MFLOPS = rsb_mflops # FIXME: differentiate tuned from untuned
+        RSBBEST_MFLOPS = rsb_mflops
         OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
         SPS_OPTIME = psf_dt
         AT_SPS_OPTIME = psf_dt
-        AT_OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
+        AT_OPTIME = rsb_dt
         AT_TIME = brdict['at_time']
-        RWminBW_GBps = 1 # FIXME
-        CB_bpf = 1 # FIXME
-        AT_MS = 0 # FIXME: merge/split
-        CMFLOPS = 2*(a.shape[0]/1e6)*a.shape[1]*nrhs
+        RWminBW_GBps = 1 # FIXME (shall be read + write traffic of operands and matrix)
+        AT_MS = 0 # fixed to 0 here
+        CMFLOPS = 2*(nnz/1e6)*nrhs
+        if not a._is_unsymmetric():
+            CMFLOPS *= 2
         if a._is_complex():
             CMFLOPS *= 4
+        el_sizes = {
+            'D': 8,
+            'S': 4,
+            'C': 8,
+            'Z': 16
+        }
+        mt = 0.0 + a._total_size + el_sizes[a._get_typechar()]*(a.shape[0]+a.shape[1])*nrhs # minimal traffic
+        CB_bpf = ( 1.0 / ( 1e6 * CMFLOPS ) ) * mt
         printf(
                 "pr:    %s"
                 "%s%s"
