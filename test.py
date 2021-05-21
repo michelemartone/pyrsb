@@ -62,7 +62,7 @@ WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 
 
-def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
+def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
     """
     Print benchmark record line
     """
@@ -82,7 +82,7 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
         TYPE = a._get_typechar()
         SYM = a._get_symchar()
         TRANS = "N"
-        MTX = mtxname
+        MTX = brdict['mtxname']
         NT0 = rsb._get_rsb_threads()
         NT1 = NT0 # AT-NT
         NT2 = NT0 # AT-SPS-NT
@@ -177,7 +177,7 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
         print("y=", y)
 
 
-def bench_both(a, c, psf, mtxname, order='C', nrhs=1):
+def bench_both(a, c, psf, brdict, order='C', nrhs=1):
     """
     Perform comparative benchmark: rsb vs csr.
     :param a: rsb matrix
@@ -224,7 +224,7 @@ def bench_both(a, c, psf, mtxname, order='C', nrhs=1):
             rsb_mflops,
             " MFLOPS",
         )
-    bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs)
+    bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
 
 
 def bench_matrix(a, c, mtxname):
@@ -233,10 +233,13 @@ def bench_matrix(a, c, mtxname):
     :param a: rsb matrix
     :param c: csr matrix
     """
+    brdict = {
+        'mtxname': mtxname
+	}
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                bench_both(a, c, WANT_PSF, mtxname, order, nrhs)
+                bench_both(a, c, WANT_PSF, brdict, order, nrhs)
     elif WANT_AUTOTUNE == 1:
         o = a.copy()
         if WANT_VERBOSE:
@@ -244,7 +247,7 @@ def bench_matrix(a, c, mtxname):
         o.autotune(verbose=WANT_VERBOSE_TUNING)
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                 bench_both(o, c, WANT_PSF, mtxname, order, nrhs)
+                 bench_both(o, c, WANT_PSF, brdict, order, nrhs)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
@@ -252,7 +255,7 @@ def bench_matrix(a, c, mtxname):
                 if WANT_VERBOSE:
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
-                bench_both(a, c, WANT_PSF, mtxname, order, nrhs)
+                bench_both(a, c, WANT_PSF, brdict, order, nrhs)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -261,7 +264,7 @@ def bench_matrix(a, c, mtxname):
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
-                bench_both(o, c, WANT_PSF, mtxname, order, nrhs)
+                bench_both(o, c, WANT_PSF, brdict, order, nrhs)
                 del o
     del a
     del c
