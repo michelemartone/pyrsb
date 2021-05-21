@@ -178,6 +178,7 @@ def test_init_tuples(f_gen_tri):
     assert mat.shape == (nr, nc)
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == True
+    assert mat._get_typechar() in [ 'S', 'D', 'C', 'Z' ]
 
 
 def test_init_tuples_and_dims(f_gen_tri):

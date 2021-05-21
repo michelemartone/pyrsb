@@ -163,6 +163,9 @@ cdef class rsb_matrix:
     def _get_dtype(self):
         return self.dtypeA
 
+    def _get_typechar(self):
+        return chr(_dt2tc(self._get_dtype()))
+
     def _psf2lsf(self, sym):
         """
         Python Symmetry Flag to librsb Symmetry Flag.

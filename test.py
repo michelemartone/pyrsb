@@ -79,7 +79,7 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
             BESTCODE = order+":P" # FIXME: note order shouldn't be here
         else:
             BESTCODE = order+":R" # FIXME: note order shouldn't be here
-        TYPE = "D" # FIXME
+        TYPE = a._get_typechar()
         if a._is_unsymmetric():
             SYM = "G" # FIXME
         else:
