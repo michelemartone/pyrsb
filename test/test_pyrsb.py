@@ -418,11 +418,12 @@ def test_init_tuples_sym(f_gen_tri):
 
 def test_init_tuples_herm(f_gen_tri_complex):
     [V,I,J,nr,nc,nnz] = f_gen_tri_complex
-    mat = rsb_matrix((V, (I, J)),sym="H")
+    mat = rsb_matrix((V, (I, J)),sym="H",dtype=V.dtype) # Note: dtype not inherited from V.
     assert mat.shape == (nr, nc)
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == False
     assert mat._get_symchar() == 'H'
+    assert mat._is_complex()
 
 
 def test_init_tuples_wrong_sym(f_gen_tri):

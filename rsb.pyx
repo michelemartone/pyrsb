@@ -45,6 +45,9 @@ ctypedef double prv_t
 #rsb_dtype = np.float32
 #ctypedef float prv_t
 
+def _is_complex_rsb_supported(dtype):
+    return ( dtype == np.complex128 or dtype == np.complex64 )
+
 def _dt2dt(dtype):
     if isinstance(dtype, np.dtype) or isinstance(dtype, type):
         if dtype == np.float64:
@@ -620,6 +623,13 @@ cdef class rsb_matrix:
         (specific to rsb).
         """
         return self.ncA
+
+    def _is_complex(self):
+        """
+        Complex scalar type?
+        (specific to rsb).
+        """
+        return _is_complex_rsb_supported(self.dtype)
 
     def _is_unsymmetric(self):
         """
