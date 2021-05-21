@@ -86,8 +86,8 @@ def bench_record(a, psf, mtxname, rsb_dt, psf_dt, order, nrhs):
         NT0 = rsb._get_rsb_threads()
         NT1 = NT0 # AT-NT
         NT2 = NT0 # AT-SPS-NT
-        BPNZ = -1 # FIXME: see RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T
-        AT_BPNZ = -1 # FIXME: see RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T
+        BPNZ = a._idx_bpnz()
+        AT_BPNZ = a._idx_bpnz() # FIXME: differentiate tuned from untuned
         NSUBM = a.nsubm() # FIXME
         AT_NSUBM = a.nsubm()
         RSBBEST_MFLOPS = rsb_mflops # FIXME: differentiate tuned from untuned
