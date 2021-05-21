@@ -158,6 +158,7 @@ cdef class rsb_matrix:
     cdef lr.rsb_nnz_idx_t nnzA # see http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.nnz.html#scipy.sparse.csr_matrix.nnz
     cdef lr.rsb_blk_idx_t nsubmA
     cdef lr.rsb_real_t idx_bpnz
+    cdef size_t total_size
     cdef lr.rsb_flags_t flagsA
     cdef type dtypeA
     idx_dtype = np.int32
@@ -603,6 +604,13 @@ cdef class rsb_matrix:
         """
         return self.nsubmA
 
+    @property
+    def _total_size(self):
+        """
+        (specific to rsb).
+        """
+        return self.total_size
+
     def _idx_bpnz(self):
         """
         Index storage bytes per nonzero.
@@ -650,6 +658,7 @@ cdef class rsb_matrix:
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_TYPECODE__TO__RSB_TYPE_T,&self.typecode)
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_LEAVES_COUNT__TO__RSB_BLK_INDEX_T,&self.nsubmA)
         errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_INDEX_STORAGE_IN_BYTES_PER_NNZ__TO__RSB_REAL_T,&self.idx_bpnz)
+        errval |= lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_TOTAL_SIZE__TO__SIZE_T,&self.total_size)
         _err_check(errval,want_strict=True)
 
     def find(self):

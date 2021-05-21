@@ -140,6 +140,7 @@ def test_init_from_none_none():
     #TODO; enable these one 1.2.0.10 and 1.3 available:
     #assert mat._idx_bpnz() > 0
     #assert mat._idx_bpnz() <= max_idx_bpnz
+    assert mat._total_size > 0
 
 
 def test_init_tuple_csr_f32():
