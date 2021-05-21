@@ -18,6 +18,7 @@ rsb_real_dtypes = [ numpy.float32, numpy.float64 ]
 rsb_cplx_dtypes = [ numpy.complex64, numpy.complex128 ]
 rsb_dtypes = rsb_real_dtypes + rsb_cplx_dtypes
 prv_t = rsb_dtype
+max_idx_bpnz = 8
 
 
 def test__err_check_ok():
@@ -189,6 +190,8 @@ def test_init_tuples(f_gen_tri):
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == True
     assert mat._get_typechar() in [ 'S', 'D', 'C', 'Z' ]
+    assert mat._idx_bpnz() > 0
+    assert mat._idx_bpnz() <= max_idx_bpnz
 
 
 def test_init_tuples_and_dims(f_gen_tri):
@@ -197,6 +200,8 @@ def test_init_tuples_and_dims(f_gen_tri):
     assert mat.shape == (nr, nc)
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == True
+    assert mat._idx_bpnz() > 0
+    assert mat._idx_bpnz() <= max_idx_bpnz
 
 
 def test_init_tuples__raises(f_gen_tri):
