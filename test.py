@@ -95,7 +95,7 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         SPS_OPTIME = psf_dt
         AT_SPS_OPTIME = psf_dt
         AT_OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
-        AT_TIME = 0 # FIXME
+        AT_TIME = brdict['at_time']
         RWminBW_GBps = 1 # FIXME
         CB_bpf = 1 # FIXME
         AT_MS = 0 # FIXME: merge/split
@@ -234,8 +234,9 @@ def bench_matrix(a, c, mtxname):
     :param c: csr matrix
     """
     brdict = {
-        'mtxname': mtxname
-	}
+        'mtxname': mtxname,
+        'at_time': 0.0
+    }
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -244,7 +245,9 @@ def bench_matrix(a, c, mtxname):
         o = a.copy()
         if WANT_VERBOSE:
             print("Will autotune matrix for SpMV    ", a)
+        at_time = rsb.rsb_time()
         o.autotune(verbose=WANT_VERBOSE_TUNING)
+        brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
                  bench_both(o, c, WANT_PSF, brdict, order, nrhs)
@@ -254,7 +257,9 @@ def bench_matrix(a, c, mtxname):
             for order in WANT_ORDER:
                 if WANT_VERBOSE:
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
+                at_time = rsb.rsb_time()
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                brdict['at_time'] = rsb.rsb_time() - at_time
                 bench_both(a, c, WANT_PSF, brdict, order, nrhs)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
@@ -262,8 +267,10 @@ def bench_matrix(a, c, mtxname):
                 o = a.copy()
                 if WANT_VERBOSE:
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
+                at_time = rsb.rsb_time()
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                brdict['at_time'] = rsb.rsb_time() - at_time
                 bench_both(o, c, WANT_PSF, brdict, order, nrhs)
                 del o
     del a
