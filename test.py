@@ -88,7 +88,7 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         NT2 = NT0 # AT-SPS-NT
         BPNZ = brdict['bpnz']
         AT_BPNZ = a._idx_bpnz()
-        NSUBM = a.nsubm() # FIXME
+        NSUBM = brdict['nsubm']
         AT_NSUBM = a.nsubm()
         RSBBEST_MFLOPS = rsb_mflops # FIXME: differentiate tuned from untuned
         OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
@@ -236,6 +236,7 @@ def bench_matrix(a, c, mtxname):
     brdict = {
         'mtxname': mtxname,
         'at_time': 0.0,
+        'nsubm': a.nsubm(),
         'bpnz': a._idx_bpnz()
     }
     if WANT_AUTOTUNE == 0:
