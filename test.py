@@ -86,8 +86,8 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         NT0 = rsb._get_rsb_threads()
         NT1 = NT0 # AT-NT
         NT2 = NT0 # AT-SPS-NT
-        BPNZ = a._idx_bpnz()
-        AT_BPNZ = a._idx_bpnz() # FIXME: differentiate tuned from untuned
+        BPNZ = brdict['bpnz']
+        AT_BPNZ = a._idx_bpnz()
         NSUBM = a.nsubm() # FIXME
         AT_NSUBM = a.nsubm()
         RSBBEST_MFLOPS = rsb_mflops # FIXME: differentiate tuned from untuned
@@ -115,8 +115,8 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
                 "%s%d"
                 "%s%d"
                 "%s%d"
-                "%s%.2e"
-                "%s%.2e"
+                "%s%.2f"
+                "%s%.2f"
                 "%s%d"
                 "%s%d"
                 "%s%.2e"
@@ -235,7 +235,8 @@ def bench_matrix(a, c, mtxname):
     """
     brdict = {
         'mtxname': mtxname,
-        'at_time': 0.0
+        'at_time': 0.0,
+        'bpnz': a._idx_bpnz()
     }
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
