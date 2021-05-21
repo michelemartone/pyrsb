@@ -60,6 +60,7 @@ WANT_PSF = "csr"
 WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
 WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
+WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
 def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
@@ -316,20 +317,21 @@ def bench_file(filename):
     Perform comparative benchmark on matrices loaded from Matrix Market files.
     :param filename: a Matrix Market file
     """
-    print("# loading from file ", filename)
-    lt = - rsb.rsb_time()
-    a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"),dtype=np.float64)
-    lt = lt + rsb.rsb_time()
-    printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
-    printf("# loaded as type %s (default is %s)\n", a.dtype, rsb.rsb_dtype)
-    if not a._is_unsymmetric():
-        print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
-    if a is not None:
-        (I, J, V) = a.find()
-        c = sp.sparse.csr_matrix((V, (I, J)))
-        ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
-        ( mtxname, _ ) = os.path.splitext(mtxname)
-        bench_matrix(a, c, mtxname)
+    for dtype in WANT_DTYPES:
+    	print("# loading from file ", filename)
+    	lt = - rsb.rsb_time()
+    	a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"),dtype=dtype)
+    	lt = lt + rsb.rsb_time()
+    	printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
+    	printf("# loaded as type %s (default is %s)\n", a.dtype, rsb.rsb_dtype)
+    	if not a._is_unsymmetric():
+    	    print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
+    	if a is not None:
+    	    (I, J, V) = a.find()
+    	    c = sp.sparse.csr_matrix((V, (I, J)))
+    	    ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
+    	    ( mtxname, _ ) = os.path.splitext(mtxname)
+    	    bench_matrix(a, c, mtxname)
 
 
 if len(sys.argv) > 1:
