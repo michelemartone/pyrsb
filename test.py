@@ -100,7 +100,7 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         CB_bpf = 1 # FIXME
         AT_MS = 0 # FIXME: merge/split
         CMFLOPS = 2*(a.shape[0]/1e6)*a.shape[1]*nrhs
-        if False: # FIXME: on complex
+        if a._is_complex():
             CMFLOPS *= 4
         printf(
                 "pr:    %s"
