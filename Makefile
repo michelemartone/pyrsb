@@ -52,6 +52,7 @@ test: rsb.so
 	python3 demo1.py
 	python3 demo2.py
 	python3 test.py A.mtx
+	python3 test.py H.mtx
 	python3 test.py
 
 itest:

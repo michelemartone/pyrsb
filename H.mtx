@@ -1,0 +1,33 @@
+%%MatrixMarket matrix coordinate complex hermitian
+% a positive definitive matrix, as in
+% http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/lpp/essl.html.en_US/html/essl43.html
+% *                        *
+% | 99  12  13  14  15  16 |
+% | 12  99  12  13  14  15 |
+% | 13  12  99  12  13  14 |
+% | 14  13  12  99  12  13 |
+% | 15  14  13  12  99  12 |
+% | 16  15  14  13  12  99 |
+% *                        *
+6 6 21
+1 1 99 0
+2 1 12 0
+2 2 99 0
+3 1 13 0
+3 2 12 0
+3 3 99 0
+4 1 14 0
+4 2 13 0
+4 3 12 0
+4 4 99 0
+5 1 15 0
+5 2 14 0
+5 3 13 0
+5 4 12 0
+5 5 99 0
+6 1 16 0
+6 2 15 0
+6 3 14 0
+6 4 13 0
+6 5 12 0
+6 6 99 0

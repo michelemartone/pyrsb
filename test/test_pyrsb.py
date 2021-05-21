@@ -14,7 +14,9 @@ from pytest import raises as assert_raises
 from time import sleep
 
 
-rsb_dtypes = [numpy.float32, numpy.float64, numpy.complex64, numpy.complex128 ]
+rsb_real_dtypes = [ numpy.float32, numpy.float64 ]
+rsb_cplx_dtypes = [ numpy.complex64, numpy.complex128 ]
+rsb_dtypes = rsb_real_dtypes + rsb_cplx_dtypes
 prv_t = rsb_dtype
 
 
@@ -68,6 +70,11 @@ def f_gen_rect(request):
 
 @pytest.fixture(params=rsb_dtypes)
 def f_gen_tri(request):
+    return gen_tri(dtype=request.param)
+
+
+@pytest.fixture(params=rsb_cplx_dtypes)
+def f_gen_tri_complex(request):
     return gen_tri(dtype=request.param)
 
 
@@ -402,6 +409,15 @@ def test_init_tuples_sym(f_gen_tri):
     assert mat.nnz == nnz
     assert mat._is_unsymmetric() == False
     assert mat._get_symchar() == 'S'
+
+
+def test_init_tuples_herm(f_gen_tri_complex):
+    [V,I,J,nr,nc,nnz] = f_gen_tri_complex
+    mat = rsb_matrix((V, (I, J)),sym="H")
+    assert mat.shape == (nr, nc)
+    assert mat.nnz == nnz
+    assert mat._is_unsymmetric() == False
+    assert mat._get_symchar() == 'H'
 
 
 def test_init_tuples_wrong_sym(f_gen_tri):

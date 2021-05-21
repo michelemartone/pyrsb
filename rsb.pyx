@@ -172,6 +172,8 @@ cdef class rsb_matrix:
         errval = lr.rsb_mtx_get_info(self.mtxAp, lr.RSB_MIF_MATRIX_FLAGS__TO__RSB_FLAGS_T,&flagsA)
         if ( ( flagsA & (lr.RSB_FLAG_HERMITIAN | lr.RSB_FLAG_SYMMETRIC ) ) == lr.RSB_FLAG_NOFLAGS ):
             return 'G'
+        elif ( ( flagsA & (lr.RSB_FLAG_HERMITIAN) ) == lr.RSB_FLAG_HERMITIAN):
+            return 'H'
         else:
             return 'S'
 
