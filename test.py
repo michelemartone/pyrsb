@@ -72,6 +72,24 @@ TC2DT = {
 WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
+def print_perf_record(pr):
+    printf("pr:    ")
+    for field in list(pr):
+        value = pr[field]
+        if field in [ 'BPNZ', 'AT_BPNZ' ]:
+            printf("%.2f",value)
+        elif type(value) is int:
+            printf("%d",value)
+        elif type(value) is float:
+            printf("%.2e",value)
+        elif type(value) is str:
+            printf("%s",value)
+        else:
+            printf("?")
+        printf(" ")
+    printf("\n")
+
+
 def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
     """
     Print benchmark record line
@@ -122,61 +140,6 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         }
         mt = 0.0 + a._total_size + el_sizes[a._get_typechar()]*(a.shape[0]+a.shape[1])*nrhs # minimal traffic
         CB_bpf = ( 1.0 / ( 1e6 * CMFLOPS ) ) * mt
-        printf(
-                "pr:    %s"
-                "%s%s"
-                "%s%d"
-                "%s%d"
-                "%s%d"
-                "%s%d"
-                "%s%c"
-                "%s%c"
-                "%s%c"
-                "%s%d"
-                "%s%d"
-                "%s%d"
-                "%s%.2f"
-                "%s%.2f"
-                "%s%d"
-                "%s%d"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-                "%s%.2e"
-            "\n",
-            BESTCODE,
-            SEP, MTX,
-            SEP, a.shape[0],
-            SEP, a.shape[1],
-            SEP, nnz,
-            SEP, nrhs,
-            SEP, TYPE,
-            SEP, SYM,
-            SEP, TRANS,
-            SEP, NT0,
-            SEP, NT1,
-            SEP, NT2,
-            SEP, BPNZ,
-            SEP, AT_BPNZ,
-            SEP, NSUBM,
-            SEP, AT_NSUBM,
-            SEP, RSBBEST_MFLOPS,
-            SEP, OPTIME,
-            SEP, SPS_OPTIME,
-            SEP, AT_OPTIME,
-            SEP, AT_SPS_OPTIME,
-            SEP, AT_TIME,
-            SEP, RWminBW_GBps,
-            SEP, CB_bpf,
-            SEP, AT_MS,
-            SEP, CMFLOPS
-        )
     else:
         printf(
             "PYRSB: nr: %d  nc: %d  nnz: %d  speedup: %.1e  nrhs: %d  order: %c"
@@ -224,6 +187,7 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
                 'AT_MS' : AT_MS,
                 'CMFLOPS' : CMFLOPS,
                 }
+        print_perf_record(br)
     else:
         br = { }
     return br
