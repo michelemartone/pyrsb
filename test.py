@@ -367,8 +367,8 @@ if len(opts) >= 1:
     print ("# librsb output:", WANT_LIBRSB_STYLE_OUTPUT )
     print ("# types:", WANT_TYPES )
     print ("# dtypes:", WANT_DTYPES )
-if len(args) > 1:
-    for arg in args[1:]:
+if len(args) > 0:
+    for arg in args[0:]:
         bench_file(arg)
 else:
     # bench_file("venkat50.mtx.gz")
