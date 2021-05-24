@@ -336,16 +336,19 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"a")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"ar:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
     if o == '-a':
         WANT_AUTOTUNE = WANT_AUTOTUNE + 1
+    if o == '-r':
+        WANT_NRHS = list(map(int,a.split(',')))
 if len(opts) == 0:
     print ("# no custom options specified: using defaults")
 if len(opts) >= 1:
     print ("# autotune:", WANT_AUTOTUNE )
+    print ("# nrhs:", WANT_NRHS )
 if len(args) > 1:
     for arg in args[1:]:
         bench_file(arg)

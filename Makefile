@@ -54,10 +54,10 @@ test: rsb.so
 	python3 test.py A.mtx
 	python3 test.py H.mtx
 	python3 test.py
-	python3 test.py -a A.mtx
-	python3 test.py -aa A.mtx
-	python3 test.py -aaa A.mtx
-	python3 test.py -aaaa A.mtx
+	python3 test.py -a -r1,2 A.mtx
+	python3 test.py -aa -r1,2 A.mtx
+	python3 test.py -aaa -r1,2 A.mtx
+	python3 test.py -aaaa -r1,2 A.mtx
 
 itest:
 	rm -fR build/ rsb.egg-info/ dist/
