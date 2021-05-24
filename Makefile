@@ -54,6 +54,7 @@ test: rsb.so
 	python3 test.py A.mtx
 	python3 test.py H.mtx
 	python3 test.py
+	python3 test.py -TZ A.mtx
 	python3 test.py -r2 -OC A.mtx
 	python3 test.py -a -r1,2 A.mtx
 	python3 test.py -aa -r1,2 A.mtx

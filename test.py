@@ -61,6 +61,13 @@ WANT_PSF = "csr"
 WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
 WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
+WANT_TYPES = [ 'S','D','C','Z' ]
+TC2DT = {
+            'S': np.float32,
+            'D': np.float64,
+            'C': np.complex64,
+            'Z': np.complex128
+        }
 WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
@@ -336,18 +343,21 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"alr:O:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"alr:O:T:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
     if o == '-a':
         WANT_AUTOTUNE = WANT_AUTOTUNE + 1
+    if o == '-l':
+        WANT_LIBRSB_STYLE_OUTPUT = True
     if o == '-r':
         WANT_NRHS = list(map(int,a.split(',')))
     if o == '-O':
         WANT_ORDER = list(a.split(','))
-    if o == '-l':
-        WANT_LIBRSB_STYLE_OUTPUT = True
+    if o == '-T':
+        WANT_TYPES = list(a)
+        WANT_DTYPES = list(map(lambda c : TC2DT[c],WANT_TYPES))
 if len(opts) == 0:
     print ("# no custom options specified: using defaults")
 if len(opts) >= 1:
@@ -355,6 +365,8 @@ if len(opts) >= 1:
     print ("# nrhs:", WANT_NRHS )
     print ("# order:", WANT_ORDER )
     print ("# librsb output:", WANT_LIBRSB_STYLE_OUTPUT )
+    print ("# types:", WANT_TYPES )
+    print ("# dtypes:", WANT_DTYPES )
 if len(args) > 1:
     for arg in args[1:]:
         bench_file(arg)
