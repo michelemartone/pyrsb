@@ -6,6 +6,7 @@ License: GPLv3+
 """
 import math
 import sys
+import getopt
 import os
 import numpy as np
 import scipy as sp
@@ -334,8 +335,19 @@ def bench_file(filename):
     	    bench_matrix(a, c, mtxname)
 
 
-if len(sys.argv) > 1:
-    for arg in sys.argv[1:]:
+try:
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"a")
+except getopt.GetoptError:
+    sys.exit(1)
+for o,a in opts:
+    if o == '-a':
+        WANT_AUTOTUNE = WANT_AUTOTUNE + 1
+if len(opts) == 0:
+    print ("# no custom options specified: using defaults")
+if len(opts) >= 1:
+    print ("# autotune:", WANT_AUTOTUNE )
+if len(args) > 1:
+    for arg in args[1:]:
         bench_file(arg)
 else:
     # bench_file("venkat50.mtx.gz")
