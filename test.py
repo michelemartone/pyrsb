@@ -357,7 +357,7 @@ for o,a in opts:
         WANT_ORDER = list(a.split(','))
     if o == '-T':
         WANT_TYPES = list(a)
-        WANT_DTYPES = list(map(lambda c : TC2DT[c],WANT_TYPES))
+        WANT_DTYPES = list(map(lambda c : TC2DT[c.upper()],WANT_TYPES))
 if len(opts) == 0:
     print ("# no custom options specified: using defaults")
 if len(opts) >= 1:
