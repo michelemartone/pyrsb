@@ -107,8 +107,8 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         AT_SPS_OPTIME = psf_dt
         AT_OPTIME = rsb_dt
         AT_TIME = brdict['at_time']
-        RWminBW_GBps = 1 # FIXME (shall be read + write traffic of operands and matrix)
-        AT_MS = 0 # fixed to 0 here
+        RWminBW_GBps = 1.0 # FIXME (shall be read + write traffic of operands and matrix)
+        AT_MS = 0.0 # fixed to 0 here
         CMFLOPS = 2*(nnz/1e6)*nrhs
         if not a._is_unsymmetric():
             CMFLOPS *= 2
@@ -195,6 +195,38 @@ def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
         )
     if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
         print("y=", y)
+    if WANT_LIBRSB_STYLE_OUTPUT:
+        br = {
+                'BESTCODE' :BESTCODE,
+                'MTX' : MTX,
+                'NR' : a.shape[0],
+                'NC' : a.shape[1],
+                'NNZ' : nnz,
+                'NRHS' : nrhs,
+                'TYPE' : TYPE,
+                'SYM' : SYM,
+                'TRANS' : TRANS,
+                'NT0' : NT0,
+                'NT1' : NT1,
+                'NT2' : NT2,
+                'BPNZ' : BPNZ,
+                'AT_BPNZ' : AT_BPNZ,
+                'NSUBM' : NSUBM,
+                'AT_NSUBM': AT_NSUBM,
+                'RSBBEST_MFLOPS' : RSBBEST_MFLOPS,
+                'OPTIME' : OPTIME,
+                'SPS_OPTIME' : SPS_OPTIME,
+                'AT_OPTIME' : AT_OPTIME,
+                'AT_SPS_OPTIME' : AT_SPS_OPTIME,
+                'AT_TIME' : AT_TIME,
+                'RWminBW_GBps' : RWminBW_GBps,
+                'CB_bpf' : CB_bpf,
+                'AT_MS' : AT_MS,
+                'CMFLOPS' : CMFLOPS,
+                }
+    else:
+        br = { }
+    return br
 
 
 def bench_both(a, c, psf, brdict, order='C', nrhs=1):
@@ -244,7 +276,7 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
             rsb_mflops,
             " MFLOPS",
         )
-    bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
+    return bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
 
 
 def bench_matrix(a, c, mtxname):
