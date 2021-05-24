@@ -336,7 +336,7 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"ar:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"aO:r:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -344,11 +344,14 @@ for o,a in opts:
         WANT_AUTOTUNE = WANT_AUTOTUNE + 1
     if o == '-r':
         WANT_NRHS = list(map(int,a.split(',')))
+    if o == '-O':
+        WANT_ORDER = list(a.split(','))
 if len(opts) == 0:
     print ("# no custom options specified: using defaults")
 if len(opts) >= 1:
     print ("# autotune:", WANT_AUTOTUNE )
     print ("# nrhs:", WANT_NRHS )
+    print ("# order:", WANT_ORDER )
 if len(args) > 1:
     for arg in args[1:]:
         bench_file(arg)
