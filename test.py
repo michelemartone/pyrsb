@@ -344,7 +344,7 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"alr:O:T:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"alr:u:O:T:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -354,6 +354,8 @@ for o,a in opts:
         WANT_LIBRSB_STYLE_OUTPUT = True
     if o == '-r':
         WANT_NRHS = list(map(int,a.split(',')))
+    if o == '-u':
+        WANT_NRA = list(map(int,a.split(',')))
     if o == '-O':
         WANT_ORDER = list(a.split(','))
     if o == '-T':
@@ -368,6 +370,7 @@ if len(opts) >= 1:
     print ("# librsb output:", WANT_LIBRSB_STYLE_OUTPUT )
     print ("# types:", WANT_TYPES )
     print ("# dtypes:", WANT_DTYPES )
+    print ("# dims (if gen random):", WANT_NRA )
 if len(args) > 0:
     for arg in args[0:]:
         bench_file(arg)
