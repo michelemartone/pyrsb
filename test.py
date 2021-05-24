@@ -298,26 +298,27 @@ def bench_matrix(a, c, mtxname):
     del c
 
 
-def bench_random_files():
+def bench_random_matrices():
     """
     Perform comparative benchmark on randomly generated matrices.
     """
-    for nrA in WANT_NRA:
-        ncA = nrA
-        dnst = (math.sqrt(1.0 * nrA)) / nrA
-        # print("# generating ",nrA,"x",ncA," with density ",dnst)
-        printf("# generating %d x %d with with density %.1e\n", nrA, ncA, dnst)
-        gt = -rsb.rsb_time()
-        c = sp.sparse.rand(nrA, ncA, density=dnst, format=WANT_PSF, dtype=sp.double)
-        gt = gt + rsb.rsb_time()
-        (I, J, V) = sp.sparse.find(c)
-        V = rsb.rsb_dtype(V)
-        c = sp.sparse.csr_matrix((V, (I, J)), [nrA, ncA])
-        ct = -rsb.rsb_time()
-        a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA])
-        ct = ct + rsb.rsb_time()
-        printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz,gt,a.nnz/gt,ct)
-        bench_matrix(a, c, "random")
+    for dtype in WANT_DTYPES:
+        for nrA in WANT_NRA:
+            ncA = nrA
+            dnst = (math.sqrt(1.0 * nrA)) / nrA
+            # print("# generating ",nrA,"x",ncA," with density ",dnst)
+            printf("# generating %d x %d with with density %.1e\n", nrA, ncA, dnst)
+            gt = -rsb.rsb_time()
+            c = sp.sparse.rand(nrA, ncA, density=dnst, format=WANT_PSF, dtype=rsb.rsb_dtype)
+            gt = gt + rsb.rsb_time()
+            (I, J, V) = sp.sparse.find(c)
+            V = dtype(V)
+            c = sp.sparse.csr_matrix((V, (I, J)), [nrA, ncA])
+            ct = -rsb.rsb_time()
+            a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA], dtype=dtype)
+            ct = ct + rsb.rsb_time()
+            printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz,gt,a.nnz/gt,ct)
+            bench_matrix(a, c, "random")
 
 
 def bench_file(filename):
@@ -372,6 +373,6 @@ if len(args) > 0:
         bench_file(arg)
 else:
     # bench_file("venkat50.mtx.gz")
-    bench_random_files()
+    bench_random_matrices()
     # a.save("file.mtx")
 rsb.rsb_lib_exit()
