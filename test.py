@@ -62,6 +62,7 @@ WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
 WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 WANT_TYPES = [ 'S','D','C','Z' ]
+WANT_TIMEOUT = 0.2
 TC2DT = {
             'S': np.float32,
             'D': np.float64,
@@ -204,7 +205,7 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
     :param psf: format string for matrix c
     :param nrhs: number of right-hand-side vectors
     """
-    timeout = 0.2
+    timeout = WANT_TIMEOUT
     if WANT_VERBOSE:
         print("Benchmarking SPMV on matrix ", a)
     x = np.ones([a.shape[1], nrhs], dtype=a.dtype, order=order)
@@ -344,12 +345,14 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"alr:u:O:T:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"ab:lr:u:O:T:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
     if o == '-a':
         WANT_AUTOTUNE = WANT_AUTOTUNE + 1
+    if o == '-b':
+        WANT_TIMEOUT = float(a)
     if o == '-l':
         WANT_LIBRSB_STYLE_OUTPUT = True
     if o == '-r':
@@ -371,6 +374,7 @@ if len(opts) >= 1:
     print ("# types:", WANT_TYPES )
     print ("# dtypes:", WANT_DTYPES )
     print ("# dims (if gen random):", WANT_NRA )
+    print ("# bench timeout:", WANT_TIMEOUT )
 if len(args) > 0:
     for arg in args[0:]:
         bench_file(arg)

@@ -51,15 +51,15 @@ test: rsb.so
 	if which pytest-3 ; then PYTHONPATH=. pytest-3 ; fi
 	python3 demo1.py
 	python3 demo2.py
-	python3 test.py A.mtx
-	python3 test.py H.mtx
-	python3 test.py
-	python3 test.py -u10 -r1 -Tzs A.mtx
-	python3 test.py -u10 -r2 -OC A.mtx
-	python3 test.py -u1000 -a -r1,2 A.mtx
-	python3 test.py -u1000 -aa -r1,2 A.mtx
-	python3 test.py -u1000 -aaa -r1,2 A.mtx
-	python3 test.py -u1000 -aaaa -r1,2 A.mtx
+	python3 test.py -b0.01 A.mtx
+	python3 test.py -b0.01 H.mtx
+	python3 test.py -b0.01
+	python3 test.py -b0.01 -u10 -r1 -Tzs A.mtx
+	python3 test.py -b0.01 -u10 -r2 -OC A.mtx
+	python3 test.py -b0.01 -u1000 -a -r1,2 A.mtx
+	python3 test.py -b0.01 -u1000 -aa -r1,2 A.mtx
+	python3 test.py -b0.01 -u1000 -aaa -r1,2 A.mtx
+	python3 test.py -b0.01 -u1000 -aaaa -r1,2 A.mtx
 
 itest:
 	rm -fR build/ rsb.egg-info/ dist/
