@@ -13,6 +13,7 @@ import scipy as sp
 import rsb
 
 
+WANT_ZERO_ALLOC = True
 WANT_MAX_DUMP_NNZ = 16
 WANT_VERBOSE = 0
 WANT_AUTOTUNE = 0 # 0..
@@ -54,14 +55,13 @@ def bench(timeout, a, x, y):
     :param y: result vector
     :return: a tuple with operation time, benchmark time, performed iterations
     """
-    zero_alloc = True
     iterations = 0
 
     if timeout > 0.0:
         bench(0.0, a, x, y) # single op to warm-up caches
 
     dt = -rsb.rsb_time()
-    if zero_alloc:
+    if WANT_ZERO_ALLOC:
         if (isinstance(a,rsb.rsb_matrix)):
             while dt + rsb.rsb_time() < timeout or iterations == 0:
                 iterations = iterations + 1
@@ -418,7 +418,7 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"ab:lr:u:O:T:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"ab:lr:u:AO:T:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -432,6 +432,8 @@ for o,a in opts:
         WANT_NRHS = list(map(int,a.split(',')))
     if o == '-u':
         WANT_NRA = list(map(int,a.split(',')))
+    if o == '-A':
+        WANT_ZERO_ALLOC = False
     if o == '-O':
         WANT_ORDER = list(a.split(','))
     if o == '-T':
@@ -448,6 +450,7 @@ if len(opts) >= 1:
     print ("# dtypes:", WANT_DTYPES )
     print ("# dims (if gen random):", WANT_NRA )
     print ("# bench timeout:", WANT_TIMEOUT )
+    print ("# operands alloc:", not WANT_ZERO_ALLOC)
 if len(args) > 0:
     for arg in args[0:]:
         bench_file(arg)
