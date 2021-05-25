@@ -380,13 +380,13 @@ def bench_matrix(a, c, mtxname):
                         if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
                             end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
                         else:
-                            end = sprintf(" %f\n",float(+Inf))
+                            end = sprintf(" %f\n",float('+inf'))
                         print_perf_record(dr,beg,end)
                     beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
                     if dr['OPTIME'] > dr['AT_OPTIME']:
                         end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
                     else:
-                        end = sprintf(" %f\n",float(+Inf))
+                        end = sprintf(" %f\n",float('+inf'))
                     print_perf_record(dr,beg,end)
                 if WANT_BOTH:
                     beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
