@@ -356,6 +356,22 @@ def bench_matrix(a, c, mtxname):
                             end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
                             print_perf_record(drx,beg,end)
                             del(dr1,drx,drn)
+    if WANT_LIBRSB_STYLE_OUTPUT:
+        if WANT_AUTOTUNE > 0:
+            for order in WANT_ORDER:
+                for nrhs in WANT_NRHS:
+                    dr = bd[nrhs][order]
+                    beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
+                    end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
+                    print_perf_record(dr,beg,end)
+                    #
+                    beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
+                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
+                    print_perf_record(dr,beg,end)
+                    #
+                    beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
+                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
+                    print_perf_record(dr,beg,end)
 
 
 def bench_random_matrices():
