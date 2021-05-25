@@ -13,6 +13,26 @@ import scipy as sp
 import rsb
 
 
+WANT_MAX_DUMP_NNZ = 16
+WANT_VERBOSE = 0
+WANT_AUTOTUNE = 0 # 0..
+WANT_VERBOSE_TUNING = False
+WANT_LIBRSB_STYLE_OUTPUT = False
+WANT_PSF = "csr"
+WANT_NRHS = [1, 2, 4, 8]
+WANT_ORDER = [ 'C', 'F' ]
+WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
+WANT_TYPES = [ 'S','D','C','Z' ]
+WANT_TIMEOUT = 0.2
+TC2DT = {
+            'S': np.float32,
+            'D': np.float64,
+            'C': np.complex64,
+            'Z': np.complex128
+        }
+WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
+
+
 def sprintf(format, *args):
     """
     Sprintf-like shorthand.
@@ -58,26 +78,6 @@ def bench(timeout, a, x, y):
     dt = dt + rsb.rsb_time()
     op_dt = dt / iterations
     return (op_dt, dt, iterations)
-
-
-WANT_MAX_DUMP_NNZ = 16
-WANT_VERBOSE = 0
-WANT_AUTOTUNE = 0 # 0..
-WANT_VERBOSE_TUNING = False
-WANT_LIBRSB_STYLE_OUTPUT = False
-WANT_PSF = "csr"
-WANT_NRHS = [1, 2, 3, 4, 5, 6, 7, 8]
-WANT_ORDER = [ 'C', 'F' ]
-WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
-WANT_TYPES = [ 'S','D','C','Z' ]
-WANT_TIMEOUT = 0.2
-TC2DT = {
-            'S': np.float32,
-            'D': np.float64,
-            'C': np.complex64,
-            'Z': np.complex128
-        }
-WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
 def print_perf_record(pr,beg="",end="\n"):
