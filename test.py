@@ -13,12 +13,17 @@ import scipy as sp
 import rsb
 
 
+def sprintf(format, *args):
+    """
+    Sprintf-like shorthand.
+    """
+    return format % args
+
 def printf(format, *args):
     """
     Printf-like shorthand.
     """
-    sys.stdout.write(format % args)
-
+    sys.stdout.write(sprintf(format % args))
 
 def bench(timeout, a, x, y):
     """
