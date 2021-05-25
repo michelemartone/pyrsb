@@ -331,9 +331,12 @@ def bench_matrix(a, c, mtxname):
                 del o
     del a
     del c
+    derived_bench_stats(bd)
 
-    # FIXME: make sure that OPTIME, AT_OPTIME correspond to pre- and post- tuning
-    # FIXME: migth want to loop on fields [OPTIME, AT_OPTIME, ...]
+def derived_bench_stats(bd):
+    """
+    Print derived benchmark data statistics
+    """
     ot_keys = ['OPTIME']
     if WANT_AUTOTUNE > 0:
         ot_keys += ['AT_OPTIME']
