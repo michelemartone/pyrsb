@@ -488,8 +488,10 @@ def bench_file(filename):
     	    ( mtxname, _ ) = os.path.splitext(mtxname)
     	    bd = bench_matrix(a, c, mtxname)
     	    dict_stat_merge(bs, derived_bench_stats(bd))
-    dict_sum_average_all(bs)
-    print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
+    bsc = bs.copy()
+    dict_sum_average_all(bsc)
+    print_perf_record(bsc,beg="pyrsb:speedups:",fields=True)
+    return bs
 
 
 try:
@@ -530,8 +532,12 @@ if len(opts) >= 1:
     print ("# operands alloc:", not WANT_ZERO_ALLOC)
     print ("# want RSB and scipy.sparse:", WANT_BOTH)
 if len(args) > 0:
+    bs = dict()
     for arg in args[0:]:
-        bench_file(arg)
+        bd = bench_file(arg)
+        dict_stat_merge(bs, bd)
+    dict_sum_average_all(bs)
+    print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
 else:
     # bench_file("venkat50.mtx.gz")
     bench_random_matrices()
