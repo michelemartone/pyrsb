@@ -98,14 +98,25 @@ def print_perf_record(pr,beg="",end="\n"):
     printf("%s",end)
 
 
-def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt):
+def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt=None, psf_at_dt=None):
     """
     Print benchmark record line
     """
     nnz = a.nnz
+    su = psf_dt / rsb_dt
+    if rsb_at_dt == None:
+        rsb_at_dt = rsb_dt
+    else:
+        rsb_at_dt = min(rsb_dt,rsb_at_dt) # noise plus very close values may lead to (rsb_dt<rsb_at_dt)
+    if psf_at_dt == None:
+        psf_at_dt = psf_dt
+    else:
+        psf_at_dt = min(psf_dt,psf_at_dt)
+        psf_dt = psf_at_dt # scipy.sparse has no autotuning -- we just take best time
     psf_mflops = (2 * nrhs * nnz) / (psf_dt * 1e6)
     rsb_mflops = (2 * nrhs * nnz) / (rsb_dt * 1e6)
-    su = psf_dt / rsb_dt
+    psf_at_mflops = (2 * nrhs * nnz) / (psf_at_dt * 1e6)
+    rsb_at_mflops = (2 * nrhs * nnz) / (rsb_at_dt * 1e6)
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
     if WANT_LIBRSB_STYLE_OUTPUT:
@@ -120,18 +131,18 @@ def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt):
         SYM = a._get_symchar()
         TRANS = "N"
         MTX = brdict['mtxname']
-        NT0 = rsb._get_rsb_threads()
-        NT1 = NT0 # AT-NT
-        NT2 = NT0 # AT-SPS-NT
+        NT = rsb._get_rsb_threads()
+        AT_NT = NT # AT-NT
+        AT_SPS_NT = NT # AT-SPS-NT
         BPNZ = brdict['bpnz']
         AT_BPNZ = a._idx_bpnz()
         NSUBM = brdict['nsubm']
         AT_NSUBM = a.nsubm()
-        RSBBEST_MFLOPS = rsb_mflops
-        OPTIME = rsb_dt # FIXME: differentiate tuned from untuned
+        RSBBEST_MFLOPS = max(rsb_mflops,rsb_at_mflops)
+        OPTIME = rsb_dt
         SPS_OPTIME = psf_dt
-        AT_SPS_OPTIME = psf_dt
-        AT_OPTIME = rsb_dt
+        AT_SPS_OPTIME = psf_at_dt
+        AT_OPTIME = rsb_at_dt
         AT_TIME = brdict['at_time']
         RWminBW_GBps = 1.0 # FIXME (shall be read + write traffic of operands and matrix)
         AT_MS = 0.0 # fixed to 0 here
@@ -177,9 +188,9 @@ def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt):
                 'TYPE' : TYPE,
                 'SYM' : SYM,
                 'TRANS' : TRANS,
-                'NT0' : NT0,
-                'NT1' : NT1,
-                'NT2' : NT2,
+                'NT' : NT,
+                'AT_NT' : AT_NT,
+                'AT_SPS_NT' : AT_SPS_NT,
                 'BPNZ' : BPNZ,
                 'AT_BPNZ' : AT_BPNZ,
                 'NSUBM' : NSUBM,
