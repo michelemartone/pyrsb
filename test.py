@@ -81,9 +81,11 @@ def bench(timeout, a, x, y):
     return (op_dt, dt, iterations)
 
 
-def print_perf_record(pr,beg="",end="\n"):
+def print_perf_record(pr,beg="",end="\n",fields=False):
     printf("%spr:    ",beg)
     for field in list(pr):
+        if fields:
+            printf("%s:",field)
         value = pr[field]
         if field in [ 'BPNZ', 'AT_BPNZ' ]:
             printf("%.2f",value)
@@ -333,6 +335,26 @@ def bench_matrix(a, c, mtxname):
     del c
     return bd
 
+def dict_sum_init(d,k):
+    d[k] = 0.0
+    d[k+'_samples'] = 0
+
+def dict_sum_update(d,k,v):
+    d[k] += v
+    d[k+'_samples'] += 1
+
+def dict_sum_average_all(d):
+    """
+    Run on list() keys to average samples
+    """
+    for k in list(d):
+        if not k.endswith('_samples'):
+            if d[k+'_samples'] == 0:
+                del(d[k+'_samples'])
+                del(d[k])
+            else:
+                d[k] /= d[k+'_samples']
+
 def derived_bench_stats(bd):
     """
     Print derived benchmark data statistics
@@ -342,6 +364,13 @@ def derived_bench_stats(bd):
         ot_keys += ['AT_OPTIME']
     if not WANT_LIBRSB_STYLE_OUTPUT:
         return
+    bs = dict()
+    dict_sum_init(bs,'speedup_from_layout')
+    dict_sum_init(bs,'speedup_over_1_rhs')
+    dict_sum_init(bs,'speedup_autotuned_over_non_tuned')
+    dict_sum_init(bs,'speedup_autotuned_over_scipy')
+    dict_sum_init(bs,'speedup_non_tuned_over_scipy')
+    # note we skip amortization stats
     if len(WANT_ORDER) == 2:
         for ot_key in ot_keys:
             for nrhs in WANT_NRHS:
@@ -354,6 +383,7 @@ def derived_bench_stats(bd):
                     beg = sprintf("pyrsb:order-%s-speedup-%c-over-%c-%d-rhs:",ot_key,or0,or1,nrhs);
                     end = sprintf(" %.2f\n",dr1[ot_key]/dr0[ot_key])
                     print_perf_record(drx,beg,end)
+                    dict_sum_update(bs,'speedup_from_layout',dr1[ot_key]/dr0[ot_key])
                     del(dr0,dr1,drx)
     if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
         for ot_key in ot_keys:
@@ -366,6 +396,7 @@ def derived_bench_stats(bd):
                         del(drx[ot_key])
                         beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
                         end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
+                        dict_sum_update(bs,'speedup_over_1_rhs',nrhs*dr1[ot_key]/(drn[ot_key]))
                         print_perf_record(drx,beg,end)
                         del(dr1,drx,drn)
     for order in WANT_ORDER:
@@ -375,10 +406,12 @@ def derived_bench_stats(bd):
                 beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
                 end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
                 print_perf_record(dr,beg,end)
+                dict_sum_update(bs,'speedup_autotuned_over_non_tuned',dr['OPTIME']/dr['AT_OPTIME'])
                 if WANT_BOTH:
                     beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
                     end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
                     print_perf_record(dr,beg,end)
+                    dict_sum_update(bs,'speedup_autotuned_over_scipy',dr['SPS_OPTIME']/dr['AT_OPTIME'])
                     beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
                     if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
                         end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
@@ -395,7 +428,9 @@ def derived_bench_stats(bd):
                 beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
                 end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
                 print_perf_record(dr,beg,end)
-
+                dict_sum_update(bs,'speedup_non_tuned_over_scipy',dr['SPS_OPTIME']/dr['OPTIME'])
+    dict_sum_average_all(bs)
+    print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
 
 def bench_random_matrices():
     """
@@ -441,7 +476,7 @@ def bench_file(filename):
     	    ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
     	    ( mtxname, _ ) = os.path.splitext(mtxname)
     	    bd = bench_matrix(a, c, mtxname)
-    	    derived_bench_stats(bd)
+    	    bs = derived_bench_stats(bd)
 
 
 try:
