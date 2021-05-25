@@ -333,7 +333,7 @@ def bench_matrix(a, c, mtxname):
         if len(WANT_ORDER) == 2:
             for ot_key in ot_keys:
                 for nrhs in WANT_NRHS:
-                    if nrhs is not 1:
+                    if nrhs != 1:
                         or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
                         dr0 = bd[nrhs][or0]
                         dr1 = bd[nrhs][or1]
@@ -347,7 +347,7 @@ def bench_matrix(a, c, mtxname):
             for ot_key in ot_keys:
                 for order in WANT_ORDER:
                     for nrhs in WANT_NRHS:
-                        if nrhs is not 1:
+                        if nrhs != 1:
                             dr1 = bd[  1 ][order]
                             drn = bd[nrhs][order]
                             drx = bd[nrhs][order].copy()
