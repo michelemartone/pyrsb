@@ -323,33 +323,39 @@ def bench_matrix(a, c, mtxname):
                 del o
     del a
     del c
-    # FIXME: make sure che OPTIME, AT_OPTIME correspond to pre- and post- tuning
+
+    # FIXME: make sure that OPTIME, AT_OPTIME correspond to pre- and post- tuning
     # FIXME: migth want to loop on fields [OPTIME, AT_OPTIME, ...]
+    ot_keys = ['OPTIME']
+    if WANT_AUTOTUNE > 0:
+        ot_keys += ['AT_OPTIME']
     if WANT_LIBRSB_STYLE_OUTPUT:
         if len(WANT_ORDER) == 2:
-            for nrhs in WANT_NRHS:
-                if nrhs is not 1:
-                    or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
-                    dr0 = bd[nrhs][or0]
-                    dr1 = bd[nrhs][or1]
-                    drx = bd[nrhs][or1].copy()
-                    del(drx['OPTIME'])
-                    beg = sprintf("pyrsb:order-speedup-%c-over-%c-%d-rhs:",or0,or1,nrhs);
-                    end = sprintf(" %.2f\n",dr1['OPTIME']/dr0['OPTIME'])
-                    print_perf_record(drx,beg,end)
-                    del(dr0,dr1,drx)
-        if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
-            for order in WANT_ORDER:
+            for ot_key in ot_keys:
                 for nrhs in WANT_NRHS:
                     if nrhs is not 1:
-                        dr1 = bd[  1 ][order]
-                        drn = bd[nrhs][order]
-                        drx = bd[nrhs][order].copy()
-                        del(drx['OPTIME'])
-                        beg = sprintf("pyrsb:rhs-speedup-%d-over-1-rhs-%c-order:",nrhs,order)
-                        end = sprintf(" %.2f\n",nrhs*dr1['OPTIME']/(drn['OPTIME']))
+                        or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
+                        dr0 = bd[nrhs][or0]
+                        dr1 = bd[nrhs][or1]
+                        drx = bd[nrhs][or1].copy()
+                        del(drx[ot_key])
+                        beg = sprintf("pyrsb:order-%s-speedup-%c-over-%c-%d-rhs:",ot_key,or0,or1,nrhs);
+                        end = sprintf(" %.2f\n",dr1[ot_key]/dr0[ot_key])
                         print_perf_record(drx,beg,end)
-                        del(dr1,drx,drn)
+                        del(dr0,dr1,drx)
+        if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
+            for ot_key in ot_keys:
+                for order in WANT_ORDER:
+                    for nrhs in WANT_NRHS:
+                        if nrhs is not 1:
+                            dr1 = bd[  1 ][order]
+                            drn = bd[nrhs][order]
+                            drx = bd[nrhs][order].copy()
+                            del(drx[ot_key])
+                            beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
+                            end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
+                            print_perf_record(drx,beg,end)
+                            del(dr1,drx,drn)
 
 
 def bench_random_matrices():
