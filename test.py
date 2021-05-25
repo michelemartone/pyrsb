@@ -245,7 +245,7 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
             rsb_mflops,
             " MFLOPS",
         )
-    return bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
+    return [rsb_dt,psf_dt]
 
 
 def bench_matrix(a, c, mtxname):
@@ -261,12 +261,14 @@ def bench_matrix(a, c, mtxname):
         'bpnz': a._idx_bpnz()
     }
     bd = dict()
+    psf = WANT_PSF
     for nrhs in WANT_NRHS:
         bd[nrhs] = dict()
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                bd[nrhs][order] = bench_both(a, c, WANT_PSF, brdict, order, nrhs)
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
     elif WANT_AUTOTUNE == 1:
         o = a.copy()
         if WANT_VERBOSE:
@@ -276,7 +278,8 @@ def bench_matrix(a, c, mtxname):
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                 bd[nrhs][order] = bench_both(o, c, WANT_PSF, brdict, order, nrhs)
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
@@ -286,7 +289,8 @@ def bench_matrix(a, c, mtxname):
                 at_time = rsb.rsb_time()
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 brdict['at_time'] = rsb.rsb_time() - at_time
-                bd[nrhs][order] = bench_both(a, c, WANT_PSF, brdict, order, nrhs)
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
