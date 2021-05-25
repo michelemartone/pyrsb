@@ -331,7 +331,7 @@ def bench_matrix(a, c, mtxname):
                 del o
     del a
     del c
-    derived_bench_stats(bd)
+    return bd
 
 def derived_bench_stats(bd):
     """
@@ -340,61 +340,61 @@ def derived_bench_stats(bd):
     ot_keys = ['OPTIME']
     if WANT_AUTOTUNE > 0:
         ot_keys += ['AT_OPTIME']
-    if WANT_LIBRSB_STYLE_OUTPUT:
-        if len(WANT_ORDER) == 2:
-            for ot_key in ot_keys:
+    if not WANT_LIBRSB_STYLE_OUTPUT:
+        return
+    if len(WANT_ORDER) == 2:
+        for ot_key in ot_keys:
+            for nrhs in WANT_NRHS:
+                if nrhs != 1:
+                    or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
+                    dr0 = bd[nrhs][or0]
+                    dr1 = bd[nrhs][or1]
+                    drx = bd[nrhs][or1].copy()
+                    del(drx[ot_key])
+                    beg = sprintf("pyrsb:order-%s-speedup-%c-over-%c-%d-rhs:",ot_key,or0,or1,nrhs);
+                    end = sprintf(" %.2f\n",dr1[ot_key]/dr0[ot_key])
+                    print_perf_record(drx,beg,end)
+                    del(dr0,dr1,drx)
+    if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
+        for ot_key in ot_keys:
+            for order in WANT_ORDER:
                 for nrhs in WANT_NRHS:
                     if nrhs != 1:
-                        or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
-                        dr0 = bd[nrhs][or0]
-                        dr1 = bd[nrhs][or1]
-                        drx = bd[nrhs][or1].copy()
+                        dr1 = bd[  1 ][order]
+                        drn = bd[nrhs][order]
+                        drx = bd[nrhs][order].copy()
                         del(drx[ot_key])
-                        beg = sprintf("pyrsb:order-%s-speedup-%c-over-%c-%d-rhs:",ot_key,or0,or1,nrhs);
-                        end = sprintf(" %.2f\n",dr1[ot_key]/dr0[ot_key])
+                        beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
+                        end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
                         print_perf_record(drx,beg,end)
-                        del(dr0,dr1,drx)
-        if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
-            for ot_key in ot_keys:
-                for order in WANT_ORDER:
-                    for nrhs in WANT_NRHS:
-                        if nrhs != 1:
-                            dr1 = bd[  1 ][order]
-                            drn = bd[nrhs][order]
-                            drx = bd[nrhs][order].copy()
-                            del(drx[ot_key])
-                            beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
-                            end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
-                            print_perf_record(drx,beg,end)
-                            del(dr1,drx,drn)
-    if WANT_LIBRSB_STYLE_OUTPUT:
-        for order in WANT_ORDER:
-            for nrhs in WANT_NRHS:
-                dr = bd[nrhs][order]
-                if WANT_AUTOTUNE > 0:
-                    beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
-                    end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
+                        del(dr1,drx,drn)
+    for order in WANT_ORDER:
+        for nrhs in WANT_NRHS:
+            dr = bd[nrhs][order]
+            if WANT_AUTOTUNE > 0:
+                beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
+                end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
+                print_perf_record(dr,beg,end)
+                if WANT_BOTH:
+                    beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
+                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
                     print_perf_record(dr,beg,end)
-                    if WANT_BOTH:
-                        beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
-                        end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
-                        print_perf_record(dr,beg,end)
-                        beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
-                        if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
-                            end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
-                        else:
-                            end = sprintf(" %f\n",float('+inf'))
-                        print_perf_record(dr,beg,end)
-                    beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
-                    if dr['OPTIME'] > dr['AT_OPTIME']:
-                        end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
+                    beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
+                    if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
+                        end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
                     else:
                         end = sprintf(" %f\n",float('+inf'))
                     print_perf_record(dr,beg,end)
-                if WANT_BOTH:
-                    beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
-                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
-                    print_perf_record(dr,beg,end)
+                beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
+                if dr['OPTIME'] > dr['AT_OPTIME']:
+                    end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
+                else:
+                    end = sprintf(" %f\n",float('+inf'))
+                print_perf_record(dr,beg,end)
+            if WANT_BOTH:
+                beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
+                end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
+                print_perf_record(dr,beg,end)
 
 
 def bench_random_matrices():
@@ -417,7 +417,8 @@ def bench_random_matrices():
             a = rsb.rsb_matrix((V, (I, J)), [nrA, ncA], dtype=dtype)
             ct = ct + rsb.rsb_time()
             printf("# generated a matrix with %.1e nnz in %.1e s (%.1e nnz/s), converted to RSB in %.1e s\n",a.nnz,gt,a.nnz/gt,ct)
-            bench_matrix(a, c, "random")
+            bd = bench_matrix(a, c, "random")
+            derived_bench_stats(bd)
 
 
 def bench_file(filename):
@@ -439,7 +440,8 @@ def bench_file(filename):
     	    c = sp.sparse.csr_matrix((V, (I, J)))
     	    ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
     	    ( mtxname, _ ) = os.path.splitext(mtxname)
-    	    bench_matrix(a, c, mtxname)
+    	    bd = bench_matrix(a, c, mtxname)
+    	    derived_bench_stats(bd)
 
 
 try:
