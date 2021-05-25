@@ -339,9 +339,20 @@ def dict_sum_init(d,k):
     d[k] = 0.0
     d[k+'_samples'] = 0
 
-def dict_sum_update(d,k,v):
+def dict_sum_update(d,k,v,w=1):
     d[k] += v
-    d[k+'_samples'] += 1
+    d[k+'_samples'] += w
+
+def dict_stat_merge(d,s):
+    """
+    Run on list() keys to average samples
+    """
+    if s != None:
+        for k in list(s):
+            if not k.endswith('_samples'):
+                if not k in list(d):
+                    dict_sum_init(d,k)
+                dict_sum_update(d,k,s[k],w=s[k+'_samples'])
 
 def dict_sum_average_all(d):
     """
@@ -429,8 +440,7 @@ def derived_bench_stats(bd):
                 end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
                 print_perf_record(dr,beg,end)
                 dict_sum_update(bs,'speedup_non_tuned_over_scipy',dr['SPS_OPTIME']/dr['OPTIME'])
-    dict_sum_average_all(bs)
-    print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
+    return bs
 
 def bench_random_matrices():
     """
@@ -461,6 +471,7 @@ def bench_file(filename):
     Perform comparative benchmark on matrices loaded from Matrix Market files.
     :param filename: a Matrix Market file
     """
+    bs = dict()
     for dtype in WANT_DTYPES:
     	print("# loading from file ", filename)
     	lt = - rsb.rsb_time()
@@ -476,7 +487,9 @@ def bench_file(filename):
     	    ( mtxname, _ ) = os.path.splitext(os.path.basename(filename))
     	    ( mtxname, _ ) = os.path.splitext(mtxname)
     	    bd = bench_matrix(a, c, mtxname)
-    	    bs = derived_bench_stats(bd)
+    	    dict_stat_merge(bs, derived_bench_stats(bd))
+    dict_sum_average_all(bs)
+    print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
 
 
 try:
