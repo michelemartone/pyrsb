@@ -278,8 +278,8 @@ def bench_matrix(a, c, mtxname):
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
-                bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt)
+                (rsb_dt,psf_dt) = bench_both(o, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
