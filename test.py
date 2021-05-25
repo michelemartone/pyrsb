@@ -367,6 +367,18 @@ def bench_matrix(a, c, mtxname):
                     beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
                     end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
                     print_perf_record(dr,beg,end)
+                    beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
+                    if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
+                        end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
+                    else:
+                        end = sprintf(" %f\n",float(+Inf))
+                    print_perf_record(dr,beg,end)
+                    beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
+                    if dr['OPTIME'] > dr['AT_OPTIME']:
+                        end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
+                    else:
+                        end = sprintf(" %f\n",float(+Inf))
+                    print_perf_record(dr,beg,end)
                 beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
                 end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
                 print_perf_record(dr,beg,end)
