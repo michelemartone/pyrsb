@@ -292,22 +292,25 @@ def bench_matrix(a, c, mtxname):
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                (rsb_dt,psf_dt) = bench_both(o, c, psf, brdict, order, nrhs)
-                bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt)
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
+                (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
                 if WANT_VERBOSE:
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 at_time = rsb.rsb_time()
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 brdict['at_time'] = rsb.rsb_time() - at_time
-                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
-                bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt)
+                (rsb_at_dt,psf_at_dt) = bench_both(a, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
+                (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 o = a.copy()
                 if WANT_VERBOSE:
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
@@ -315,8 +318,8 @@ def bench_matrix(a, c, mtxname):
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 brdict['at_time'] = rsb.rsb_time() - at_time
-                (rsb_dt,psf_dt) = bench_both(o, c, psf, brdict, order, nrhs)
-                bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt)
+                (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
+                bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
                 del o
     del a
     del c
