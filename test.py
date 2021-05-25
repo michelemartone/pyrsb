@@ -36,8 +36,11 @@ def bench(timeout, a, x, y):
     """
     zero_alloc = True
     iterations = 0
-    dt = -rsb.rsb_time()
 
+    if timeout > 0.0:
+        bench(0.0, a, x, y) # single op to warm-up caches
+
+    dt = -rsb.rsb_time()
     if zero_alloc:
         if (isinstance(a,rsb.rsb_matrix)):
             while dt + rsb.rsb_time() < timeout or iterations == 0:
