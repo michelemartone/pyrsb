@@ -54,6 +54,7 @@ test: rsb.so
 	python3 test.py -b0.01 A.mtx
 	python3 test.py -b0.01 H.mtx
 	python3 test.py -b0.01
+	python3 test.py -b0.01 -u10 -r1 -Tzs A.mtx -R
 	python3 test.py -b0.01 -u10 -r1 -Tzs A.mtx
 	python3 test.py -b0.01 -u10 -r2 -OC A.mtx
 	python3 test.py -b0.01 -u1000 -a1 -r1,2 A.mtx

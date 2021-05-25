@@ -20,6 +20,7 @@ WANT_AUTOTUNE = 0 # 0..
 WANT_VERBOSE_TUNING = False
 WANT_LIBRSB_STYLE_OUTPUT = False
 WANT_PSF = "csr"
+WANT_BOTH = True
 WANT_NRHS = [1, 2, 4, 8]
 WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
@@ -113,9 +114,13 @@ def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt=None, ps
     else:
         psf_at_dt = min(psf_dt,psf_at_dt)
         psf_dt = psf_at_dt # scipy.sparse has no autotuning -- we just take best time
-    psf_mflops = (2 * nrhs * nnz) / (psf_dt * 1e6)
+    if WANT_BOTH:
+        psf_mflops = (2 * nrhs * nnz) / (psf_dt * 1e6)
+        psf_at_mflops = (2 * nrhs * nnz) / (psf_at_dt * 1e6)
+    else:
+        psf_mflops = 0.0
+        psf_at_mflops = 0.0
     rsb_mflops = (2 * nrhs * nnz) / (rsb_dt * 1e6)
-    psf_at_mflops = (2 * nrhs * nnz) / (psf_at_dt * 1e6)
     rsb_at_mflops = (2 * nrhs * nnz) / (rsb_at_dt * 1e6)
     if WANT_VERBOSE:
         print("Speedup of RSB over ", psf, " is ", su, "x")
@@ -231,21 +236,24 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
         print("x=", x)
         print("y=", y)
         print("Benchmarking y<-A*x+y ... ")
-    (psf_dt, dt, iterations) = bench(timeout, c, x, y)
-    if WANT_VERBOSE:
-        print(
-            "Done ",
-            iterations,
-            " ",
-            psf,
-            " SPMV iterations in ",
-            dt,
-            " s: ",
-            psf_dt,
-            "s per iteration, ",
-            psf_mflops,
-            " MFLOPS",
-        )
+    if WANT_BOTH:
+        (psf_dt, dt, iterations) = bench(timeout, c, x, y)
+        if WANT_VERBOSE:
+            print(
+                "Done ",
+                iterations,
+                " ",
+                psf,
+                " SPMV iterations in ",
+                dt,
+                " s: ",
+                psf_dt,
+                "s per iteration, ",
+                psf_mflops,
+                " MFLOPS",
+            )
+    else:
+        (psf_dt, dt, iterations) = (0.0, 0.0, 0)
     (rsb_dt, dt, iterations) = bench(timeout, a, x, y)
     if WANT_VERBOSE:
         print(
@@ -364,24 +372,26 @@ def bench_matrix(a, c, mtxname):
                     beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
                     end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
                     print_perf_record(dr,beg,end)
-                    beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
-                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
-                    print_perf_record(dr,beg,end)
-                    beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
-                    if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
-                        end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
-                    else:
-                        end = sprintf(" %f\n",float(+Inf))
-                    print_perf_record(dr,beg,end)
+                    if WANT_BOTH:
+                        beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
+                        end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
+                        print_perf_record(dr,beg,end)
+                        beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
+                        if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
+                            end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
+                        else:
+                            end = sprintf(" %f\n",float(+Inf))
+                        print_perf_record(dr,beg,end)
                     beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
                     if dr['OPTIME'] > dr['AT_OPTIME']:
                         end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
                     else:
                         end = sprintf(" %f\n",float(+Inf))
                     print_perf_record(dr,beg,end)
-                beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
-                end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
-                print_perf_record(dr,beg,end)
+                if WANT_BOTH:
+                    beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
+                    end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
+                    print_perf_record(dr,beg,end)
 
 
 def bench_random_matrices():
@@ -430,7 +440,7 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:T:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RT:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -448,6 +458,8 @@ for o,a in opts:
         WANT_ZERO_ALLOC = False
     if o == '-O':
         WANT_ORDER = list(a.split(','))
+    if o == '-R':
+        WANT_BOTH = False
     if o == '-T':
         WANT_TYPES = list(a)
         WANT_DTYPES = list(map(lambda c : TC2DT[c.upper()],WANT_TYPES))
@@ -463,6 +475,7 @@ if len(opts) >= 1:
     print ("# dims (if gen random):", WANT_NRA )
     print ("# bench timeout:", WANT_TIMEOUT )
     print ("# operands alloc:", not WANT_ZERO_ALLOC)
+    print ("# want RSB and scipy.sparse:", WANT_BOTH)
 if len(args) > 0:
     for arg in args[0:]:
         bench_file(arg)
