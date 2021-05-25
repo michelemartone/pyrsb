@@ -430,12 +430,12 @@ def bench_file(filename):
 
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"ab:lr:u:AO:T:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:T:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
     if o == '-a':
-        WANT_AUTOTUNE = WANT_AUTOTUNE + 1
+        WANT_AUTOTUNE = int(a)
     if o == '-b':
         WANT_TIMEOUT = float(a)
     if o == '-l':
