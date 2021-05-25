@@ -77,8 +77,8 @@ TC2DT = {
 WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
-def print_perf_record(pr):
-    printf("pr:    ")
+def print_perf_record(pr,beg="",end="\n"):
+    printf("%spr:    ",beg)
     for field in list(pr):
         value = pr[field]
         if field in [ 'BPNZ', 'AT_BPNZ' ]:
@@ -92,7 +92,7 @@ def print_perf_record(pr):
         else:
             printf("?")
         printf(" ")
-    printf("\n")
+    printf("%s",end)
 
 
 def bench_record(a, psf, brdict, rsb_dt, psf_dt, order, nrhs):
@@ -260,10 +260,13 @@ def bench_matrix(a, c, mtxname):
         'nsubm': a.nsubm(),
         'bpnz': a._idx_bpnz()
     }
+    bd = dict()
+    for nrhs in WANT_NRHS:
+        bd[nrhs] = dict()
     if WANT_AUTOTUNE == 0:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                bench_both(a, c, WANT_PSF, brdict, order, nrhs)
+                bd[nrhs][order] = bench_both(a, c, WANT_PSF, brdict, order, nrhs)
     elif WANT_AUTOTUNE == 1:
         o = a.copy()
         if WANT_VERBOSE:
@@ -273,7 +276,7 @@ def bench_matrix(a, c, mtxname):
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
-                 bench_both(o, c, WANT_PSF, brdict, order, nrhs)
+                 bd[nrhs][order] = bench_both(o, c, WANT_PSF, brdict, order, nrhs)
         del o
     elif WANT_AUTOTUNE == 2:
         for nrhs in WANT_NRHS:
@@ -283,7 +286,7 @@ def bench_matrix(a, c, mtxname):
                 at_time = rsb.rsb_time()
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 brdict['at_time'] = rsb.rsb_time() - at_time
-                bench_both(a, c, WANT_PSF, brdict, order, nrhs)
+                bd[nrhs][order] = bench_both(a, c, WANT_PSF, brdict, order, nrhs)
     elif WANT_AUTOTUNE >= 3:
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -294,10 +297,37 @@ def bench_matrix(a, c, mtxname):
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
                 brdict['at_time'] = rsb.rsb_time() - at_time
-                bench_both(o, c, WANT_PSF, brdict, order, nrhs)
+                bd[nrhs][order] = bench_both(o, c, WANT_PSF, brdict, order, nrhs)
                 del o
     del a
     del c
+    # FIXME: make sure che OPTIME, AT_OPTIME correspond to pre- and post- tuning
+    # FIXME: migth want to loop on fields [OPTIME, AT_OPTIME, ...]
+    if WANT_LIBRSB_STYLE_OUTPUT:
+        if len(WANT_ORDER) == 2:
+            for nrhs in WANT_NRHS:
+                if nrhs is not 1:
+                    or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
+                    dr0 = bd[nrhs][or0]
+                    dr1 = bd[nrhs][or1]
+                    drx = bd[nrhs][or1].copy()
+                    del(drx['OPTIME'])
+                    beg = sprintf("pyrsb:order-speedup-%c-over-%c-%d-rhs:",or0,or1,nrhs);
+                    end = sprintf(" %.2f\n",dr1['OPTIME']/dr0['OPTIME'])
+                    print_perf_record(drx,beg,end)
+                    del(dr0,dr1,drx)
+        if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
+            for order in WANT_ORDER:
+                for nrhs in WANT_NRHS:
+                    if nrhs is not 1:
+                        dr1 = bd[  1 ][order]
+                        drn = bd[nrhs][order]
+                        drx = bd[nrhs][order].copy()
+                        del(drx['OPTIME'])
+                        beg = sprintf("pyrsb:rhs-speedup-%d-over-1-rhs-%c-order:",nrhs,order)
+                        end = sprintf(" %.2f\n",nrhs*dr1['OPTIME']/(drn['OPTIME']))
+                        print_perf_record(drx,beg,end)
+                        del(dr1,drx,drn)
 
 
 def bench_random_matrices():
