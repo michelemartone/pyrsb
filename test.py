@@ -7,7 +7,7 @@ License: GPLv3+
 import math
 import sys
 import getopt
-import os
+import os, socket, datetime
 import numpy as np
 import scipy as sp
 import rsb
@@ -535,6 +535,7 @@ def elapsed_time():
     (_,_,_,_,elpt) = os.times()
     return elpt
 
+print ("# PyRSB benchmark on ", socket.gethostname(), " ", datetime.datetime.now().ctime() )
 try:
     opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RST:")
 except getopt.GetoptError:
