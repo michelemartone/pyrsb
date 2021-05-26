@@ -32,6 +32,12 @@ TC2DT = {
             'C': np.complex64,
             'Z': np.complex128
         }
+DT2TC = {
+            np.float32: 'S',
+            np.float64: 'D',
+            np.complex64: 'C',
+            np.complex128: 'Z'
+        }
 WANT_DTYPES = [ np.float32, np.float64, np.complex64, np.complex128 ]
 
 
@@ -473,12 +479,12 @@ def bench_file(filename):
     """
     bs = dict()
     for dtype in WANT_DTYPES:
-    	print("# loading from file ", filename)
+    	print("# loading matrix from file ", filename)
     	lt = - rsb.rsb_time()
     	a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"),dtype=dtype)
     	lt = lt + rsb.rsb_time()
     	printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
-    	printf("# loaded as type %s (default is %s)\n", a.dtype, rsb.rsb_dtype)
+    	printf("# loaded as type %s/%c (default is %s/%c)\n", a.dtype, DT2TC[a.dtype], rsb.rsb_dtype, DT2TC[rsb.rsb_dtype])
     	if not a._is_unsymmetric():
     	    print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     	if a is not None:
@@ -493,6 +499,9 @@ def bench_file(filename):
     print_perf_record(bsc,beg="pyrsb:speedups:",fields=True)
     return bs
 
+def elapsed_time():
+    (_,_,_,_,elpt) = os.times()
+    return elpt
 
 try:
     opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RT:")
@@ -533,9 +542,17 @@ if len(opts) >= 1:
     print ("# want RSB and scipy.sparse:", WANT_BOTH)
 if len(args) > 0:
     bs = dict()
+    if len(args):
+        printf("# will load matrix files:")
+        for arg in args[0:]:
+            printf(" %s", arg)
+        printf("\n")
+    elt0 = elapsed_time()
     for arg in args[0:]:
         bd = bench_file(arg)
         dict_stat_merge(bs, bd)
+        elt1 = elapsed_time()
+        printf("# time elapsed: %.1f s\n", elt1-elt0)
     dict_sum_average_all(bs)
     print_perf_record(bs,beg="pyrsb:speedups:",fields=True)
 else:
