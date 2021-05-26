@@ -26,6 +26,7 @@ WANT_ORDER = [ 'C', 'F' ]
 WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 WANT_TYPES = [ 'S','D','C','Z' ]
 WANT_TIMEOUT = 0.2
+WANT_SYMMETRIZE = True
 TC2DT = {
             'S': np.float32,
             'D': np.float64,
@@ -486,7 +487,12 @@ def bench_file(filename):
     	printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
     	printf("# loaded as type %s/%c (default is %s/%c)\n", a.dtype, DT2TC[a.dtype], rsb.rsb_dtype, DT2TC[rsb.rsb_dtype])
     	if not a._is_unsymmetric():
-    	    print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
+    	    if WANT_SYMMETRIZE:
+    	        print("# NOTE: loaded RSB matrix is NOT unsymmetric: expanding symmetry to cope with csr.")
+    	        (I, J, V) = a.find()
+    	        a = rsb.rsb_matrix((np.append(V,V), (np.append(I,J), np.append(J,I))), a.shape)
+    	    else:
+    	        print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     	if a is not None:
     	    (I, J, V) = a.find()
     	    c = sp.sparse.csr_matrix((V, (I, J)))
@@ -504,7 +510,7 @@ def elapsed_time():
     return elpt
 
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RT:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RST:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -524,6 +530,8 @@ for o,a in opts:
         WANT_ORDER = list(a.split(','))
     if o == '-R':
         WANT_BOTH = False
+    if o == '-S':
+        WANT_SYMMETRIZE = False
     if o == '-T':
         WANT_TYPES = list(a)
         WANT_DTYPES = list(map(lambda c : TC2DT[c.upper()],WANT_TYPES))
@@ -540,6 +548,7 @@ if len(opts) >= 1:
     print ("# bench timeout:", WANT_TIMEOUT )
     print ("# operands alloc:", not WANT_ZERO_ALLOC)
     print ("# want RSB and scipy.sparse:", WANT_BOTH)
+    print ("# symmetrize:", WANT_SYMMETRIZE )
 if len(args) > 0:
     bs = dict()
     if len(args):
