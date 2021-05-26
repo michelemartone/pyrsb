@@ -380,6 +380,8 @@ def derived_bench_stats(bd):
     ot_keys = ['OPTIME']
     if WANT_AUTOTUNE > 0:
         ot_keys += ['AT_OPTIME']
+    if WANT_BOTH > 0:
+        ot_keys += ['SPS_OPTIME']
     if not WANT_LIBRSB_STYLE_OUTPUT:
         return
     bs = dict()
