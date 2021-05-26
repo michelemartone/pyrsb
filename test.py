@@ -382,14 +382,13 @@ def derived_bench_stats(bd):
     if not WANT_LIBRSB_STYLE_OUTPUT:
         return
     bs = dict()
-    dict_sum_init(bs,'speedup_from_layout')
-    dict_sum_init(bs,'speedup_over_1_rhs')
     dict_sum_init(bs,'speedup_autotuned_over_non_tuned')
     dict_sum_init(bs,'speedup_autotuned_over_scipy')
     dict_sum_init(bs,'speedup_non_tuned_over_scipy')
     # note we skip amortization stats
     if len(WANT_ORDER) == 2:
         for ot_key in ot_keys:
+            dict_sum_init(bs,'speedup_from_layout_'+ot_key)
             for nrhs in WANT_NRHS:
                 if nrhs != 1:
                     or0,or1 = ( WANT_ORDER[0], WANT_ORDER[1] )
@@ -400,10 +399,11 @@ def derived_bench_stats(bd):
                     beg = sprintf("pyrsb:order-%s-speedup-%c-over-%c-%d-rhs:",ot_key,or0,or1,nrhs);
                     end = sprintf(" %.2f\n",dr1[ot_key]/dr0[ot_key])
                     print_perf_record(drx,beg,end)
-                    dict_sum_update(bs,'speedup_from_layout',dr1[ot_key]/dr0[ot_key])
+                    dict_sum_update(bs,'speedup_from_layout_'+ot_key,dr1[ot_key]/dr0[ot_key])
                     del(dr0,dr1,drx)
     if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
         for ot_key in ot_keys:
+            dict_sum_init(bs,'speedup_over_1_rhs_'+ot_key)
             for order in WANT_ORDER:
                 for nrhs in WANT_NRHS:
                     if nrhs != 1:
@@ -413,7 +413,7 @@ def derived_bench_stats(bd):
                         del(drx[ot_key])
                         beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
                         end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
-                        dict_sum_update(bs,'speedup_over_1_rhs',nrhs*dr1[ot_key]/(drn[ot_key]))
+                        dict_sum_update(bs,'speedup_over_1_rhs_'+ot_key,nrhs*dr1[ot_key]/(drn[ot_key]))
                         print_perf_record(drx,beg,end)
                         del(dr1,drx,drn)
     for order in WANT_ORDER:
