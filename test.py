@@ -434,29 +434,29 @@ def derived_bench_stats(bd):
         for nrhs in WANT_NRHS:
             dr = bd[nrhs][order]
             if WANT_AUTOTUNE > 0:
-                beg = sprintf("pyrsb:speedup-autotuned-over-non-tuned:");
+                beg = sprintf("pyrsb:speedup_autotuned_over_non_tuned:");
                 end = sprintf(" %.2f\n",dr['OPTIME']/dr['AT_OPTIME'])
                 print_perf_record(dr,beg,end)
                 dict_sum_update(bs,'speedup_autotuned_over_non_tuned',dr['OPTIME']/dr['AT_OPTIME'])
                 if WANT_BOTH:
-                    beg = sprintf("pyrsb:speedup-autotuned-over-scipy:");
+                    beg = sprintf("pyrsb:speedup_autotuned_over_scipy:");
                     end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['AT_OPTIME'])
                     print_perf_record(dr,beg,end)
                     dict_sum_update(bs,'speedup_autotuned_over_scipy',dr['SPS_OPTIME']/dr['AT_OPTIME'])
-                    beg = sprintf("pyrsb:amortize-tuning-over-scipy:");
+                    beg = sprintf("pyrsb:amortize_tuning_over_scipy:");
                     if dr['SPS_OPTIME'] > dr['AT_OPTIME']:
                         end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['SPS_OPTIME']-dr['AT_OPTIME']))
                     else:
                         end = sprintf(" %f\n",float('+inf'))
                     print_perf_record(dr,beg,end)
-                beg = sprintf("pyrsb:amortize-tuning-over-untuned-rsb:");
+                beg = sprintf("pyrsb:amortize_tuning_over_untuned_rsb:");
                 if dr['OPTIME'] > dr['AT_OPTIME']:
                     end = sprintf(" %.2f\n",dr['AT_TIME']/(dr['OPTIME']-dr['AT_OPTIME']))
                 else:
                     end = sprintf(" %f\n",float('+inf'))
                 print_perf_record(dr,beg,end)
             if WANT_BOTH:
-                beg = sprintf("pyrsb:speedup-non-tuned-over-scipy:");
+                beg = sprintf("pyrsb:speedup_non_tuned_over_scipy:");
                 end = sprintf(" %.2f\n",dr['SPS_OPTIME']/dr['OPTIME'])
                 print_perf_record(dr,beg,end)
                 dict_sum_update(bs,'speedup_non_tuned_over_scipy',dr['SPS_OPTIME']/dr['OPTIME'])
