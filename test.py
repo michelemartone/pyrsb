@@ -423,21 +423,24 @@ def derived_bench_stats(bd):
                     del(dr0,dr1,drx)
     if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
         for ot_key in ot_keys:
+            auk = sprintf("rhs_%s_speedup_over_1_rhs",ot_key)
+            dict_sum_init(bs,auk)
             for nrhs in WANT_NRHS:
                 if nrhs != 1:
-                    ouk = sprintf("rhs_%s_speedup_%d_over_1_rhs",ot_key,nrhs)
+                    ouk = sprintf("rhs_%d_%s_speedup_over_1_rhs",nrhs,ot_key)
                     dict_sum_init(bs,ouk)
                     for order in WANT_ORDER:
                         dr1 = bd[  1 ][order]
                         drn = bd[nrhs][order]
                         drx = bd[nrhs][order].copy()
                         del(drx[ot_key])
-                        iuk = sprintf("rhs_%s_speedup_%d_over_1_rhs_%c_order",ot_key,nrhs,order)
+                        iuk = sprintf("rhs_%d_%s_speedup_over_1_rhs_%c_order",nrhs,ot_key,order)
                         beg = sprintf("pyrsb:%s",iuk)
                         dict_sum_init(bs,iuk)
                         end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
                         dict_sum_update(bs,iuk,nrhs*dr1[ot_key]/(drn[ot_key]))
                         dict_sum_update(bs,ouk,nrhs*dr1[ot_key]/(drn[ot_key]))
+                        dict_sum_update(bs,auk,nrhs*dr1[ot_key]/(drn[ot_key]))
                         print_perf_record(drx,beg,end)
                         del(dr1,drx,drn)
     for order in WANT_ORDER:
