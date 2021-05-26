@@ -61,30 +61,40 @@ def bench(timeout, a, x, y):
     :param a: matrix
     :param x: right hand side vector
     :param y: result vector
-    :return: a tuple with operation time, benchmark time, performed iterations
+    :return: a tuple with min operation time, benchmark time, performed iterations
     """
     iterations = 0
 
     if timeout > 0.0:
         bench(0.0, a, x, y) # single op to warm-up caches
 
-    dt = -rsb.rsb_time()
+    op_dt = float('+inf')
+    t0 = rsb.rsb_time()
+    t1 = t0
     if WANT_ZERO_ALLOC:
         if (isinstance(a,rsb.rsb_matrix)):
-            while dt + rsb.rsb_time() < timeout or iterations == 0:
+            while t1 - t0 < timeout or iterations == 0:
                 iterations = iterations + 1
+                t2 = rsb.rsb_time()
                 a._spmm(x,y) # This form avoids the copy of y
+                t1 = rsb.rsb_time()
+                op_dt = min(op_dt,t1-t2)
         else:
-            while dt + rsb.rsb_time() < timeout or iterations == 0:
+            while t1 - t0 < timeout or iterations == 0:
                 iterations = iterations + 1
+                t2 = rsb.rsb_time()
                 # y += a._mul_multivector(x) # inefficient
                 sp.sparse._sparsetools.csr_matvecs(a.shape[0], a.shape[1], x.shape[1], a.indptr, a.indices, a.data, x.ravel(), y.ravel())
+                t1 = rsb.rsb_time()
+                op_dt = min(op_dt,t1-t2)
     else:
-        while dt + rsb.rsb_time() < timeout or iterations == 0:
+        while t1 - t0 < timeout or iterations == 0:
             iterations = iterations + 1
+            t2 = rsb.rsb_time()
             y += a * x  # Inefficient (result created repeatedly) see __mul__
-    dt = dt + rsb.rsb_time()
-    op_dt = dt / iterations
+            t1 = rsb.rsb_time()
+            op_dt = min(op_dt,t1-t2)
+    dt = rsb.rsb_time() - t0
     return (op_dt, dt, iterations)
 
 
