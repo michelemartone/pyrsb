@@ -88,11 +88,14 @@ def bench(timeout, a, x, y):
     return (op_dt, dt, iterations)
 
 
-def print_perf_record(pr,beg="",end="\n",fields=False):
+def print_perf_record(pr,beg="",end="\n",fields=False,omit_samples_field=True):
     printf("%spr:    ",beg)
     for field in list(pr):
         if fields:
-            printf("%s:",field)
+            if omit_samples_field and field.endswith('_samples'):
+                printf("/")
+            else:
+                printf("%s:",field)
         value = pr[field]
         if field in [ 'BPNZ', 'AT_BPNZ' ]:
             printf("%.2f",value)
