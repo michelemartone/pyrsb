@@ -421,9 +421,11 @@ def derived_bench_stats(bd):
                         drn = bd[nrhs][order]
                         drx = bd[nrhs][order].copy()
                         del(drx[ot_key])
-                        beg = sprintf("pyrsb:rhs-%s-speedup-%d-over-1-rhs-%c-order:",ot_key,nrhs,order)
+                        iuk = sprintf("rhs_%s_speedup_%d_over_1_rhs_%c_order",ot_key,nrhs,order)
+                        beg = sprintf("pyrsb:%s",iuk)
+                        dict_sum_init(bs,iuk)
                         end = sprintf(" %.2f\n",nrhs*dr1[ot_key]/(drn[ot_key]))
-                        dict_sum_update(bs,'speedup_over_1_rhs_'+ot_key,nrhs*dr1[ot_key]/(drn[ot_key]))
+                        dict_sum_update(bs,iuk,nrhs*dr1[ot_key]/(drn[ot_key]))
                         print_perf_record(drx,beg,end)
                         del(dr1,drx,drn)
     for order in WANT_ORDER:
