@@ -94,8 +94,8 @@ def bench(timeout, a, x, y):
             y += a * x  # Inefficient (result created repeatedly) see __mul__
             t1 = rsb.rsb_time()
             op_dt = min(op_dt,t1-t2)
-    dt = rsb.rsb_time() - t0
-    return (op_dt, dt, iterations)
+    bt = rsb.rsb_time() - t0
+    return (op_dt, bt, iterations)
 
 
 def print_perf_record(pr,beg="",end="\n",fields=False,omit_samples_field=True):
@@ -259,7 +259,7 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
         print("y=", y)
         print("Benchmarking y<-A*x+y ... ")
     if WANT_BOTH:
-        (psf_dt, dt, iterations) = bench(timeout, c, x, y)
+        (psf_dt, bt, iterations) = bench(timeout, c, x, y)
         if WANT_VERBOSE:
             print(
                 "Done ",
@@ -267,7 +267,7 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
                 " ",
                 psf,
                 " SPMV iterations in ",
-                dt,
+                bt,
                 " s: ",
                 psf_dt,
                 "s per iteration, ",
@@ -275,14 +275,14 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
                 " MFLOPS",
             )
     else:
-        (psf_dt, dt, iterations) = (0.0, 0.0, 0)
-    (rsb_dt, dt, iterations) = bench(timeout, a, x, y)
+        (psf_dt, bt, iterations) = (0.0, 0.0, 0)
+    (rsb_dt, bt, iterations) = bench(timeout, a, x, y)
     if WANT_VERBOSE:
         print(
             "Done ",
             iterations,
             " rsb SPMV iterations in ",
-            dt,
+            bt,
             " s: ",
             rsb_dt,
             "s per iteration, ",
