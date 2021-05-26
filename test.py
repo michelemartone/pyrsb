@@ -414,10 +414,10 @@ def derived_bench_stats(bd):
     if len(WANT_NRHS) >= 2 and WANT_NRHS[0] == 1:
         for ot_key in ot_keys:
             for nrhs in WANT_NRHS:
-                ouk = sprintf("rhs_%s_speedup_%d_over_1_rhs",ot_key,nrhs)
-                dict_sum_init(bs,ouk)
-                for order in WANT_ORDER:
-                    if nrhs != 1:
+                if nrhs != 1:
+                    ouk = sprintf("rhs_%s_speedup_%d_over_1_rhs",ot_key,nrhs)
+                    dict_sum_init(bs,ouk)
+                    for order in WANT_ORDER:
                         dr1 = bd[  1 ][order]
                         drn = bd[nrhs][order]
                         drx = bd[nrhs][order].copy()
