@@ -27,6 +27,7 @@ WANT_NRA = [10, 30, 100, 300, 1000, 3000, 10000]
 WANT_TYPES = [ 'S','D','C','Z' ]
 WANT_TIMEOUT = 0.2
 WANT_SYMMETRIZE = True
+WANT_RENDER = False
 TC2DT = {
             'S': np.float32,
             'D': np.float64,
@@ -310,6 +311,9 @@ def bench_matrix(a, c, mtxname):
     tmax = 0
     bd = dict()
     psf = WANT_PSF
+    if WANT_RENDER:
+        filename = bytes(sprintf("%s-%c.eps",mtxname,DT2TC[a.dtype]), encoding="utf-8")
+        a.render(filename)
     for nrhs in WANT_NRHS:
         bd[nrhs] = dict()
     if WANT_AUTOTUNE == 0:
@@ -323,6 +327,9 @@ def bench_matrix(a, c, mtxname):
             print("Will autotune matrix for SpMV    ", a)
         at_time = rsb.rsb_time()
         o.autotune(verbose=WANT_VERBOSE_TUNING,tmax=tmax)
+        if WANT_RENDER:
+            filename = bytes(sprintf("%s-%c-tuned.eps",mtxname,DT2TC[a.dtype]), encoding="utf-8")
+            a.render(filename)
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -339,6 +346,9 @@ def bench_matrix(a, c, mtxname):
                 at_time = rsb.rsb_time()
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
+                if WANT_RENDER:
+                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs), encoding="utf-8")
+                    a.render(filename)
                 (rsb_at_dt,psf_at_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
     elif WANT_AUTOTUNE >= 3:
@@ -352,6 +362,9 @@ def bench_matrix(a, c, mtxname):
                 for i in range(2,+WANT_AUTOTUNE):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
+                if WANT_RENDER:
+                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs), encoding="utf-8")
+                    a.render(filename)
                 (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
                 del o
@@ -541,7 +554,7 @@ def elapsed_time():
 
 print ("# PyRSB benchmark on ", socket.gethostname(), " ", datetime.datetime.now().ctime() )
 try:
-    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lr:u:AO:RST:")
+    opts,args = getopt.gnu_getopt(sys.argv[1:],"a:b:lpr:u:AO:RST:")
 except getopt.GetoptError:
     sys.exit(1)
 for o,a in opts:
@@ -551,6 +564,8 @@ for o,a in opts:
         WANT_TIMEOUT = float(a)
     if o == '-l':
         WANT_LIBRSB_STYLE_OUTPUT = True
+    if o == '-p':
+        WANT_RENDER = True
     if o == '-r':
         WANT_NRHS = list(map(int,a.split(',')))
     if o == '-u':
@@ -579,6 +594,7 @@ if len(opts) >= 1:
     print ("# bench timeout:", WANT_TIMEOUT )
     print ("# operands alloc:", not WANT_ZERO_ALLOC)
     print ("# want RSB and scipy.sparse:", WANT_BOTH)
+    print ("# render:", WANT_RENDER)
     print ("# symmetrize:", WANT_SYMMETRIZE )
 if len(args) > 0:
     bs = dict()
