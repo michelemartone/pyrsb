@@ -304,6 +304,10 @@ def bench_matrix(a, c, mtxname):
         'nsubm': a.nsubm(),
         'bpnz': a._idx_bpnz()
     }
+    #tmax = 2
+    #tmax = 0.1
+    #tmax = -3
+    tmax = 0
     bd = dict()
     psf = WANT_PSF
     for nrhs in WANT_NRHS:
@@ -318,7 +322,7 @@ def bench_matrix(a, c, mtxname):
         if WANT_VERBOSE:
             print("Will autotune matrix for SpMV    ", a)
         at_time = rsb.rsb_time()
-        o.autotune(verbose=WANT_VERBOSE_TUNING)
+        o.autotune(verbose=WANT_VERBOSE_TUNING,tmax=tmax)
         brdict['at_time'] = rsb.rsb_time() - at_time
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -333,7 +337,7 @@ def bench_matrix(a, c, mtxname):
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
                 (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 at_time = rsb.rsb_time()
-                a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 (rsb_at_dt,psf_at_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
@@ -346,7 +350,7 @@ def bench_matrix(a, c, mtxname):
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
                 at_time = rsb.rsb_time()
                 for i in range(2,+WANT_AUTOTUNE):
-                    o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order))
+                    o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
