@@ -533,7 +533,7 @@ def bench_file(filename):
     	    if WANT_SYMMETRIZE:
     	        print("# NOTE: loaded RSB matrix is NOT unsymmetric: expanding symmetry to cope with csr.")
     	        (I, J, V) = a.find()
-    	        a = rsb.rsb_matrix((np.append(V,V), (np.append(I,J), np.append(J,I))), a.shape)
+    	        a = rsb.rsb_matrix((np.append(V,V), (np.append(I,J), np.append(J,I))), a.shape, dtype=dtype)
     	    else:
     	        print("# NOTE: loaded RSB matrix is NOT unsymmetric, but scipy will only perform unsymmetric SpMM")
     	if a is not None:
