@@ -567,7 +567,7 @@ for o,a in opts:
     if o == '-A':
         WANT_ZERO_ALLOC = False
     if o == '-O':
-        WANT_ORDER = list(a.split(','))
+        WANT_ORDER = list(map(lambda c : c.upper(),a.split(',')) )
     if o == '-R':
         WANT_BOTH = False
     if o == '-S':
