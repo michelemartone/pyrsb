@@ -327,10 +327,10 @@ def bench_matrix(a, c, mtxname):
             print("Will autotune matrix for SpMV    ", a)
         at_time = rsb.rsb_time()
         o.autotune(verbose=WANT_VERBOSE_TUNING,tmax=tmax)
-        if WANT_RENDER:
-            filename = bytes(sprintf("%s-%c-tuned.eps",mtxname,DT2TC[a.dtype]), encoding="utf-8")
-            a.render(filename)
         brdict['at_time'] = rsb.rsb_time() - at_time
+        if WANT_RENDER:
+            filename = bytes(sprintf("%s-%c-tuned.eps",mtxname,DT2TC[o.dtype]), encoding="utf-8")
+            o.render(filename)
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
                 (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
@@ -363,8 +363,8 @@ def bench_matrix(a, c, mtxname):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 if WANT_RENDER:
-                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs), encoding="utf-8")
-                    a.render(filename)
+                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[o.dtype],order,nrhs), encoding="utf-8")
+                    o.render(filename)
                 (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
                 del o
