@@ -598,6 +598,11 @@ if len(args) > 0:
             printf(" %s", arg)
         printf("\n")
     elt0 = elapsed_time()
+    if True:
+        # warm up threads
+        u = rsb.rsb_matrix(np.ones(shape=(1000,1000)))
+        u.autotune(verbose=False,nrhs=1,tmax=0.0001)
+        del u
     for arg in args[0:]:
         bd = bench_file(arg)
         dict_stat_merge(bs, bd)
