@@ -203,8 +203,6 @@ def bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt=None, ps
             rsb_dt,
             a.nsubm(),
         )
-    if WANT_VERBOSE and nnz <= WANT_MAX_DUMP_NNZ:
-        print("y=", y)
     if WANT_LIBRSB_STYLE_OUTPUT:
         br = {
                 'BESTCODE' :BESTCODE,
@@ -272,8 +270,6 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
                 " s: ",
                 psf_dt,
                 "s per iteration, ",
-                psf_mflops,
-                " MFLOPS",
             )
     else:
         (psf_dt, bt, iterations) = (0.0, 0.0, 0)
@@ -287,8 +283,6 @@ def bench_both(a, c, psf, brdict, order='C', nrhs=1):
             " s: ",
             rsb_dt,
             "s per iteration, ",
-            rsb_mflops,
-            " MFLOPS",
         )
     return [rsb_dt,psf_dt]
 
