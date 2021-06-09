@@ -385,9 +385,9 @@ def test__otn2obc_rect_n(f_gen_rect):
     [V,I,J,nr,nc,nnz] = f_gen_rect
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     nrhs = 2
-    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'N',nrhs)
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,'N',nrhs)
     assert ( (cm_ldB,cm_ldC) == ( nc, nr ) )
-    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'N',nrhs)
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,'N',nrhs)
     assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
 
 
@@ -395,9 +395,9 @@ def test__otn2obc_rect_t(f_gen_rect):
     [V,I,J,nr,nc,nnz] = f_gen_rect
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     nrhs = 2
-    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'T',nrhs)
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,'T',nrhs)
     assert ( (cm_ldB,cm_ldC) == ( nr, nc ) )
-    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'T',nrhs)
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,'T',nrhs)
     assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
 
 
@@ -405,9 +405,9 @@ def test__otn2obc_tri(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     rmat = rsb_matrix((V, (I, J)),[nr,nc])
     nrhs = 1
-    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,b'N',nrhs)
+    (cm_o,cm_ldB,cm_ldC) = rmat._otn2obc(False,'N',nrhs)
     assert ( (cm_ldB,cm_ldC) == ( nr, nc ) )
-    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,b'N',nrhs)
+    (rm_o,rm_ldB,rm_ldC) = rmat._otn2obc(True ,'N',nrhs)
     assert ( (rm_ldB,rm_ldC) == ( nrhs, nrhs ) )
 
 
@@ -536,7 +536,7 @@ def test_spmm_C_T(f_gen_mats):
     x = gen_x(rmat.nc(),nrhs,order)
     y = numpy.empty([rmat.nr(), nrhs], dtype=prv_t, order=order)
     y[:, :] = 0.0
-    rmat._spmm(x,y,transA=b'T')
+    rmat._spmm(x,y,transA='T')
     assert ( y == (cmat.transpose() * x) ).all()
 
 
@@ -575,7 +575,7 @@ def test_spmm_F_T(f_gen_mats):
     order = 'F'
     x = gen_x(rmat.nr(),nrhs,order)
     y = numpy.zeros([rmat.nc(), nrhs], dtype=prv_t, order=order)
-    rmat._spmm(x,y,transA=b'T')
+    rmat._spmm(x,y,transA='T')
     assert ( y == (cmat.transpose() * x) ).all()
 
 
