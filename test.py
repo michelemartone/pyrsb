@@ -306,7 +306,7 @@ def bench_matrix(a, c, mtxname):
     bd = dict()
     psf = WANT_PSF
     if WANT_RENDER:
-        filename = bytes(sprintf("%s-%c.eps",mtxname,DT2TC[a.dtype]), encoding="utf-8")
+        filename = sprintf("%s-%c.eps",mtxname,DT2TC[a.dtype])
         a.render(filename)
     for nrhs in WANT_NRHS:
         bd[nrhs] = dict()
@@ -323,7 +323,7 @@ def bench_matrix(a, c, mtxname):
         o.autotune(verbose=WANT_VERBOSE_TUNING,tmax=tmax)
         brdict['at_time'] = rsb.rsb_time() - at_time
         if WANT_RENDER:
-            filename = bytes(sprintf("%s-%c-tuned.eps",mtxname,DT2TC[o.dtype]), encoding="utf-8")
+            filename = sprintf("%s-%c-tuned.eps",mtxname,DT2TC[o.dtype])
             o.render(filename)
         for nrhs in WANT_NRHS:
             for order in WANT_ORDER:
@@ -341,7 +341,7 @@ def bench_matrix(a, c, mtxname):
                 a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=order,tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 if WANT_RENDER:
-                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs), encoding="utf-8")
+                    filename = sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs)
                     a.render(filename)
                 (rsb_at_dt,psf_at_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(a, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)
@@ -357,7 +357,7 @@ def bench_matrix(a, c, mtxname):
                     o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=order,tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 if WANT_RENDER:
-                    filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[o.dtype],order,nrhs), encoding="utf-8")
+                    filename = sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[o.dtype],order,nrhs)
                     o.render(filename)
                 (rsb_at_dt,psf_at_dt) = bench_both(o, c, psf, brdict, order, nrhs)
                 bd[nrhs][order] = bench_record(o, psf, brdict, order, nrhs, rsb_dt, psf_dt, rsb_at_dt, psf_at_dt)

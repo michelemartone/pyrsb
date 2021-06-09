@@ -742,16 +742,25 @@ cdef class rsb_matrix:
         """
         return True
 
-    def render(self, char * filename=NULL):
+    def render(self, filename=None):
         """
         Render block structure to a specified file, in the Encapsulated Postscript (EPS) format.
-        With NULL filename, write to stdout.
+        With None filename, write to stdout.
         (specific to rsb).
         """
         cdef lr.rsb_err_t errval
         cdef lr.rsb_coo_idx_t pmWidth=512, pmHeight=512
         cdef lr.rsb_marf_t rflags = lr.RSB_MARF_EPS_B
-        errval = lr.rsb_mtx_rndr(filename, self.mtxAp, pmWidth, pmHeight, rflags)
+        if filename is None:
+            errval = lr.rsb_mtx_rndr(NULL, self.mtxAp, pmWidth, pmHeight, rflags)
+        else:
+            if isinstance(filename, bytes):
+                pass
+            elif isinstance(filename, str):
+                filename = bytes(filename, encoding="utf-8")
+            else:
+                raise TypeError("Unsupported string type")
+            errval = lr.rsb_mtx_rndr(filename, self.mtxAp, pmWidth, pmHeight, rflags)
         _err_check(errval)
         return True
 

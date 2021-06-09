@@ -283,6 +283,16 @@ def test_nonzero(f_gen_tri):
     assert ( cJ == rJ ).all()
 
 
+def test_render_to_stdout():
+    mat = rsb_matrix([1,1],dtype='d')
+    mat.render()
+
+
+# def test_render_to_stdout():
+#     mat = rsb_matrix([1,1],dtype='d')
+#     mat.render("one.eps")
+
+
 def test_io_bytes_ctor(f_gen_tri):
     for dtype in rsb_dtypes:
         [sV,sI,sJ,nr,nc,nnz] = f_gen_tri
