@@ -268,12 +268,13 @@ cdef class rsb_matrix:
             self.dtypeA = _dt2dt(dtype)
 
         if arg1 is not None:
+            if isinstance(arg1, str):
+                arg1 = bytes(arg1,encoding="utf-8")
             if isinstance(arg1, bytes):
                 if dtype is None:
                     self.dtypeA = _dt2dt(rsb_dtype)
-                filename = arg1
                 self.typecode = _dt2tc(self.dtype)
-                self.mtxAp = lr.rsb_file_mtx_load(filename,flagsA,self.typecode,&errval)
+                self.mtxAp = lr.rsb_file_mtx_load(arg1,flagsA,self.typecode,&errval)
                 _err_check(errval)
                 self._refresh()
                 return

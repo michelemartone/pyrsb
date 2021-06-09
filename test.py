@@ -519,7 +519,7 @@ def bench_file(filename):
     for dtype in WANT_DTYPES:
     	print("# loading matrix from file ", filename)
     	lt = - rsb.rsb_time()
-    	a = rsb.rsb_matrix(bytes(filename, encoding="utf-8"),dtype=dtype)
+    	a = rsb.rsb_matrix(filename,dtype=dtype)
     	lt = lt + rsb.rsb_time()
     	printf("# loaded a matrix with %.1e nnz in %.1e s (%.1e nnz/s)\n",a.nnz,lt,a.nnz/lt)
     	printf("# loaded as type %s/%c (default is %s/%c)\n", a.dtype, DT2TC[a.dtype], rsb.rsb_dtype, DT2TC[rsb.rsb_dtype])
