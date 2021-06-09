@@ -338,7 +338,7 @@ def bench_matrix(a, c, mtxname):
                     print("Will autotune one matrix instance for different specific SpMM    ", a)
                 (rsb_dt,psf_dt) = bench_both(a, c, psf, brdict, order, nrhs)
                 at_time = rsb.rsb_time()
-                a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
+                a.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=order,tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 if WANT_RENDER:
                     filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[a.dtype],order,nrhs), encoding="utf-8")
@@ -354,7 +354,7 @@ def bench_matrix(a, c, mtxname):
                     print("Will autotune copies of starting matrix for specific SpMM    ", a)
                 at_time = rsb.rsb_time()
                 for i in range(2,+WANT_AUTOTUNE):
-                    o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=ord(order),tmax=tmax)
+                    o.autotune(verbose=WANT_VERBOSE_TUNING,nrhs=nrhs,order=order,tmax=tmax)
                 brdict['at_time'] = rsb.rsb_time() - at_time
                 if WANT_RENDER:
                     filename = bytes(sprintf("%s-%c-tuned-%c-%d.eps",mtxname,DT2TC[o.dtype],order,nrhs), encoding="utf-8")
