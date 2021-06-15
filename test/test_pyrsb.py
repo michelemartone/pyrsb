@@ -481,6 +481,13 @@ def test_spmv_1D_N_alpha(f_gen_mats):
 def test_autotune_simple(f_gen_tri):
     [V,I,J,nr,nc,nnz] = f_gen_tri
     omat = rsb_matrix((V, (I, J)))
+    cmat = omat.copy()
+    assert( omat.todense() == cmat.todense() ).all()
+
+
+def test_autotune_simple(f_gen_tri):
+    [V,I,J,nr,nc,nnz] = f_gen_tri
+    omat = rsb_matrix((V, (I, J)))
     rmat = rsb_matrix((V, (I, J)))
     rmat.autotune()
     assert( rmat.todense() == omat.todense() ).all()
