@@ -400,6 +400,18 @@ cdef class rsb_matrix:
 	# 5: >=
         return False
 
+    cdef _build_from_ptr(self, lr.rsb_mtx_ptr mtxAp):
+        """
+        Temporary to get entire matrix from mere pointer.
+        Might eventually finish in __init__.
+        (specific to rsb).
+        """
+        rm = rsb_matrix(None,dtype=self.dtype)
+        rm._mtx_free()
+        rm.mtxAp = mtxAp
+        rm._refresh()
+        return rm
+
     def _spmul(self, rsb_matrix other):
         """
         Multiply two rsb_matrix objects.
@@ -412,12 +424,9 @@ cdef class rsb_matrix:
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        rm = rsb_matrix(None,dtype=self.dtype)
-        rm._mtx_free()
-        rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
+        mtxBp = lr.rsb_spmsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
-        rm._refresh()
-        return rm
+        return self._build_from_ptr(mtxBp)
 
     def rescaled(self, alpha):
         """
@@ -487,12 +496,9 @@ cdef class rsb_matrix:
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        rm = rsb_matrix(None,dtype=self.dtype)
-        rm._mtx_free()
-        rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
+        mtxBp = lr.rsb_sppsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
-        rm._refresh()
-        return rm
+        return self._build_from_ptr(mtxBp)
 
     def __add__(self,other):
         """Add two rsb_matrix objects (also in scipy.sparse)."""
@@ -790,11 +796,7 @@ cdef class rsb_matrix:
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,talpha.data,self.mtxAp,flagsA)
         _err_check(errval)
-        rm = rsb_matrix(None,dtype=self.dtype)
-        rm._mtx_free()
-        rm.mtxAp = mtxBp
-        rm._refresh()
-        return rm
+        return self._build_from_ptr(mtxBp)
 
     def todense(self,order=None,out=None):
         """
