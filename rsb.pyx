@@ -412,7 +412,8 @@ cdef class rsb_matrix:
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        rm = rsb_matrix()
+        rm = rsb_matrix(None,dtype=self.dtype)
+        rm._mtx_free()
         rm.mtxAp = lr.rsb_spmsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
         rm._refresh()
@@ -486,7 +487,8 @@ cdef class rsb_matrix:
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_trans_t transB=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
-        rm = rsb_matrix()
+        rm = rsb_matrix(None,dtype=self.dtype)
+        rm._mtx_free()
         rm.mtxAp = lr.rsb_sppsp(self.typecode,transA,talpha.data,self.mtxAp,transB,tbeta.data,other.mtxAp,&errval)
         _err_check(errval)
         rm._refresh()
@@ -787,8 +789,9 @@ cdef class rsb_matrix:
         cdef lr.rsb_trans_t transA=lr.RSB_TRANSPOSITION_N
         cdef lr.rsb_flags_t flagsA = lr.RSB_FLAG_NOFLAGS
         errval = lr.rsb_mtx_clone(&mtxBp,self.typecode,transA,talpha.data,self.mtxAp,flagsA)
-        rm = rsb_matrix(None,dtype=self.dtype)
         _err_check(errval)
+        rm = rsb_matrix(None,dtype=self.dtype)
+        rm._mtx_free()
         rm.mtxAp = mtxBp
         rm._refresh()
         return rm
