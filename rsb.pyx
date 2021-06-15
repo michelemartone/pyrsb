@@ -95,7 +95,7 @@ cpdef rsb_lib_init():
     if verbose:
         print("Initializing librsb")
     cdef lr.rsb_err_t errval = lr.rsb_lib_init(NULL)
-    _err_check(errval)
+    _err_check(errval,want_strict=True)
     return errval
 
 cpdef rsb_lib_exit():
@@ -103,7 +103,7 @@ cpdef rsb_lib_exit():
     if verbose:
         print("Finalizing librsb")
     cdef lr.rsb_err_t errval = lr.rsb_lib_exit(NULL)
-    _err_check(errval)
+    _err_check(errval,want_strict=True)
     return errval
 
 cpdef rsb_time():
