@@ -458,6 +458,17 @@ def test_spmv_matvec(f_gen_mats):
     assert ( (rmat.matvec(x) ) == (cmat * x) ).all()
 
 
+def test_spmv_matvec_gmres():
+     for dtype in [float]:
+        A = csr_matrix([[3, 2, 0], [1, -1, 0], [0, 5, 1]], dtype=dtype)
+        A = rsb_matrix(A)
+        n = A.shape[0]
+        b = numpy.sin(numpy.array(range(1,n+1)))
+        from scipy.sparse.linalg import gmres
+        x, exitCode = gmres(A, b)
+        assert ( exitCode == 0 )
+
+
 def test_spmv_1D_N(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     nrhs = 1
