@@ -690,6 +690,10 @@ cdef class rsb_matrix:
         (IA,JA,VA)=self.find()
         return (VA,(IA,JA))
 
+    def matvec(self, other):
+        """Multiply matrix by vector."""
+        return self * other
+
     def tocsr(self,copy=False):
         """Transition solution (does not exploit rsb_mtx_get_csr)."""
         return csr_matrix(self._find_v_ij())

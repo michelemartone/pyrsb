@@ -452,6 +452,12 @@ def test_spmv__mul__(f_gen_mats):
     assert ( (rmat * x) == (cmat * x) ).all()
 
 
+def test_spmv_matvec(f_gen_mats):
+    [rmat,cmat] = f_gen_mats
+    x = gen_x(rmat.nc())
+    assert ( (rmat.matvec(x) ) == (cmat * x) ).all()
+
+
 def test_spmv_1D_N(f_gen_mats):
     [rmat,cmat] = f_gen_mats
     nrhs = 1
