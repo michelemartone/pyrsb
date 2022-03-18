@@ -2,7 +2,6 @@
 # PyRSB
 
 [![GPL enforced badge](https://img.shields.io/badge/GPL-enforced-blue.svg "This project enforces the GPL.")](https://gplenforced.org)
-[![Build Status](https://travis-ci.org/michelemartone/pyrsb.svg?branch=master)](https://travis-ci.org/michelemartone/pyrsb)
 
 [librsb](http://librsb.sourceforge.net/) is a **high performance sparse matrix
 library** implementing the Recursive Sparse Blocks format,
@@ -34,7 +33,7 @@ The following functionality is implemented:
 ## Build and Use
 
 - If you want the `Makefile` to build librsb (in this directory):
- `make all-local` will attempt downloading librsb-1.2.0.9 from the
+ `make all-local` will attempt downloading librsb-1.3.0.0 from the
  web and building it here before building pyrsb.
  If the file is in place, it won't download it a second time.
  After that, `make local-librsb-pyrsb` (or `make lp`) will build pyrsb

@@ -23,22 +23,22 @@ all: test
 rsb: local-librsb
 
 local-librsb-dl:
-	wget 'https://sourceforge.net/projects/librsb/files/librsb-1.2.0.9.tar.gz/download' -O librsb-1.2.0.9.tar.gz
+	wget 'https://sourceforge.net/projects/librsb/files/librsb-1.3.0.0.tar.gz/download' -O librsb-1.3.0.0.tar.gz
 
 local-librsb-get:
-	test -f librsb-1.2.0.9.tar.gz || make local-librsb-dl
+	test -f librsb-1.3.0.0.tar.gz || make local-librsb-dl
 	make md5check
-	tar xvzf librsb-1.2.0.9.tar.gz
+	tar xvzf librsb-1.3.0.0.tar.gz
 
 md5check:
-	echo "f34b2968f354f7c33e1fbcffd3955ed7  librsb-1.2.0.9.tar.gz" > librsb-1.2.0.9.tar.gz.md5
-	md5sum -c librsb-1.2.0.9.tar.gz.md5 || false
+	echo "546a3fb32d2f1c9c4adbf8d189d5bbfd  librsb-1.3.0.0.tar.gz" > librsb-1.3.0.0.tar.gz.md5
+	md5sum -c librsb-1.3.0.0.tar.gz.md5 || false
 
 local-librsb: local-librsb-get
-	cd librsb-1.2.0.9 && ./configure CFLAGS=-O3\ -march=native\ -mtune=native\ -fPIC\ -pipe        --prefix=`pwd`/../local --enable-shared --disable-c-examples && make -j4 && make install
+	cd librsb-1.3.0.0 && ./configure CFLAGS=-O3\ -march=native\ -mtune=native\ -fPIC\ -pipe        --prefix=`pwd`/../local --enable-shared --disable-c-examples && make -j4 && make install
 
 local-librsb-debug: local-librsb-get
-	cd librsb-1.2.0.9 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb\ -pipe --prefix=`pwd`/../local --enable-shared && make -j4 && make install
+	cd librsb-1.3.0.0 && ./configure CFLAGS=-O0\ -fPIC\ -ggdb\ -pipe --prefix=`pwd`/../local --enable-shared && make -j4 && make install
 
 lp: local-librsb-pyrsb
 local-librsb-pyrsb:
