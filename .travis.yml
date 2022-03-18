@@ -13,16 +13,11 @@ env:
   global:
     - OMP_NUM_THREADS=2
   jobs:
-    - IMG=ubuntu:18.04
-    - IMG=ubuntu:20.04
-    - IMG=debian:stable
-    - IMG=debian:testing
-    - IMG=debian:unstable
+    - IMG=debian:bookworm
 
 jobs:
   allow_failures:
-    - env: IMG=debian:unstable
-    - env: IMG=debian:testing
+    - env: IMG=debian:bullseye
   include:
     - env: IMG=""
       stage: post

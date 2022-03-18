@@ -1,5 +1,5 @@
 # Start with a configurable base image
-ARG IMG="debian:testing"
+ARG IMG="debian:bookworm"
 FROM "${IMG}"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,9 +12,11 @@ ARG CXX="g++"
 RUN apt-get update
 
 # Install the packages needed for the build
+RUN apt-get update --yes
 RUN apt-get install --yes \
     "libpapi-dev" \
     "man" "librsb-dev" "librsb-doc" \
+    "librsb-tools" \
     "libhwloc-dev" "libz-dev" \
     "make" "gfortran" \
     "octave" "octave-sparsersb" \
@@ -34,12 +36,16 @@ COPY "." "/mnt"
 WORKDIR "/mnt"
 
 # Continue as unprivileged user
-RUN useradd "user"
+RUN useradd --create-home --home-dir "/home/user" "user"
 RUN chown --recursive "user:user" "."
 USER "user"
 
 # Build and test PyRSB
-RUN make clean && make && python setup.py install --user
+RUN rsbench --version
+RUN rsbench --version | grep 1.3 # we want librsb-1.3
+RUN make clean
+RUN make
+RUN python3 setup.py install --user
 
 # Run asv
 #RUN export HOME=/mnt ; cd /mnt/benchmarks && asv machine --yes && asv run --python=python
